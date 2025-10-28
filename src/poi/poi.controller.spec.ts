@@ -2,17 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PoiController } from './poi.controller';
 
 describe('PoiController', () => {
-  let controller: PoiController;
+    let controller: PoiController;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [PoiController],
-    }).compile();
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            controllers: [PoiController],
+        }).compile();
 
-    controller = module.get<PoiController>(PoiController);
-  });
+        controller = module.get<PoiController>(PoiController);
+    });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+    it('should be defined', () => {
+        expect(controller).toBeDefined();
+    });
 });

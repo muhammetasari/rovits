@@ -4,8 +4,8 @@ import { PlanService } from './plan.service';
 import { PoiModule } from '../poi/poi.module';
 
 @Module({
-  imports: [PoiModule],
-  controllers: [PlanController],
-  providers: [PlanService]
+    imports: [PoiModule],
+    controllers: [PlanController],
+    providers: [PlanService]
 })
 export class PlanModule {}
