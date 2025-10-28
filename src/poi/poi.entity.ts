@@ -1,84 +1,62 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum PoiCategory {
-    MUSEUM = 'museum',
-    MOSQUE = 'mosque',
-    LANDMARK = 'landmark',
-    PALACE = 'palace',
-    STREET = 'street',
-    SQUARE = 'square',
-    VIEWPOINT = 'viewpoint',
-    MARKET = 'market',
-    WATERFRONT = 'waterfront',
-    RESTAURANT = 'restaurant'
-}
-
-export enum DayOfWeek {
-    MONDAY = 'Monday',
-    TUESDAY = 'Tuesday',
-    WEDNESDAY = 'Wednesday',
-    THURSDAY = 'Thursday',
-    FRIDAY = 'Friday',
-    SATURDAY = 'Saturday',
-    SUNDAY = 'Sunday'
+  MUST_SEE = 'must_see',
+  FOOD = 'food',
+  SHOPPING = 'shopping',
+  NATURE = 'nature'
 }
 
 @Entity('poi')
 export class Poi {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    name: string;
+  @Column({ unique: true })
+  placeId: string;
 
-    @Column({
-        type: 'enum',
-        enum: PoiCategory,
-    })
-    category: PoiCategory;
+  // MANUEL DATA
+  @Column()
+  score: number;
 
-    @Column('decimal', { precision: 10, scale: 7 })
-    latitude: number;
+  @Column({ default: 120 })
+  avgDuration: number;
 
-    @Column('decimal', { precision: 10, scale: 7 })
-    longitude: number;
+  @Column({
+    type: 'enum',
+    enum: PoiCategory,
+    default: PoiCategory.MUST_SEE
+  })
+  category: PoiCategory;
 
-    @Column()
-    score: number;
+  // CACHED DATA (FROM API)
+  @Column({ nullable: true })
+  name: string;
 
-    @Column()
-    avgDuration: number;
+  @Column({ nullable: true })
+  address: string;
 
-    @OneToMany(() => WeeklySchedule, schedule => schedule.poi, { eager: true, cascade: true })
-    weeklySchedule: WeeklySchedule[];
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  nameUpdatedAt: Date;
 
-    @Column({ nullable: true })
-    queueTime: number; // Ortalama kuyruk süresi
-}
+  @Column({ type: 'float', nullable: true })
+  rating: number;
 
-@Entity('weekly_schedule')
-export class WeeklySchedule {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  ratingUpdatedAt: Date;
 
-    @Column({
-        type: 'enum',
-        enum: DayOfWeek,
-    })
-    day: DayOfWeek;
+  @Column({ type: 'jsonb', nullable: true })
+  openingHours: any;
 
-    @Column()
-    open: string;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  hoursUpdatedAt: Date;
 
-    @Column()
-    close: string;
+  @Column({ type: 'jsonb', nullable: true })
+  photos: any;
 
-    @Column()
-    isClosed: boolean;
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  latitude: number;
 
-    @Column()
-    poiId: number;
-
-    @Column(() => Poi, (poi: Poi) => poi.weeklySchedule)
-    poi: Poi;
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  longitude: number;
 }
