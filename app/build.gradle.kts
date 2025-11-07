@@ -1,3 +1,11 @@
+import java.util.Properties
+val properties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    properties.load(localPropertiesFile.inputStream())
+}
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +14,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.ksp)
 }
+
 
 android {
     namespace = "com.rovits.app"

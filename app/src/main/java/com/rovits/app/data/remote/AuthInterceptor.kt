@@ -1,5 +1,6 @@
 package com.rovits.app.data.remote
 
+import com.rovits.app.BuildConfig // BuildConfig'i import edin
 import com.rovits.app.data.local.PreferencesManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -11,22 +12,23 @@ class AuthInterceptor @Inject constructor(
     private val preferencesManager: PreferencesManager
 ) : Interceptor {
 
+    // Anahtarı GÜVENLİ bir şekilde BuildConfig'ten al
+    private val apiKey: String = BuildConfig.APPLICATION_ID
+
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
 
-        // API Key ve JWT Token'ı DataStore'dan al
-        val apiKey = runBlocking { preferencesManager.getApiKey().first() }
+        // Sadece JWT Token'ı DataStore'dan al
         val jwtToken = runBlocking { preferencesManager.getJwtToken().first() }
 
-        // Request builder
         val requestBuilder = originalRequest.newBuilder()
 
-        // API Key'i her zaman ekle
-        apiKey?.let {
-            requestBuilder.addHeader(ApiConstants.HEADER_API_KEY, it)
+        // API Key'i (BuildConfig'ten gelen) her zaman ekle
+        if (apiKey.isNotEmpty()) {
+            requestBuilder.addHeader(ApiConstants.HEADER_API_KEY, apiKey)
         }
 
-        // JWT Token varsa Authorization header'ına ekle
+        // JWT Token (DataStore'dan gelen) varsa Authorization header'ına ekle
         jwtToken?.let {
             requestBuilder.addHeader(ApiConstants.HEADER_AUTHORIZATION, "Bearer $it")
         }

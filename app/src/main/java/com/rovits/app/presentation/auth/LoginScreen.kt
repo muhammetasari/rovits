@@ -4,34 +4,13 @@ import android.app.Activity.RESULT_OK
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,12 +18,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.rovits.app.data.auth.GoogleSignInState
-import com.rovits.app.data.auth.LoginState
-import com.rovits.app.data.auth.LoginViewModel
 
 @Composable
 fun LoginScreen(
+    // Doğru ViewModel'i import ettiğimizden emin oluyoruz
     viewModel: LoginViewModel = hiltViewModel(),
     onLoginSuccess: () -> Unit
 ) {
@@ -53,6 +30,8 @@ fun LoginScreen(
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val isLoading = loginState is LoginState.Loading || googleSignInState is GoogleSignInState.Loading
 
     // Google Sign-In Launcher
     val launcher = rememberLauncherForActivityResult(
@@ -77,6 +56,7 @@ fun LoginScreen(
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
             onLoginSuccess()
+            viewModel.resetState() // State'i sıfırla
         }
     }
 
@@ -107,7 +87,7 @@ fun LoginScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                enabled = loginState !is LoginState.Loading
+                enabled = !isLoading
             )
 
             // Password Input
@@ -120,7 +100,7 @@ fun LoginScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                enabled = loginState !is LoginState.Loading
+                enabled = !isLoading
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -129,7 +109,7 @@ fun LoginScreen(
             Button(
                 onClick = { viewModel.login(email, password) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = loginState !is LoginState.Loading && email.isNotEmpty() && password.isNotEmpty()
+                enabled = !isLoading && email.isNotEmpty() && password.isNotEmpty()
             ) {
                 if (loginState is LoginState.Loading) {
                     CircularProgressIndicator(
@@ -159,7 +139,7 @@ fun LoginScreen(
             OutlinedButton(
                 onClick = { viewModel.signInWithGoogle() },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = loginState !is LoginState.Loading && googleSignInState !is GoogleSignInState.Loading
+                enabled = !isLoading
             ) {
                 if (googleSignInState is GoogleSignInState.Loading) {
                     CircularProgressIndicator(
@@ -172,25 +152,16 @@ fun LoginScreen(
             }
 
             // Error Messages
-            when (val state = loginState) {
-                is LoginState.Error -> {
-                    Text(
-                        text = state.message,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                else -> {}
-            }
-            when (val state = googleSignInState) {
-                is GoogleSignInState.Error -> {
-                    Text(
-                        text = state.message,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                else -> {}
+            val loginError = (loginState as? LoginState.Error)?.message
+            val googleError = (googleSignInState as? GoogleSignInState.Error)?.message
+            val errorMessage = loginError ?: googleError
+
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }
