@@ -24,6 +24,7 @@ fun LoginScreen(
     // Doğru ViewModel'i import ettiğimizden emin oluyoruz
     viewModel: LoginViewModel = hiltViewModel(),
     onLoginSuccess: () -> Unit
+    onNavigateToRegister: () -> Unit
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
     val googleSignInState by viewModel.googleSignInState.collectAsStateWithLifecycle()

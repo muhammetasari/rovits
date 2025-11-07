@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.rovits.app.presentation.auth.LoginScreen
+import com.rovits.app.presentation.auth.RegisterScreen // YENİ IMPORT
 import com.rovits.app.presentation.home.HomeScreen
 
 @Composable
@@ -23,6 +24,25 @@ fun NavGraph(
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
+                },
+                // YENİ EKLENEN PARAMETRE
+                onNavigateToRegister = {
+                    navController.navigate(Screen.Register.route)
+                }
+            )
+        }
+
+        // YENİ EKLENEN COMPOSABLE
+        composable(Screen.Register.route) {
+            RegisterScreen(
+                onRegisterSuccess = {
+                    // Kayıt olunca da ana ekrana git
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                },
+                onBackToLogin = {
+                    navController.popBackStack() // Geri dön
                 }
             )
         }

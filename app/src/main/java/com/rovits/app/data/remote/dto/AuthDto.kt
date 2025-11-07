@@ -18,6 +18,16 @@ data class SocialLoginRequest(
     val provider: String // "google" veya "apple"
 )
 
+// Register Request
+data class RegisterRequest(
+    @SerializedName("name")
+    val name: String,
+    @SerializedName("email")
+    val email: String,
+    @SerializedName("password")
+    val password: String
+)
+
 // Auth Response
 data class AuthResponse(
     @SerializedName("token")

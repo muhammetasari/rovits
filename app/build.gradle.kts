@@ -22,6 +22,7 @@ android {
 
     defaultConfig {
         applicationId = "com.rovits.app"
+        buildConfigField("String", "API_KEY", "\"${properties.getProperty("API_KEY")}\"")
         minSdk = 26
         targetSdk = 35
         versionCode = 1

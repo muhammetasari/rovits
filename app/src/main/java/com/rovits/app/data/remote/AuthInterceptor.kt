@@ -1,6 +1,6 @@
 package com.rovits.app.data.remote
 
-import com.rovits.app.BuildConfig // BuildConfig'i import edin
+import com.rovits.app.BuildConfig
 import com.rovits.app.data.local.PreferencesManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -12,8 +12,7 @@ class AuthInterceptor @Inject constructor(
     private val preferencesManager: PreferencesManager
 ) : Interceptor {
 
-    // Anahtarı GÜVENLİ bir şekilde BuildConfig'ten al
-    private val apiKey: String = BuildConfig.APPLICATION_ID
+    private val apiKey: String = BuildConfig.API_KEY
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()

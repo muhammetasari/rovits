@@ -3,6 +3,7 @@ package com.rovits.app.data.repository
 import com.rovits.app.data.local.PreferencesManager
 import com.rovits.app.data.remote.api.AuthApiService
 import com.rovits.app.data.remote.dto.LoginRequest
+import com.rovits.app.data.remote.dto.RegisterRequest
 import com.rovits.app.data.remote.dto.SocialLoginRequest
 import com.rovits.app.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +36,31 @@ class AuthRepository @Inject constructor(
                 emit(Resource.Success(authResponse.token))
             } else {
                 emit(Resource.Error(response.message() ?: "Login failed"))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: "An error occurred"))
+        }
+    }
+
+    fun register(name: String, email: String, password: String): Flow<Resource<String>> = flow {
+        try {
+            emit(Resource.Loading())
+            val response = authApi.register(RegisterRequest(name, email, password))
+
+            if (response.isSuccessful && response.body() != null) {
+                val authResponse = response.body()!!
+
+                // Token'ları kaydet (kayıt sonrası otomatik giriş)
+                preferencesManager.saveJwtToken(authResponse.token)
+                authResponse.refreshToken?.let {
+                    preferencesManager.saveRefreshToken(it)
+                }
+                preferencesManager.saveUserEmail(authResponse.user.email)
+
+                emit(Resource.Success(authResponse.token))
+            } else {
+                // TODO: Hata mesajını response body'den parse et
+                emit(Resource.Error(response.message() ?: "Registration failed"))
             }
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "An error occurred"))
