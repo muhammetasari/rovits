@@ -21,9 +21,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun LoginScreen(
-    // Doğru ViewModel'i import ettiğimizden emin oluyoruz
     viewModel: LoginViewModel = hiltViewModel(),
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
@@ -57,7 +56,7 @@ fun LoginScreen(
     LaunchedEffect(loginState) {
         if (loginState is LoginState.Success) {
             onLoginSuccess()
-            viewModel.resetState() // State'i sıfırla
+            viewModel.resetState()
         }
     }
 
@@ -150,6 +149,15 @@ fun LoginScreen(
                 } else {
                     Text("Continue with Google")
                 }
+            }
+
+            // Register Link - YENİ EKLENEN
+            TextButton(
+                onClick = onNavigateToRegister,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
+            ) {
+                Text("Hesabınız yok mu? Kayıt Olun")
             }
 
             // Error Messages
