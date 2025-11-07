@@ -3,6 +3,7 @@ package com.rovits.app.presentation.auth
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -96,7 +97,7 @@ fun RegisterScreen(
                 title = { Text("Kayıt Ol") },
                 navigationIcon = {
                     IconButton(onClick = onBackToLogin, enabled = !isLoading) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Geri dön")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Geri dön")
                     }
                 }
             )

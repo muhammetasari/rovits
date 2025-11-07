@@ -8,6 +8,8 @@ import com.rovits.app.data.remote.dto.SocialLoginRequest
 import com.rovits.app.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import okhttp3.ResponseBody // YENİ IMPORT
+import org.json.JSONObject // YENİ IMPORT
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,6 +18,24 @@ class AuthRepository @Inject constructor(
     private val authApi: AuthApiService,
     private val preferencesManager: PreferencesManager
 ) {
+
+    /**
+     * Retrofit'in hata gövdesini (errorBody) JSON'a dönüştürür
+     * ve içindeki "message" alanını alır.
+     */
+    private fun parseErrorMessage(errorBody: ResponseBody?): String {
+        return try {
+            val errorJsonString = errorBody?.string()
+            if (errorJsonString.isNullOrEmpty()) {
+                "Bilinmeyen bir hata oluştu."
+            } else {
+                val jsonObject = JSONObject(errorJsonString)
+                jsonObject.getString("message") ?: "Hata mesajı okunamadı."
+            }
+        } catch (e: Exception) {
+            "Yanıt işlenirken hata oluştu."
+        }
+    }
 
     fun login(email: String, password: String): Flow<Resource<String>> = flow {
         try {
@@ -35,7 +55,8 @@ class AuthRepository @Inject constructor(
 
                 emit(Resource.Success(authResponse.token))
             } else {
-                emit(Resource.Error(response.message() ?: "Login failed"))
+                val errorMessage = parseErrorMessage(response.errorBody())
+                emit(Resource.Error(errorMessage))
             }
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "An error occurred"))
@@ -59,8 +80,8 @@ class AuthRepository @Inject constructor(
 
                 emit(Resource.Success(authResponse.token))
             } else {
-                // TODO: Hata mesajını response body'den parse et
-                emit(Resource.Error(response.message() ?: "Registration failed"))
+                val errorMessage = parseErrorMessage(response.errorBody())
+                emit(Resource.Error(errorMessage))
             }
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "An error occurred"))
@@ -85,7 +106,8 @@ class AuthRepository @Inject constructor(
 
                 emit(Resource.Success(authResponse.token))
             } else {
-                emit(Resource.Error(response.message() ?: "Social login failed"))
+                val errorMessage = parseErrorMessage(response.errorBody())
+                emit(Resource.Error(errorMessage))
             }
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "An error occurred"))

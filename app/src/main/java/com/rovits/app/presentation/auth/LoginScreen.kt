@@ -72,7 +72,7 @@ fun LoginScreen(
         ) {
             // Title
             Text(
-                text = "Rovits POI",
+                text = "Rovits",
                 style = MaterialTheme.typography.headlineLarge
             )
 
@@ -151,7 +151,6 @@ fun LoginScreen(
                 }
             }
 
-            // Register Link - YENİ EKLENEN
             TextButton(
                 onClick = onNavigateToRegister,
                 modifier = Modifier.fillMaxWidth(),
