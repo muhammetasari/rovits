@@ -1,0 +1,26 @@
+# IDE files
+*.iml
+.idea
+
+# Gradle files
+.gradle
+build/
+
+# Local configuration
+local.properties
+
+# Keystore files
+*.jks
+*.keystore
+
+# Log files
+*.log
+
+# Captures
+captures/
+
+# Test reports
+app/build/reports/
+
+# Other
+.DS_Store
