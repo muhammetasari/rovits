@@ -24,3 +24,4 @@ app/build/reports/
 
 # Other
 .DS_Store
+/app/google-services.json
