@@ -4,6 +4,7 @@ import android.app.Activity.RESULT_OK
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,13 +34,12 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
-    val googleSignInState by viewModel.googleSignInState.collectAsStateWithLifecycle()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val isLoading = loginState is LoginState.Loading || googleSignInState is GoogleSignInState.Loading
-    val currentLocale by localeViewModel.currentLocale.collectAsStateWithLifecycle()
+    val isLoading = loginState is LoginState.Loading
+    val currentLocale = AppCompatDelegate.getApplicationLocales().get(0) ?: Locale.getDefault()
     var showLanguageDialog by remember { mutableStateOf(false) }
 
     // Google Sign-In Launcher
@@ -54,9 +54,9 @@ fun LoginScreen(
     }
 
     // Google Sign-In Intent hazır olduğunda başlat
-    LaunchedEffect(googleSignInState) {
-        if (googleSignInState is GoogleSignInState.IntentReady) {
-            val intentSender = (googleSignInState as GoogleSignInState.IntentReady).intentSender
+    LaunchedEffect(loginState) {
+        if (loginState is LoginState.GoogleSignInIntentReady) {
+            val intentSender = (loginState as LoginState.GoogleSignInIntentReady).intentSender
             launcher.launch(IntentSenderRequest.Builder(intentSender).build())
         }
     }
@@ -103,7 +103,7 @@ fun LoginScreen(
                             ListItem(
                                 headlineContent = { Text(text = stringResource(id = R.string.turkish)) },
                                 modifier = Modifier.clickable {
-                                    localeViewModel.setLocale(Locale("tr"))
+                                    localeViewModel.setLocale(Locale.forLanguageTag("tr"))
                                     showLanguageDialog = false
                                 }
                             )
@@ -199,7 +199,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading
             ) {
-                if (googleSignInState is GoogleSignInState.Loading) {
+                if (loginState is LoginState.Loading) { // GoogleSignInState.Loading yerine
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
                         color = MaterialTheme.colorScheme.primary
@@ -226,9 +226,7 @@ fun LoginScreen(
             }
 
             // Error Messages
-            val loginError = (loginState as? LoginState.Error)?.message
-            val googleError = (googleSignInState as? GoogleSignInState.Error)?.message
-            val errorMessage = loginError ?: googleError
+            val errorMessage = (loginState as? LoginState.Error)?.message
 
             if (errorMessage != null) {
                 Text(

@@ -17,6 +17,7 @@ import javax.inject.Singleton
 import android.content.Context
 import com.rovits.app.R
 import dagger.hilt.android.qualifiers.ApplicationContext
+import android.util.Log
 
 @Singleton
 class AuthRepository @Inject constructor(
@@ -33,14 +34,14 @@ class AuthRepository @Inject constructor(
         return try {
             val errorJsonString = errorBody?.string()
             if (errorJsonString.isNullOrEmpty()) {
-                "Bilinmeyen bir hata oluştu."
+                context.getString(R.string.error_unknown_response)
             } else {
                 val jsonObject = JSONObject(errorJsonString)
-                jsonObject.getString("message") ?: "Hata mesajı okunamadı."
+                jsonObject.getString("message") ?: context.getString(R.string.error_cant_parse_error_message)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            "Yanıt işlenirken hata oluştu."
+            Log.e("AuthRepository", "Error parsing error message", e)
+            context.getString(R.string.error_parsing_response)
         }
     }
 
@@ -66,13 +67,13 @@ class AuthRepository @Inject constructor(
                 emit(Resource.Error(errorMessage))
             }
         } catch (e: SocketTimeoutException) {
-            e.printStackTrace()
+            Log.e("AuthRepository", "Login timeout", e)
             emit(Resource.Error(context.getString(R.string.error_timeout)))
         } catch (e: IOException) {
-            e.printStackTrace()
+            Log.e("AuthRepository", "Login network error", e)
             emit(Resource.Error(context.getString(R.string.error_network)))
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("AuthRepository", "Login error", e)
             emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }
@@ -98,13 +99,13 @@ class AuthRepository @Inject constructor(
                 emit(Resource.Error(errorMessage))
             }
         } catch (e: SocketTimeoutException) {
-            e.printStackTrace()
+            Log.e("AuthRepository", "Register timeout", e)
             emit(Resource.Error(context.getString(R.string.error_timeout)))
         } catch (e: IOException) {
-            e.printStackTrace()
+            Log.e("AuthRepository", "Register network error", e)
             emit(Resource.Error(context.getString(R.string.error_network)))
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("AuthRepository", "Register error", e)
             emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }
@@ -132,13 +133,13 @@ class AuthRepository @Inject constructor(
                 emit(Resource.Error(errorMessage))
             }
         } catch (e: SocketTimeoutException) {
-            e.printStackTrace()
+            Log.e("AuthRepository", "Social login timeout", e)
             emit(Resource.Error(context.getString(R.string.error_timeout)))
         } catch (e: IOException) {
-            e.printStackTrace()
+            Log.e("AuthRepository", "Social login network error", e)
             emit(Resource.Error(context.getString(R.string.error_network)))
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("AuthRepository", "Social login error", e)
             emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }

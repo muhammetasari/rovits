@@ -28,22 +28,18 @@ class LoginViewModel @Inject constructor(
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
 
-    private val _googleSignInState = MutableStateFlow<GoogleSignInState>(GoogleSignInState.Idle)
-    val googleSignInState: StateFlow<GoogleSignInState> = _googleSignInState.asStateFlow()
-
     fun login(email: String, password: String) {
         viewModelScope.launch {
             authRepository.login(email, password).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
                         _loginState.value = LoginState.Loading
-                        _googleSignInState.value = GoogleSignInState.Idle // Diğer state'i sıfırla
                     }
                     is Resource.Success -> {
                         _loginState.value = LoginState.Success(result.data ?: "")
                     }
                     is Resource.Error -> {
-                        _loginState.value = LoginState.Error(result.message ?: "Unknown error")
+                        _loginState.value = LoginState.Error(result.message ?: context.getString(R.string.error_unknown))
                     }
                 }
             }
@@ -56,13 +52,12 @@ class LoginViewModel @Inject constructor(
                 when (result) {
                     is Resource.Loading -> {
                         _loginState.value = LoginState.Loading
-                        _googleSignInState.value = GoogleSignInState.Idle
                     }
                     is Resource.Success -> {
                         _loginState.value = LoginState.Success(result.data ?: "")
                     }
                     is Resource.Error -> {
-                        _loginState.value = LoginState.Error(result.message ?: "Unknown error")
+                        _loginState.value = LoginState.Error(result.message ?: context.getString(R.string.error_unknown))
                     }
                 }
             }
@@ -71,64 +66,56 @@ class LoginViewModel @Inject constructor(
 
     fun signInWithGoogle() {
         viewModelScope.launch {
-            _googleSignInState.value = GoogleSignInState.Loading
-            _loginState.value = LoginState.Idle // Diğer state'i sıfırla
+            _loginState.value = LoginState.Loading
 
             val googleApiAvailability = GoogleApiAvailability.getInstance()
             val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(context)
 
             if (resultCode != ConnectionResult.SUCCESS) {
-                _googleSignInState.value = GoogleSignInState.Error(context.getString(R.string.error_google_play_services))
+                _loginState.value = LoginState.Error(context.getString(R.string.error_google_play_services))
                 return@launch
             }
 
             try {
                 val intentSender = googleAuthManager.signIn()
                 if (intentSender != null) {
-                    _googleSignInState.value = GoogleSignInState.IntentReady(intentSender)
+                    _loginState.value = LoginState.GoogleSignInIntentReady(intentSender)
                 } else {
-                    _googleSignInState.value = GoogleSignInState.Error(context.getString(R.string.error_google_sign_in_intent))
+                    _loginState.value = LoginState.Error(context.getString(R.string.error_google_sign_in_intent))
                 }
             } catch (e: Exception) {
-                _googleSignInState.value = GoogleSignInState.Error(e.message ?: context.getString(R.string.error_google_sign_in_failed))
+                _loginState.value = LoginState.Error(e.message ?: context.getString(R.string.error_google_sign_in_failed))
             }
         }
     }
 
     fun handleGoogleSignInResult(intent: Intent) {
         viewModelScope.launch {
-            _googleSignInState.value = GoogleSignInState.Loading
+            _loginState.value = LoginState.Loading
             try {
                 val firebaseToken = googleAuthManager.signInWithIntent(intent)
                 if (firebaseToken != null) {
                     // Firebase token ile kendi backend'imize socialLogin isteği atıyoruz
                     socialLogin(firebaseToken)
                 } else {
-                    _googleSignInState.value = GoogleSignInState.Error(context.getString(R.string.error_google_firebase_token))
+                    _loginState.value = LoginState.Error(context.getString(R.string.error_google_firebase_token))
                 }
             } catch (e: Exception) {
-                _googleSignInState.value = GoogleSignInState.Error(e.message ?: context.getString(R.string.error_google_sign_in_handle))
+                _loginState.value = LoginState.Error(e.message ?: context.getString(R.string.error_google_sign_in_handle))
             }
         }
     }
 
     fun resetState() {
         _loginState.value = LoginState.Idle
-        _googleSignInState.value = GoogleSignInState.Idle
     }
 }
 
-// State'leri ViewModel'in dışına, ancak aynı dosyaya taşıdık.
+// State'leri tek bir sealed class altında birleştirdik.
 sealed class LoginState {
     object Idle : LoginState()
     object Loading : LoginState()
     data class Success(val token: String) : LoginState()
     data class Error(val message: String) : LoginState()
-}
-
-sealed class GoogleSignInState {
-    object Idle : GoogleSignInState()
-    object Loading : GoogleSignInState()
-    data class IntentReady(val intentSender: IntentSender) : GoogleSignInState()
-    data class Error(val message: String) : GoogleSignInState()
+    data class GoogleSignInIntentReady(val intentSender: IntentSender) : LoginState()
 }
