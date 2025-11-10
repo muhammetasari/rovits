@@ -115,21 +115,4 @@ class ErrorMessageMapper @Inject constructor(
         Log.d(TAG, "Mapped message: $mappedMessage")
         return mappedMessage
     }
-
-    /**
-     * HTTP status code'una göre genel hata mesajı döner.
-     */
-    fun mapHttpError(statusCode: Int): String {
-        return when (statusCode) {
-            400 -> context.getString(R.string.error_bad_request)
-            401 -> context.getString(R.string.error_unauthorized)
-            403 -> context.getString(R.string.error_forbidden)
-            404 -> context.getString(R.string.error_not_found)
-            408 -> context.getString(R.string.error_timeout)
-            429 -> context.getString(R.string.error_too_many_requests)
-            500, 502, 503, 504 -> context.getString(R.string.error_server_error)
-            else -> context.getString(R.string.error_unknown)
-        }
-    }
 }
-

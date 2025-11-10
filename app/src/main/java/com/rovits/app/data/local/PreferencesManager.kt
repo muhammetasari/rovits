@@ -21,24 +21,10 @@ class PreferencesManager @Inject constructor(
     private val dataStore by lazy { context.dataStore }
 
     companion object {
-        private val API_KEY = stringPreferencesKey("api_key")
         private val JWT_TOKEN = stringPreferencesKey("jwt_token")
         private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
         private val USER_EMAIL = stringPreferencesKey("user_email")
-        private val LANGUAGE = stringPreferencesKey("language") // YENİ
-    }
-
-    // API Key
-    suspend fun saveApiKey(apiKey: String) {
-        dataStore.edit { preferences ->
-            preferences[API_KEY] = apiKey
-        }
-    }
-
-    fun getApiKey(): Flow<String?> {
-        return dataStore.data.map { preferences ->
-            preferences[API_KEY]
-        }
+        private val LANGUAGE = stringPreferencesKey("language")
     }
 
     // JWT Token
