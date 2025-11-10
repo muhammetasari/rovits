@@ -39,7 +39,7 @@ class ErrorMessageMapper @Inject constructor(
         val mappedMessage = when {
             // Login/Auth hataları
             // Backend'den gelen Türkçe mesaj: "Geçersiz e-posta veya şifre"
-            backendMessage.contains("Geçersiz e-posta veya şifre", ignoreCase = true) ||
+            backendMessage.contains("Geçersiz e-posta veya şifre.", ignoreCase = true) ||
             backendMessage.contains("Invalid email or password", ignoreCase = true) ||
             backendMessage.contains("Invalid credentials", ignoreCase = true) ->
                 context.getString(R.string.error_invalid_credentials)
