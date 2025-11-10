@@ -4,10 +4,14 @@ import android.content.Intent
 import android.content.IntentSender
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.rovits.app.R
 import com.rovits.app.data.auth.GoogleAuthManager
 import com.rovits.app.data.repository.AuthRepository
 import com.rovits.app.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val googleAuthManager: GoogleAuthManager
+    private val googleAuthManager: GoogleAuthManager,
+    @ApplicationContext private val context: android.content.Context
 ) : ViewModel() {
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
@@ -45,9 +50,9 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun socialLogin(firebaseToken: String, provider: String) {
+    private fun socialLogin(firebaseToken: String) {
         viewModelScope.launch {
-            authRepository.socialLogin(firebaseToken, provider).collect { result ->
+            authRepository.socialLogin(firebaseToken).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
                         _loginState.value = LoginState.Loading
@@ -68,15 +73,24 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _googleSignInState.value = GoogleSignInState.Loading
             _loginState.value = LoginState.Idle // Diğer state'i sıfırla
+
+            val googleApiAvailability = GoogleApiAvailability.getInstance()
+            val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(context)
+
+            if (resultCode != ConnectionResult.SUCCESS) {
+                _googleSignInState.value = GoogleSignInState.Error(context.getString(R.string.error_google_play_services))
+                return@launch
+            }
+
             try {
                 val intentSender = googleAuthManager.signIn()
                 if (intentSender != null) {
                     _googleSignInState.value = GoogleSignInState.IntentReady(intentSender)
                 } else {
-                    _googleSignInState.value = GoogleSignInState.Error("Google Sign-In intent could not be created.")
+                    _googleSignInState.value = GoogleSignInState.Error(context.getString(R.string.error_google_sign_in_intent))
                 }
             } catch (e: Exception) {
-                _googleSignInState.value = GoogleSignInState.Error(e.message ?: "Google Sign-In failed")
+                _googleSignInState.value = GoogleSignInState.Error(e.message ?: context.getString(R.string.error_google_sign_in_failed))
             }
         }
     }
@@ -88,12 +102,12 @@ class LoginViewModel @Inject constructor(
                 val firebaseToken = googleAuthManager.signInWithIntent(intent)
                 if (firebaseToken != null) {
                     // Firebase token ile kendi backend'imize socialLogin isteği atıyoruz
-                    socialLogin(firebaseToken, "google")
+                    socialLogin(firebaseToken)
                 } else {
-                    _googleSignInState.value = GoogleSignInState.Error("Failed to get Firebase token from Google intent.")
+                    _googleSignInState.value = GoogleSignInState.Error(context.getString(R.string.error_google_firebase_token))
                 }
             } catch (e: Exception) {
-                _googleSignInState.value = GoogleSignInState.Error(e.message ?: "Google Sign-In result handling failed")
+                _googleSignInState.value = GoogleSignInState.Error(e.message ?: context.getString(R.string.error_google_sign_in_handle))
             }
         }
     }

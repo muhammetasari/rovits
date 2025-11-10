@@ -10,13 +10,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okhttp3.ResponseBody // YENİ IMPORT
 import org.json.JSONObject // YENİ IMPORT
+import java.io.IOException
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
+import android.content.Context
+import com.rovits.app.R
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Singleton
 class AuthRepository @Inject constructor(
     private val authApi: AuthApiService,
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    @ApplicationContext private val context: Context
 ) {
 
     /**
@@ -33,6 +39,7 @@ class AuthRepository @Inject constructor(
                 jsonObject.getString("message") ?: "Hata mesajı okunamadı."
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             "Yanıt işlenirken hata oluştu."
         }
     }
@@ -58,8 +65,15 @@ class AuthRepository @Inject constructor(
                 val errorMessage = parseErrorMessage(response.errorBody())
                 emit(Resource.Error(errorMessage))
             }
+        } catch (e: SocketTimeoutException) {
+            e.printStackTrace()
+            emit(Resource.Error(context.getString(R.string.error_timeout)))
+        } catch (e: IOException) {
+            e.printStackTrace()
+            emit(Resource.Error(context.getString(R.string.error_network)))
         } catch (e: Exception) {
-            emit(Resource.Error(e.localizedMessage ?: "An error occurred"))
+            e.printStackTrace()
+            emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }
 
@@ -83,16 +97,24 @@ class AuthRepository @Inject constructor(
                 val errorMessage = parseErrorMessage(response.errorBody())
                 emit(Resource.Error(errorMessage))
             }
+        } catch (e: SocketTimeoutException) {
+            e.printStackTrace()
+            emit(Resource.Error(context.getString(R.string.error_timeout)))
+        } catch (e: IOException) {
+            e.printStackTrace()
+            emit(Resource.Error(context.getString(R.string.error_network)))
         } catch (e: Exception) {
-            emit(Resource.Error(e.localizedMessage ?: "An error occurred"))
+            e.printStackTrace()
+            emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }
 
-    fun socialLogin(firebaseToken: String, provider: String): Flow<Resource<String>> = flow {
+
+    fun socialLogin(firebaseToken: String): Flow<Resource<String>> = flow {
         try {
             emit(Resource.Loading())
 
-            val response = authApi.socialLogin(SocialLoginRequest(firebaseToken, provider))
+            val response = authApi.socialLogin(SocialLoginRequest(firebaseToken, "google"))
 
             if (response.isSuccessful && response.body() != null) {
                 val authResponse = response.body()!!
@@ -109,8 +131,15 @@ class AuthRepository @Inject constructor(
                 val errorMessage = parseErrorMessage(response.errorBody())
                 emit(Resource.Error(errorMessage))
             }
+        } catch (e: SocketTimeoutException) {
+            e.printStackTrace()
+            emit(Resource.Error(context.getString(R.string.error_timeout)))
+        } catch (e: IOException) {
+            e.printStackTrace()
+            emit(Resource.Error(context.getString(R.string.error_network)))
         } catch (e: Exception) {
-            emit(Resource.Error(e.localizedMessage ?: "An error occurred"))
+            e.printStackTrace()
+            emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }
 

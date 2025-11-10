@@ -22,12 +22,12 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Welcome to Rovits POI!",
+                text = "Welcome to Rovits!",
                 style = MaterialTheme.typography.headlineMedium
             )
 
             Text(
-                text = "Home Screen - POI listesi buraya gelecek",
+                text = "Home Screen ",
                 style = MaterialTheme.typography.bodyMedium
             )
 

@@ -1,14 +1,15 @@
 package com.rovits.app
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
+import androidx.activity.viewModels
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.rovits.app.data.local.PreferencesManager
 import com.rovits.app.navigation.NavGraph
@@ -17,8 +18,12 @@ import com.rovits.app.presentation.splash.SplashScreen
 import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.util.JwtValidator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import com.rovits.app.presentation.settings.LocaleViewModel
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -26,30 +31,48 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var preferencesManager: PreferencesManager
 
+    private val localeViewModel: LocaleViewModel by viewModels()
+
+    override fun attachBaseContext(newBase: Context) {
+        val locale = runBlocking(Dispatchers.Default) {
+            try {
+                LocaleViewModel.getSavedLocale(newBase)
+            } catch (e: Exception) {
+                Locale.getDefault()
+            }
+        }
+        val config = Configuration(newBase.resources.configuration)
+        config.setLocale(locale)
+        val context = newBase.createConfigurationContext(config)
+        super.attachBaseContext(context)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            LaunchedEffect(Unit) {
+                localeViewModel.recreateActivity
+                    .flowWithLifecycle(lifecycle)
+                    .collect {
+                        recreate()
+                    }
+            }
+
             RovitsAppTheme {
                 val navController = rememberNavController()
 
-                // JWT token'ı collect et
                 val jwtToken by preferencesManager.getJwtToken()
                     .collectAsStateWithLifecycle(initialValue = null)
 
-                // Loading state - Token okunana kadar splash screen göster
                 var isLoading by remember { mutableStateOf(true) }
                 var isTokenValid by remember { mutableStateOf(false) }
 
-                // Token kontrolü ve validation
+                // Token kontrolü
                 LaunchedEffect(jwtToken) {
-                    // Minimum splash screen süresi (UX için)
                     delay(500)
-
-                    // Token'ı validate et
                     isTokenValid = JwtValidator.isTokenValid(jwtToken)
 
-                    // Token geçersizse temizle
                     if (!jwtToken.isNullOrEmpty() && !isTokenValid) {
                         preferencesManager.clearAll()
                     }
@@ -57,48 +80,24 @@ class MainActivity : ComponentActivity() {
                     isLoading = false
                 }
 
-                // Token durumuna göre start destination belirle
-                val startDestination by remember {
-                    derivedStateOf {
-                        if (isTokenValid && !jwtToken.isNullOrEmpty()) {
-                            Screen.Home.route
-                        } else {
-                            Screen.Login.route
-                        }
+                // Start destination belirleme
+                val startDestination = remember(isLoading, isTokenValid, jwtToken) {
+                    if (isLoading) return@remember Screen.Login.route
+                    if (isTokenValid && !jwtToken.isNullOrEmpty()) {
+                        Screen.Home.route
+                    } else {
+                        Screen.Login.route
                     }
                 }
 
-                // Token değişikliklerini dinle ve navigate et
-                LaunchedEffect(jwtToken, isTokenValid) {
-                    if (!isLoading) {
-                        if (jwtToken.isNullOrEmpty() || !isTokenValid) {
-                            // Token yoksa veya geçersizse Login'e yönlendir
-                            if (navController.currentDestination?.route != Screen.Login.route) {
-                                navController.navigate(Screen.Login.route) {
-                                    popUpTo(0) { inclusive = true }
-                                }
-                            }
-                        } else {
-                            // Token varsa ve geçerliyse Home'a yönlendir
-                            if (navController.currentDestination?.route != Screen.Home.route) {
-                                navController.navigate(Screen.Home.route) {
-                                    popUpTo(0) { inclusive = true }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Splash screen göster veya ana içeriği göster
+                // UI
                 if (isLoading) {
                     SplashScreen()
                 } else {
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        NavGraph(
-                            navController = navController,
-                            startDestination = startDestination
-                        )
-                    }
+                    NavGraph(
+                        navController = navController,
+                        startDestination = startDestination
+                    )
                 }
             }
         }
