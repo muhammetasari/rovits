@@ -25,6 +25,7 @@ class PreferencesManager @Inject constructor(
         private val JWT_TOKEN = stringPreferencesKey("jwt_token")
         private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
         private val USER_EMAIL = stringPreferencesKey("user_email")
+        private val LANGUAGE = stringPreferencesKey("language")
     }
 
     // API Key
@@ -76,6 +77,19 @@ class PreferencesManager @Inject constructor(
     fun getUserEmail(): Flow<String?> {
         return dataStore.data.map { preferences ->
             preferences[USER_EMAIL]
+        }
+    }
+
+    // Language
+    suspend fun setLanguage(languageCode: String) {
+        dataStore.edit { preferences ->
+            preferences[LANGUAGE] = languageCode
+        }
+    }
+
+    fun getLanguage(): Flow<String?> {
+        return dataStore.data.map { preferences ->
+            preferences[LANGUAGE]
         }
     }
 

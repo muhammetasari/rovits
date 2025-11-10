@@ -10,18 +10,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Language
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onNavigateToLanguage: () -> Unit
 ) {
     val logoutCompleted by viewModel.logoutCompleted.collectAsStateWithLifecycle()
 
     LaunchedEffect(logoutCompleted) {
         if (logoutCompleted) {
             onLogout()
-            viewModel.onLogoutCompleted() // Reset the state
+            viewModel.onLogoutCompleted()
         }
     }
 
@@ -39,18 +42,30 @@ fun HomeScreen(
             )
 
             Text(
-                text = "Home Screen ",
+                text = "Home Screen",
                 style = MaterialTheme.typography.bodyMedium
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Button(
-                onClick = {
-                    viewModel.logout()
-                }
+            // Dil değiştirme butonu
+            OutlinedButton(
+                onClick = onNavigateToLanguage,
+                modifier = Modifier.fillMaxWidth(0.6f)
             ) {
-                Text("Logout")
+                Icon(
+                    imageVector = Icons.Default.Language,
+                    contentDescription = "Language"
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Dil Ayarları")
+            }
+
+            Button(
+                onClick = { viewModel.logout() },
+                modifier = Modifier.fillMaxWidth(0.6f)
+            ) {
+                Text("Çıkış Yap")
             }
         }
     }

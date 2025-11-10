@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Rovits</string>
+
+    <!-- Auth Screens -->
+    <string name="login">Giriş Yap</string>
+    <string name="email">E-posta</string>
+    <string name="password">Şifre</string>
+    <string name="or">VEYA</string>
+    <string name="continue_with_google">Google ile Devam Et</string>
+    <string name="no_account_register">Hesabınız yok mu? Kayıt Olun</string>
+    <string name="guest_login">Misafir Olarak Devam Et</string>
+
+    <string name="register">Kayıt Ol</string>
+    <string name="full_name">Ad Soyad</string>
+    <string name="confirm_password">Şifreyi Onayla</string>
+    <string name="passwords_do_not_match">Şifreler eşleşmiyor</string>
+    <string name="terms_and_conditions">Kullanım koşullarını kabul ediyorum</string>
+    <string name="back">Geri</string>
+
+    <!-- Error Messages -->
+    <string name="error_unknown">Bilinmeyen bir hata oluştu.</string>
+    <string name="error_timeout">Sunucuya bağlanırken zaman aşımı oluştu. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.</string>
+    <string name="error_network">Bir ağ hatası oluştu. Lütfen internet bağlantınızı kontrol edin.</string>
+    <string name="error_google_sign_in_intent">Google Giriş isteği oluşturulamadı. Lütfen cihazınızda bir Google hesabı kurulu olduğundan ve Google Play Hizmetlerinin güncel olduğundan emin olun.</string>
+    <string name="error_google_sign_in_failed">Google Girişi başarısız oldu.</string>
+    <string name="error_google_play_services">Google Girişi için Google Play Hizmetleri gereklidir. Lütfen yükleyin veya güncelleyin.</string>
+    <string name="error_google_firebase_token">Google isteğinden Firebase token alınamadı.</string>
+    <string name="error_google_sign_in_handle">Google Giriş sonucu işlenemedi.</string>
+    <string name="error_invalid_email">Lütfen geçerli bir e-posta adresi girin</string>
+    <string name="hide_password">Şifreyi gizle</string>
+    <string name="show_password">Şifreyi göster</string>
+
+    <!-- Auth Repository Error Messages -->
+    <string name="error_unknown_response">Bilinmeyen bir hata oluştu.</string>
+    <string name="error_cant_parse_error_message">Hata mesajı okunamadı.</string>
+    <string name="error_parsing_response">Yanıt işlenirken hata oluştu.</string>
+</resources>
