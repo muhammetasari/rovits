@@ -3,8 +3,10 @@ package com.rovits.app.presentation.auth
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,21 +21,27 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rovits.app.R
+import com.rovits.app.presentation.settings.LanguageViewModel
+import com.rovits.app.util.Language
 import kotlinx.coroutines.launch
 import android.util.Log
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
+    languageViewModel: LanguageViewModel = hiltViewModel(),
     onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
+    val currentLanguage by languageViewModel.currentLanguage.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var showLanguageMenu by remember { mutableStateOf(false) }
 
     val isLoading = loginState is LoginState.Loading
 
@@ -67,13 +75,66 @@ fun LoginScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                actions = {
+                    Box {
+                        IconButton(onClick = { showLanguageMenu = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Language,
+                                contentDescription = stringResource(R.string.language_screen_title),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = showLanguageMenu,
+                            onDismissRequest = { showLanguageMenu = false }
+                        ) {
+                            Language.entries.forEach { language ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(text = stringResource(language.stringResId))
+                                            if (currentLanguage == language) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Check,
+                                                    contentDescription = "Selected",
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                            }
+                                        }
+                                    },
+                                    onClick = {
+                                        languageViewModel.changeLanguage(language, context)
+                                        showLanguageMenu = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0f)
+                )
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -179,5 +240,6 @@ fun LoginScreen(
                 )
             }
         }
+    }
     }
 }

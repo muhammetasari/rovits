@@ -108,7 +108,6 @@ class LoginViewModel @Inject constructor(
     }
 }
 
-// State'leri tek bir sealed class altında birleştirdik.
 sealed class LoginState {
     object Idle : LoginState()
     object Loading : LoginState()
