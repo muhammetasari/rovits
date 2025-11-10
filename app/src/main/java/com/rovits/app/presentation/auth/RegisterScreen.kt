@@ -34,7 +34,6 @@ import com.rovits.app.presentation.components.TermsDialog
 
 // 3. UI (Composable Ekran)
 @OptIn(ExperimentalMaterial3Api::class)
-@Suppress("UNUSED_CHANGED_VALUE")
 @Composable
 fun RegisterScreen(
     viewModel: RegisterViewModel = hiltViewModel(),

@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rovits.app.data.local.PreferencesManager
 import com.rovits.app.util.Language
-import com.rovits.app.util.LocaleManager
+import com.rovits.app.util.LocaleHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,15 +36,14 @@ class LanguageViewModel @Inject constructor(
 
     fun changeLanguage(language: Language, context: Context) {
         viewModelScope.launch {
-            // Tercihi kaydet
-            preferencesManager.setLanguage(language.code)
+            // Hem DataStore hem de SharedPreferences'a kaydet (senkronizasyon)
+            preferencesManager.saveLanguage(language.code)
+            LocaleHelper.saveLanguage(context, language.code)
+
             _currentLanguage.value = language
 
-            // Locale'i uygula ve activity'yi restart et
-            LocaleManager.setLocale(context, language)
-            (context as? Activity)?.let {
-                LocaleManager.restartActivity(it)
-            }
+            // Activity'yi yeniden başlat
+            (context as? Activity)?.recreate()
         }
     }
 }

@@ -10,7 +10,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.rovits.app.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rovits.app.util.Language
@@ -27,10 +29,10 @@ fun LanguageScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Language / Dil") },
+                title = { Text(stringResource(R.string.language_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_button))
                     }
                 }
             )
@@ -71,7 +73,7 @@ private fun LanguageItem(
     ) {
         Column {
             Text(
-                text = language.displayName,
+                text = stringResource(language.stringResId),
                 style = MaterialTheme.typography.bodyLarge
             )
             Text(

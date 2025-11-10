@@ -34,4 +34,52 @@
     <string name="error_unknown_response">An unknown error occurred.</string>
     <string name="error_cant_parse_error_message">Couldn\'t read error message.</string>
     <string name="error_parsing_response">Error parsing response.</string>
+
+    <!-- Backend Error Mappings -->
+    <string name="error_invalid_credentials">Invalid email or password.</string>
+    <string name="error_user_not_found">User not found.</string>
+    <string name="error_email_already_exists">This email is already registered.</string>
+    <string name="error_invalid_email_format">Invalid email format.</string>
+    <string name="error_password_too_short">Password must be at least 6 characters.</string>
+    <string name="error_password_too_weak">Password is too weak. Please use a stronger password.</string>
+    <string name="error_token_expired">Your session has expired. Please login again.</string>
+    <string name="error_invalid_token">Invalid authentication token.</string>
+    <string name="error_unauthorized">You are not authorized to perform this action.</string>
+    <string name="error_server_error">Server error occurred. Please try again later.</string>
+    <string name="error_required_fields">Please fill in all required fields.</string>
+    <string name="error_invalid_data">Invalid data provided.</string>
+    <string name="error_bad_request">Invalid request.</string>
+    <string name="error_forbidden">Access forbidden.</string>
+    <string name="error_not_found">Resource not found.</string>
+    <string name="error_too_many_requests">Too many requests. Please try again later.</string>
+
+    <!-- Home Screen -->
+    <string name="welcome_message">Welcome to Rovits!</string>
+    <string name="home_screen">Home Screen</string>
+    <string name="change_language">Change Language</string>
+    <string name="logout">Logout</string>
+
+    <!-- Terms and Conditions Dialog -->
+    <string name="terms_dialog_title">Terms of Use and Privacy Policy</string>
+    <string name="terms_dialog_accept">Accept</string>
+    <string name="terms_dialog_cancel">Cancel</string>
+    <string name="terms_dialog_content">TERMS OF USE\n\n1. General Provisions\nThis application provides users with services for managing POI (Points of Interest) data. By using the application, you accept the following terms.\n\n2. User Obligations\n- Provide accurate and up-to-date information\n- Maintain account security\n- Not use for illegal activities\n- Respect other users\' rights\n\n3. Service Usage\n- Service is provided \"as is\"\n- No guarantee of uninterrupted service\n- Content and features may be modified\n\nPRIVACY POLICY\n\n1. Collected Information\n- Name, surname, and email address\n- Location information (with permission)\n- Usage statistics\n\n2. Information Usage\nCollected information is used for:\n- Providing and improving service\n- Improving user experience\n- Communication\n\n3. Information Security\nYour data is protected with industry-standard security measures. Passwords are hashed and not shared with third parties.\n\n4. User Rights\n- You can request access to your data\n- You can request data correction\n- You can delete your account and data\n\n5. Contact\nFor questions: support@rovitspoi.com\n\nLast updated: November 10, 2025</string>
+
+    <!-- Password Strength -->
+    <string name="password_strength_weak">Weak</string>
+    <string name="password_strength_medium">Medium</string>
+    <string name="password_strength_good">Good</string>
+    <string name="password_strength_strong">Strong</string>
+    <string name="password_hint_min_length">Must be at least 6 characters</string>
+    <string name="password_hint_medium">Add at least 8 characters, uppercase letter, and number</string>
+    <string name="password_hint_good">Add special character (!@#$%^&amp;*)</string>
+
+    <!-- Language Screen -->
+    <string name="language_screen_title">Language</string>
+    <string name="back_button">Back</string>
+
+    <!-- Language Names -->
+    <string name="language_english">English</string>
+    <string name="language_turkish">Türkçe</string>
+    <string name="language_german">Deutsch</string>
 </resources>

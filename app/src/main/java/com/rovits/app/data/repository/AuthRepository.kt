@@ -23,21 +23,46 @@ import android.util.Log
 class AuthRepository @Inject constructor(
     private val authApi: AuthApiService,
     private val preferencesManager: PreferencesManager,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val errorMessageMapper: com.rovits.app.util.ErrorMessageMapper
 ) {
 
     /**
      * Retrofit'in hata gövdesini (errorBody) JSON'a dönüştürür
      * ve içindeki "message" alanını alır.
+     * Backend'den gelen mesajları ErrorMessageMapper ile uygulamanın diline çevirir.
+     *
+     * NOT: Backend Accept-Language header'ını desteklemiyor!
+     * Backend her zaman Türkçe hata mesajları gönderiyor.
+     * Bu fonksiyon Türkçe mesajları alıp uygulama dilinde gösterilmek üzere çeviriyor.
+     * TODO: Backend güncellendiğinde Accept-Language desteği eklenebilir.
      */
     private fun parseErrorMessage(errorBody: ResponseBody?): String {
         return try {
             val errorJsonString = errorBody?.string()
             if (errorJsonString.isNullOrEmpty()) {
+                Log.w("AuthRepository", "Error body is null or empty")
                 context.getString(R.string.error_unknown_response)
             } else {
                 val jsonObject = JSONObject(errorJsonString)
-                jsonObject.getString("message") ?: context.getString(R.string.error_cant_parse_error_message)
+                // optString boş string döner, null değil
+                val messageFromJson = jsonObject.optString("message", "")
+                val errorFromJson = jsonObject.optString("error", "")
+
+                val backendMessage = when {
+                    messageFromJson.isNotEmpty() -> messageFromJson
+                    errorFromJson.isNotEmpty() -> errorFromJson
+                    else -> context.getString(R.string.error_cant_parse_error_message)
+                }
+
+                Log.d("AuthRepository", "Backend error message: $backendMessage")
+
+                // Backend'den gelen mesajı map et (Türkçe -> Uygulama dili)
+                val mappedMessage = errorMessageMapper.mapErrorMessage(backendMessage)
+
+                Log.d("AuthRepository", "Mapped error message: $mappedMessage")
+
+                mappedMessage
             }
         } catch (e: Exception) {
             Log.e("AuthRepository", "Error parsing error message", e)

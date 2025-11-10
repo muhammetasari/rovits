@@ -18,13 +18,7 @@ object LocaleManager {
         val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
 
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.createConfigurationContext(config)
-        } else {
-            @Suppress("DEPRECATION")
-            context.resources.updateConfiguration(config, context.resources.displayMetrics)
-            context
-        }
+        return context.createConfigurationContext(config)
     }
 
     /**
@@ -33,19 +27,23 @@ object LocaleManager {
     fun restartActivity(activity: Activity) {
         activity.finish()
         activity.startActivity(activity.intent)
-        activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            activity.overrideActivityTransition(
+                Activity.OVERRIDE_TRANSITION_OPEN,
+                android.R.anim.fade_in,
+                android.R.anim.fade_out
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
     }
 
     /**
      * Context'ten mevcut dili alır
      */
     fun getCurrentLanguage(context: Context): Language {
-        val locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.resources.configuration.locales[0]
-        } else {
-            @Suppress("DEPRECATION")
-            context.resources.configuration.locale
-        }
+        val locale = context.resources.configuration.locales[0]
         return Language.fromCode(locale.language)
     }
 }

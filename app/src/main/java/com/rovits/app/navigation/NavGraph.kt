@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import com.rovits.app.presentation.auth.LoginScreen
 import com.rovits.app.presentation.auth.RegisterScreen
 import com.rovits.app.presentation.home.HomeScreen
-import com.rovits.app.presentation.language.LanguageScreen
+import com.rovits.app.presentation.settings.LanguageScreen // YENİ
 
 @Composable
 fun NavGraph(
@@ -51,19 +51,20 @@ fun NavGraph(
             HomeScreen(
                 onLogout = {
                     navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Home.route) { inclusive = true }
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 },
+                // YENİ
                 onNavigateToLanguage = {
                     navController.navigate(Screen.Language.route)
                 }
             )
         }
 
-        // Language Screen
+        // Language Screen - YENİ
         composable(Screen.Language.route) {
             LanguageScreen(
-                onNavigateBack = {
+                onBack = {
                     navController.popBackStack()
                 }
             )

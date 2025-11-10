@@ -2,36 +2,25 @@ package com.rovits.app
 
 import android.app.Application
 import android.content.Context
-import com.rovits.app.data.local.PreferencesManager
-import com.rovits.app.util.Language
-import com.rovits.app.util.LocaleManager
+import com.rovits.app.util.LocaleHelper
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
-import javax.inject.Inject
 
 @HiltAndroidApp
 class RovitsApp : Application() {
 
-    @Inject
-    lateinit var preferencesManager: PreferencesManager
-
     override fun attachBaseContext(base: Context) {
-        val context = runBlocking {
-            val languageCode = try {
-                preferencesManager.getLanguage().first()
-            } catch (_: Exception) {
-                null
-            }
+        super.attachBaseContext(LocaleHelper.setLocale(base))
+    }
 
-            val language = if (languageCode != null) {
-                Language.fromCode(languageCode)
-            } else {
-                Language.getSystemLanguage()
-            }
+    override fun onCreate() {
+        super.onCreate()
+        // Dil ayarını uygula
+        LocaleHelper.setLocale(this)
 
-            LocaleManager.setLocale(base, language)
-        }
-        super.attachBaseContext(context)
+        // NOT: Backend Accept-Language header'ını desteklemiyor!
+        // Backend her zaman Türkçe hata mesajları gönderiyor.
+        // ErrorMessageMapper sınıfı backend'den gelen Türkçe mesajları
+        // uygulama dilinde gösterilmek üzere çeviriyor.
+        // TODO: Backend güncellendiğinde Accept-Language desteği eklenebilir.
     }
 }

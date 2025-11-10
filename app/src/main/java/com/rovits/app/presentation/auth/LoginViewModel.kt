@@ -1,7 +1,7 @@
 package com.rovits.app.presentation.auth
 
-import android.content.Intent
-import android.content.IntentSender
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.common.ConnectionResult
@@ -77,23 +77,20 @@ class LoginViewModel @Inject constructor(
             }
 
             try {
-                val intentSender = googleAuthManager.signIn()
-                if (intentSender != null) {
-                    _loginState.value = LoginState.GoogleSignInIntentReady(intentSender)
-                } else {
-                    _loginState.value = LoginState.Error(context.getString(R.string.error_google_sign_in_intent))
-                }
+                val request = googleAuthManager.signIn()
+                val credentialManager = googleAuthManager.getCredentialManager()
+                _loginState.value = LoginState.GoogleSignInRequestReady(credentialManager, request)
             } catch (e: Exception) {
                 _loginState.value = LoginState.Error(e.message ?: context.getString(R.string.error_google_sign_in_failed))
             }
         }
     }
 
-    fun handleGoogleSignInResult(intent: Intent) {
+    fun handleGoogleSignInResult(credential: androidx.credentials.Credential) {
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
             try {
-                val firebaseToken = googleAuthManager.signInWithIntent(intent)
+                val firebaseToken = googleAuthManager.signInWithCredential(credential)
                 if (firebaseToken != null) {
                     // Firebase token ile kendi backend'imize socialLogin isteği atıyoruz
                     socialLogin(firebaseToken)
@@ -117,5 +114,5 @@ sealed class LoginState {
     object Loading : LoginState()
     data class Success(val token: String) : LoginState()
     data class Error(val message: String) : LoginState()
-    data class GoogleSignInIntentReady(val intentSender: IntentSender) : LoginState()
+    data class GoogleSignInRequestReady(val credentialManager: CredentialManager, val request: GetCredentialRequest) : LoginState()
 }

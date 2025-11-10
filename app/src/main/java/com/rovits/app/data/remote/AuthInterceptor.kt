@@ -17,7 +17,7 @@ class AuthInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
 
-        // Sadece JWT Token'ı DataStore'dan al
+        // JWT Token'ı DataStore'dan al
         val jwtToken = runBlocking { preferencesManager.getJwtToken().first() }
 
         val requestBuilder = originalRequest.newBuilder()
@@ -31,6 +31,11 @@ class AuthInterceptor @Inject constructor(
         jwtToken?.let {
             requestBuilder.addHeader(ApiConstants.HEADER_AUTHORIZATION, "Bearer $it")
         }
+
+        // NOT: Backend Accept-Language header'ını desteklemiyor!
+        // Backend her zaman Türkçe hata mesajları gönderiyor.
+        // Bu nedenle ErrorMessageMapper ile client-side'da Türkçe -> Uygulama Dili çevirisi yapıyoruz.
+        // TODO: Backend güncellendiğinde Accept-Language header'ı eklenebilir.
 
         val newRequest = requestBuilder.build()
         return chain.proceed(newRequest)

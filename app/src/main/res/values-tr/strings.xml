@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Rovits</string>
 
@@ -7,25 +8,25 @@
     <string name="password">Şifre</string>
     <string name="or">VEYA</string>
     <string name="continue_with_google">Google ile Devam Et</string>
-    <string name="no_account_register">Hesabınız yok mu? Kayıt Olun</string>
+    <string name="no_account_register">Hesabın yok mu? Kayıt ol</string>
     <string name="guest_login">Misafir Olarak Devam Et</string>
 
     <string name="register">Kayıt Ol</string>
     <string name="full_name">Ad Soyad</string>
     <string name="confirm_password">Şifreyi Onayla</string>
     <string name="passwords_do_not_match">Şifreler eşleşmiyor</string>
-    <string name="terms_and_conditions">Kullanım koşullarını kabul ediyorum</string>
+    <string name="terms_and_conditions">Şartları ve koşulları kabul ediyorum</string>
     <string name="back">Geri</string>
 
     <!-- Error Messages -->
     <string name="error_unknown">Bilinmeyen bir hata oluştu.</string>
     <string name="error_timeout">Sunucuya bağlanırken zaman aşımı oluştu. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.</string>
     <string name="error_network">Bir ağ hatası oluştu. Lütfen internet bağlantınızı kontrol edin.</string>
-    <string name="error_google_sign_in_intent">Google Giriş isteği oluşturulamadı. Lütfen cihazınızda bir Google hesabı kurulu olduğundan ve Google Play Hizmetlerinin güncel olduğundan emin olun.</string>
+    <string name="error_google_sign_in_intent">Google Giriş niyeti oluşturulamadı. Lütfen cihazınızda bir Google hesabı kurulu olduğundan ve Google Play Hizmetlerinin güncel olduğundan emin olun.</string>
     <string name="error_google_sign_in_failed">Google Girişi başarısız oldu.</string>
-    <string name="error_google_play_services">Google Girişi için Google Play Hizmetleri gereklidir. Lütfen yükleyin veya güncelleyin.</string>
-    <string name="error_google_firebase_token">Google isteğinden Firebase token alınamadı.</string>
-    <string name="error_google_sign_in_handle">Google Giriş sonucu işlenemedi.</string>
+    <string name="error_google_play_services">Google Play Hizmetleri Google Girişi için gereklidir. Lütfen yükleyin veya güncelleyin.</string>
+    <string name="error_google_firebase_token">Google girişinden Firebase jetonu alınamadı.</string>
+    <string name="error_google_sign_in_handle">Google Giriş sonucunun işlenmesi başarısız oldu.</string>
     <string name="error_invalid_email">Lütfen geçerli bir e-posta adresi girin</string>
     <string name="hide_password">Şifreyi gizle</string>
     <string name="show_password">Şifreyi göster</string>
@@ -34,4 +35,52 @@
     <string name="error_unknown_response">Bilinmeyen bir hata oluştu.</string>
     <string name="error_cant_parse_error_message">Hata mesajı okunamadı.</string>
     <string name="error_parsing_response">Yanıt işlenirken hata oluştu.</string>
+
+    <!-- Backend Error Mappings -->
+    <string name="error_invalid_credentials">Geçersiz e-posta veya şifre.</string>
+    <string name="error_user_not_found">Kullanıcı bulunamadı.</string>
+    <string name="error_email_already_exists">Bu e-posta adresi zaten kayıtlı.</string>
+    <string name="error_invalid_email_format">Geçersiz e-posta formatı.</string>
+    <string name="error_password_too_short">Şifre en az 6 karakter olmalıdır.</string>
+    <string name="error_password_too_weak">Şifre çok zayıf. Lütfen daha güçlü bir şifre kullanın.</string>
+    <string name="error_token_expired">Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.</string>
+    <string name="error_invalid_token">Geçersiz kimlik doğrulama belirteci.</string>
+    <string name="error_unauthorized">Bu işlemi gerçekleştirmek için yetkiniz yok.</string>
+    <string name="error_server_error">Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="error_required_fields">Lütfen tüm gerekli alanları doldurun.</string>
+    <string name="error_invalid_data">Geçersiz veri sağlandı.</string>
+    <string name="error_bad_request">Geçersiz istek.</string>
+    <string name="error_forbidden">Erişim yasak.</string>
+    <string name="error_not_found">Kaynak bulunamadı.</string>
+    <string name="error_too_many_requests">Çok fazla istek. Lütfen daha sonra tekrar deneyin.</string>
+
+    <!-- Home Screen -->
+    <string name="welcome_message">Rovits\'e Hoş Geldiniz!</string>
+    <string name="home_screen">Ana Sayfa</string>
+    <string name="change_language">Dili Değiştir</string>
+    <string name="logout">Çıkış Yap</string>
+
+    <!-- Terms and Conditions Dialog -->
+    <string name="terms_dialog_title">Kullanım Koşulları ve Gizlilik Politikası</string>
+    <string name="terms_dialog_accept">Kabul Ediyorum</string>
+    <string name="terms_dialog_cancel">İptal</string>
+    <string name="terms_dialog_content">KULLANIM KOŞULLARI\n\n1. Genel Hükümler\nBu uygulama, POI (Points of Interest) verilerini yönetmek için kullanıcılara hizmet sunmaktadır. Uygulamayı kullanarak aşağıdaki koşulları kabul etmiş sayılırsınız.\n\n2. Kullanıcı Yükümlülükleri\n- Doğru ve güncel bilgiler sağlamak\n- Hesap güvenliğini korumak\n- Yasal olmayan faaliyetlerde kullanmamak\n- Diğer kullanıcıların haklarına saygı göstermek\n\n3. Hizmet Kullanımı\n- Hizmet \"olduğu gibi\" sunulmaktadır\n- Kesintisiz hizmet garantisi verilmemektedir\n- İçerik ve özellikler değiştirilebilir\n\nGİZLİLİK POLİTİKASI\n\n1. Toplanan Bilgiler\n- Ad, soyad ve email adresi\n- Konum bilgileri (izninizle)\n- Kullanım istatistikleri\n\n2. Bilgi Kullanımı\nTopladığımız bilgiler şu amaçlarla kullanılır:\n- Hizmet sağlamak ve geliştirmek\n- Kullanıcı deneyimini iyileştirmek\n- İletişim kurmak\n\n3. Bilgi Güvenliği\nVerileriniz endüstri standardı güvenlik önlemleriyle korunmaktadır. Şifreler hash\'lenerek saklanır ve üçüncü taraflarla paylaşılmaz.\n\n4. Kullanıcı Hakları\n- Verilerinize erişim talep edebilirsiniz\n- Verilerin düzeltilmesini isteyebilirsiniz\n- Hesabınızı ve verilerinizi silebilirsiniz\n\n5. İletişim\nSorularınız için: support@rovitspoi.com\n\nSon güncelleme: 10 Kasım 2025</string>
+
+    <!-- Password Strength -->
+    <string name="password_strength_weak">Zayıf</string>
+    <string name="password_strength_medium">Orta</string>
+    <string name="password_strength_good">İyi</string>
+    <string name="password_strength_strong">Güçlü</string>
+    <string name="password_hint_min_length">En az 6 karakter olmalı</string>
+    <string name="password_hint_medium">En az 8 karakter, büyük harf ve rakam ekleyin</string>
+    <string name="password_hint_good">Özel karakter ekleyin (!@#$%^&amp;*)</string>
+
+    <!-- Language Screen -->
+    <string name="language_screen_title">Dil</string>
+    <string name="back_button">Geri</string>
+
+    <!-- Language Names -->
+    <string name="language_english">English</string>
+    <string name="language_turkish">Türkçe</string>
+    <string name="language_german">Deutsch</string>
 </resources>

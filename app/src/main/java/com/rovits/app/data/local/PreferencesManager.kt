@@ -18,14 +18,14 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 class PreferencesManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    private val dataStore = context.dataStore
+    private val dataStore by lazy { context.dataStore }
 
     companion object {
         private val API_KEY = stringPreferencesKey("api_key")
         private val JWT_TOKEN = stringPreferencesKey("jwt_token")
         private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
         private val USER_EMAIL = stringPreferencesKey("user_email")
-        private val LANGUAGE = stringPreferencesKey("language")
+        private val LANGUAGE = stringPreferencesKey("language") // YENİ
     }
 
     // API Key
@@ -80,8 +80,8 @@ class PreferencesManager @Inject constructor(
         }
     }
 
-    // Language
-    suspend fun setLanguage(languageCode: String) {
+    // Language - YENİ
+    suspend fun saveLanguage(languageCode: String) {
         dataStore.edit { preferences ->
             preferences[LANGUAGE] = languageCode
         }

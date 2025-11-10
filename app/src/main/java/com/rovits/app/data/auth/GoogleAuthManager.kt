@@ -1,11 +1,11 @@
 package com.rovits.app.data.auth
 
 import android.content.Context
-import android.content.Intent
-import android.content.IntentSender
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.auth.api.identity.SignInClient
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.rovits.app.R
@@ -19,25 +19,33 @@ class GoogleAuthManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val firebaseAuth: FirebaseAuth
 ) {
-    private val oneTapClient: SignInClient = Identity.getSignInClient(context)
+    private val credentialManager = CredentialManager.create(context)
 
-    suspend fun signIn(): IntentSender? {
-        return try {
-            val result = oneTapClient.beginSignIn(buildSignInRequest()).await()
-            result.pendingIntent.intentSender
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+    suspend fun signIn(): GetCredentialRequest {
+        val signInWithGoogleOption = GetSignInWithGoogleOption.Builder(
+            context.getString(R.string.default_web_client_id)
+        )
+            .build()
+
+        return GetCredentialRequest.Builder()
+            .addCredentialOption(signInWithGoogleOption)
+            .build()
     }
 
-    suspend fun signInWithIntent(intent: Intent): String? {
+    suspend fun getCredentialManager(): CredentialManager {
+        return credentialManager
+    }
+
+    suspend fun signInWithCredential(credential: androidx.credentials.Credential): String? {
         return try {
-            val credential = oneTapClient.getSignInCredentialFromIntent(intent)
-            val googleIdToken = credential.googleIdToken
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            val googleIdToken = googleIdTokenCredential.idToken
             val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
             val user = firebaseAuth.signInWithCredential(googleCredentials).await()
             user.user?.getIdToken(false)?.await()?.token
+        } catch (e: GoogleIdTokenParsingException) {
+            e.printStackTrace()
+            null
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -46,23 +54,9 @@ class GoogleAuthManager @Inject constructor(
 
     suspend fun signOut() {
         try {
-            oneTapClient.signOut().await()
             firebaseAuth.signOut()
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    private fun buildSignInRequest(): BeginSignInRequest {
-        return BeginSignInRequest.builder()
-            .setGoogleIdTokenRequestOptions(
-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(context.getString(R.string.default_web_client_id))
-                    .build()
-            )
-            .setAutoSelectEnabled(true)
-            .build()
     }
 }

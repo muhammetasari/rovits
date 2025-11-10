@@ -14,7 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.rovits.app.R
 
 @Composable
 fun PasswordStrengthIndicator(password: String) {
@@ -49,16 +51,16 @@ fun PasswordStrengthIndicator(password: String) {
                 color = strength.color,
             )
             Text(
-                text = strength.label,
+                text = stringResource(strength.labelResId),
                 style = MaterialTheme.typography.labelSmall,
                 color = strength.color
             )
         }
 
-        if (strength != PasswordStrength.STRONG) {
+        if (strength != PasswordStrength.STRONG && strength.hintResId != 0) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = strength.hint,
+                text = stringResource(strength.hintResId),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -67,34 +69,34 @@ fun PasswordStrengthIndicator(password: String) {
 }
 
 private enum class PasswordStrength(
-    val label: String,
+    val labelResId: Int,
     val progress: Float,
     val color: Color,
-    val hint: String
+    val hintResId: Int
 ) {
     WEAK(
-        label = "Zayıf",
+        labelResId = R.string.password_strength_weak,
         progress = 0.25f,
         color = Color(0xFFE53935),
-        hint = "En az 6 karakter olmalı"
+        hintResId = R.string.password_hint_min_length
     ),
     MEDIUM(
-        label = "Orta",
+        labelResId = R.string.password_strength_medium,
         progress = 0.5f,
         color = Color(0xFFFB8C00),
-        hint = "En az 8 karakter, büyük harf ve rakam ekleyin"
+        hintResId = R.string.password_hint_medium
     ),
     GOOD(
-        label = "İyi",
+        labelResId = R.string.password_strength_good,
         progress = 0.75f,
         color = Color(0xFF43A047),
-        hint = "Özel karakter ekleyin (!@#$%^&*)"
+        hintResId = R.string.password_hint_good
     ),
     STRONG(
-        label = "Güçlü",
+        labelResId = R.string.password_strength_strong,
         progress = 1f,
         color = Color(0xFF2E7D32),
-        hint = ""
+        hintResId = 0
     )
 }
 

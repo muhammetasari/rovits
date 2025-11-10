@@ -1,9 +1,5 @@
 package com.rovits.app.presentation.auth
 
-import android.app.Activity.RESULT_OK
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -13,13 +9,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rovits.app.R
+import kotlinx.coroutines.launch
+import android.util.Log
 
 @Composable
 fun LoginScreen(
@@ -28,28 +29,33 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     val isLoading = loginState is LoginState.Loading
 
-    // Google Sign-In Launcher
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartIntentSenderForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            result.data?.let { intent ->
-                viewModel.handleGoogleSignInResult(intent)
-            }
-        }
-    }
-
-    // Google Sign-In Intent hazır olduğunda başlat
+    // Google Sign-In Request hazır olduğunda başlat
     LaunchedEffect(loginState) {
-        if (loginState is LoginState.GoogleSignInIntentReady) {
-            val intentSender = (loginState as LoginState.GoogleSignInIntentReady).intentSender
-            launcher.launch(IntentSenderRequest.Builder(intentSender).build())
+        if (loginState is LoginState.GoogleSignInRequestReady) {
+            val state = loginState as LoginState.GoogleSignInRequestReady
+            scope.launch {
+                try {
+                    val result = state.credentialManager.getCredential(
+                        request = state.request,
+                        context = context
+                    )
+                    viewModel.handleGoogleSignInResult(result.credential)
+                } catch (_: GetCredentialCancellationException) {
+                    Log.d("LoginScreen", "Google Sign-In cancelled by user")
+                    viewModel.resetState()
+                } catch (e: GetCredentialException) {
+                    Log.e("LoginScreen", "Google Sign-In credential error", e)
+                    viewModel.resetState()
+                }
+            }
         }
     }
 
@@ -152,13 +158,6 @@ fun LoginScreen(
                 }
             }
 
-            TextButton(
-                onClick = { /* TODO: Misafir girişi daha sonra eklenecek */ },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading
-            ) {
-                Text(stringResource(id = R.string.guest_login))
-            }
 
             TextButton(
                 onClick = onNavigateToRegister,
@@ -172,6 +171,7 @@ fun LoginScreen(
             val errorMessage = (loginState as? LoginState.Error)?.message
 
             if (errorMessage != null) {
+                Log.e("LoginScreen", "Login error: $errorMessage")
                 Text(
                     text = errorMessage,
                     color = MaterialTheme.colorScheme.error,
