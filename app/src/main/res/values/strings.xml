@@ -34,10 +34,4 @@
     <string name="error_unknown_response">An unknown error occurred.</string>
     <string name="error_cant_parse_error_message">Couldn\'t read error message.</string>
     <string name="error_parsing_response">Error parsing response.</string>
-
-    <!-- Language selector -->
-    <string name="choose_language">Choose language</string>
-    <string name="english">English</string>
-    <string name="turkish">Türkçe</string>
-    <string name="cancel">Cancel</string>
 </resources>

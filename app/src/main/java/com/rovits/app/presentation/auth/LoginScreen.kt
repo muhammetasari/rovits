@@ -4,8 +4,6 @@ import android.app.Activity.RESULT_OK
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -15,7 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.zIndex
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -23,13 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rovits.app.R
-import com.rovits.app.presentation.settings.LocaleViewModel
-import java.util.Locale
 
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
-    localeViewModel: LocaleViewModel = hiltViewModel(),
     onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
@@ -39,8 +33,6 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
 
     val isLoading = loginState is LoginState.Loading
-    val currentLocale = AppCompatDelegate.getApplicationLocales().get(0) ?: Locale.getDefault()
-    var showLanguageDialog by remember { mutableStateOf(false) }
 
     // Google Sign-In Launcher
     val launcher = rememberLauncherForActivityResult(
@@ -75,55 +67,6 @@ fun LoginScreen(
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            TextButton(
-                onClick = { showLanguageDialog = true },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
-                    .zIndex(2f)
-            ) {
-                Text(text = stringResource(
-                    id = if (currentLocale.language == "tr")
-                        R.string.turkish
-                    else
-                        R.string.english
-                ))
-            }
-
-            if (showLanguageDialog) {
-                AlertDialog(
-                    onDismissRequest = { showLanguageDialog = false },
-                    title = { Text(text = stringResource(id = R.string.choose_language)) },
-                    text = {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            ListItem(
-                                headlineContent = { Text(text = stringResource(id = R.string.turkish)) },
-                                modifier = Modifier.clickable {
-                                    localeViewModel.setLocale(Locale.forLanguageTag("tr"))
-                                    showLanguageDialog = false
-                                }
-                            )
-                            ListItem(
-                                headlineContent = { Text(text = stringResource(id = R.string.english)) },
-                                modifier = Modifier.clickable {
-                                    localeViewModel.setLocale(Locale.ENGLISH)
-                                    showLanguageDialog = false
-                                }
-                            )
-                        }
-                    },
-                    confirmButton = {
-                        TextButton(onClick = { showLanguageDialog = false }) {
-                            Text(text = stringResource(id = R.string.cancel))
-                        }
-                    }
-                )
-            }
-        }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -199,7 +142,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading
             ) {
-                if (loginState is LoginState.Loading) { // GoogleSignInState.Loading yerine
+                if (loginState is LoginState.Loading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
                         color = MaterialTheme.colorScheme.primary
