@@ -23,19 +23,15 @@ import android.util.Log
 class AuthRepository @Inject constructor(
     private val authApi: AuthApiService,
     private val preferencesManager: PreferencesManager,
-    @ApplicationContext private val context: Context,
-    private val errorMessageMapper: com.rovits.app.util.ErrorMessageMapper
+    @ApplicationContext private val context: Context
 ) {
 
     /**
      * Retrofit'in hata gövdesini (errorBody) JSON'a dönüştürür
      * ve içindeki "message" alanını alır.
-     * Backend'den gelen mesajları ErrorMessageMapper ile uygulamanın diline çevirir.
      *
-     * NOT: Backend Accept-Language header'ını desteklemiyor!
-     * Backend her zaman Türkçe hata mesajları gönderiyor.
-     * Bu fonksiyon Türkçe mesajları alıp uygulama dilinde gösterilmek üzere çeviriyor.
-     * TODO: Backend güncellendiğinde Accept-Language desteği eklenebilir.
+     * Backend artık Accept-Language header'ını destekliyor ve
+     * doğrudan uygulamanın dilinde hata mesajları gönderiyor.
      */
     private fun parseErrorMessage(errorBody: ResponseBody?): String {
         return try {
@@ -55,14 +51,10 @@ class AuthRepository @Inject constructor(
                     else -> context.getString(R.string.error_cant_parse_error_message)
                 }
 
-                Log.d("AuthRepository", "Backend error message: $backendMessage")
+                Log.d("AuthRepository", "Backend error message (already localized): $backendMessage")
 
-                // Backend'den gelen mesajı map et (Türkçe -> Uygulama dili)
-                val mappedMessage = errorMessageMapper.mapErrorMessage(backendMessage)
-
-                Log.d("AuthRepository", "Mapped error message: $mappedMessage")
-
-                mappedMessage
+                // Backend artık Accept-Language header'ına göre çevrilmiş mesaj gönderiyor
+                backendMessage
             }
         } catch (e: Exception) {
             Log.e("AuthRepository", "Error parsing error message", e)

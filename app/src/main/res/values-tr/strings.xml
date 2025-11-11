@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">Rovits</string>
 
+    <!-- Google Sign-In -->
+    <string name="default_web_client_id">1036460419015-i9rvhdvnnumi2v7ji6br45i8fqmgjj55.apps.googleusercontent.com</string>
+
     <!-- Auth Screens -->
     <string name="login">Giriş Yap</string>
     <string name="email">E-posta</string>
@@ -27,6 +30,7 @@
     <string name="error_google_play_services">Google Play Hizmetleri Google Girişi için gereklidir. Lütfen yükleyin veya güncelleyin.</string>
     <string name="error_google_firebase_token">Google girişinden Firebase jetonu alınamadı.</string>
     <string name="error_google_sign_in_handle">Google Giriş sonucunun işlenmesi başarısız oldu.</string>
+    <string name="error_no_google_credentials">Google hesabı bulunamadı. Lütfen cihazınıza bir Google hesabı ekleyin veya Google Play Hizmetlerinin güncel olduğundan emin olun.</string>
     <string name="error_invalid_email">Lütfen geçerli bir e-posta adresi girin</string>
     <string name="hide_password">Şifreyi gizle</string>
     <string name="show_password">Şifreyi göster</string>

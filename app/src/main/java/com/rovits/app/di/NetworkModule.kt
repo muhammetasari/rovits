@@ -4,6 +4,8 @@ import com.rovits.app.data.local.PreferencesManager
 import com.rovits.app.data.remote.ApiConstants
 import com.rovits.app.data.remote.AuthInterceptor
 import com.rovits.app.data.remote.api.AuthApiService
+import com.rovits.app.data.remote.api.PlacesApiService
+import com.rovits.app.data.remote.api.LocationSyncApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -66,5 +68,19 @@ object NetworkModule {
     @Singleton
     fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
         return retrofit.create(AuthApiService::class.java)
+    }
+
+    // Places API Service
+    @Provides
+    @Singleton
+    fun providePlacesApiService(retrofit: Retrofit): PlacesApiService {
+        return retrofit.create(PlacesApiService::class.java)
+    }
+
+    // Location Sync API Service
+    @Provides
+    @Singleton
+    fun provideLocationSyncApiService(retrofit: Retrofit): LocationSyncApiService {
+        return retrofit.create(LocationSyncApiService::class.java)
     }
 }

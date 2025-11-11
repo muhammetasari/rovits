@@ -16,11 +16,5 @@ class RovitsApp : Application() {
         super.onCreate()
         // Dil ayarını uygula
         LocaleHelper.setLocale(this)
-
-        // NOT: Backend Accept-Language header'ını desteklemiyor!
-        // Backend her zaman Türkçe hata mesajları gönderiyor.
-        // ErrorMessageMapper sınıfı backend'den gelen Türkçe mesajları
-        // uygulama dilinde gösterilmek üzere çeviriyor.
-        // TODO: Backend güncellendiğinde Accept-Language desteği eklenebilir.
     }
 }

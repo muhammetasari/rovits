@@ -61,7 +61,7 @@ fun LoginScreen(
                     viewModel.resetState()
                 } catch (e: GetCredentialException) {
                     Log.e("LoginScreen", "Google Sign-In credential error", e)
-                    viewModel.resetState()
+                    viewModel.handleCredentialError(e.message ?: "Unknown credential error")
                 }
             }
         }
