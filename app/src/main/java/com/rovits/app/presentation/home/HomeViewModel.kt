@@ -88,7 +88,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun testPlaceDetails(placeId: String = "ChIJnePCdZ3ZuxQRqB86s6BsfrA") {
+    fun testPlaceDetails(placeId: String = "ChIJAQAAACW0yhQR2ZKKrI2y0NI") {
         viewModelScope.launch {
             _testResult.value = EndpointTestResult.Loading
             try {
