@@ -1,9 +1,6 @@
 <resources>
     <string name="app_name">Rovits</string>
 
-    <!-- Google Sign-In -->
-    <string name="default_web_client_id">1036460419015-i9rvhdvnnumi2v7ji6br45i8fqmgjj55.apps.googleusercontent.com</string>
-
     <!-- Auth Screens -->
     <string name="login">Login</string>
     <string name="email">Email</string>
@@ -29,7 +26,6 @@
     <string name="error_google_play_services">Google Play Services is required for Google Sign-In. Please install or update it.</string>
     <string name="error_google_firebase_token">Failed to get Firebase token from Google intent.</string>
     <string name="error_google_sign_in_handle">Google Sign-In result handling failed.</string>
-    <string name="error_no_google_credentials">No Google account found. Please add a Google account to your device or ensure Google Play Services is up to date.</string>
     <string name="error_invalid_email">Please enter a valid email address</string>
     <string name="hide_password">Hide password</string>
     <string name="show_password">Show password</string>

@@ -7,7 +7,6 @@ object ApiConstants {
     const val HEADER_API_KEY = "X-API-Key"
     const val HEADER_AUTHORIZATION = "Authorization"
     const val HEADER_CONTENT_TYPE = "Content-Type"
-    const val HEADER_ACCEPT_LANGUAGE = "Accept-Language"
 
     // Endpoints
     object Auth {
@@ -21,9 +20,5 @@ object ApiConstants {
         const val NEARBY = "api/places/nearby"
         const val TEXT_SEARCH = "api/places/text-search"
         const val DETAILS = "api/places/details/{placeId}"
-    }
-
-    object LocationSync {
-        const val SYNC_LOCATIONS = "api/sync/locations"
     }
 }

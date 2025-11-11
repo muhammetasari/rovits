@@ -103,18 +103,6 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun handleCredentialError(errorMessage: String) {
-        _loginState.value = LoginState.Error(
-            when {
-                errorMessage.contains("No credentials available", ignoreCase = true) ->
-                    context.getString(R.string.error_no_google_credentials)
-                errorMessage.contains("timed out", ignoreCase = true) ->
-                    context.getString(R.string.error_timeout)
-                else -> context.getString(R.string.error_google_sign_in_failed)
-            }
-        )
-    }
-
     fun resetState() {
         _loginState.value = LoginState.Idle
     }
