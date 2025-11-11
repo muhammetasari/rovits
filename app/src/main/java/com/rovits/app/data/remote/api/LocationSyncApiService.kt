@@ -15,6 +15,6 @@ interface LocationSyncApiService {
         @Query("radius") radius: Int = 5000,
         @Query("type") type: String = "restaurant",
         @Header(ApiConstants.HEADER_ACCEPT_LANGUAGE) language: String = "tr-TR"
-    ): Response<String>
+    ): Response<Any>
 }
 
