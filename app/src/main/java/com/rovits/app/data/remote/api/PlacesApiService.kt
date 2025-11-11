@@ -30,5 +30,10 @@ interface PlacesApiService {
     suspend fun getPlaceDetails(
         @Path("placeId") placeId: String
     ): Response<Any>
+
+    @GET("api/places/details")
+    suspend fun getPlaceDetailsWithQuery(
+        @Query("placeId") placeId: String
+    ): Response<Any>
 }
 

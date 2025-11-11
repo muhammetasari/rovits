@@ -20,16 +20,6 @@ class AuthInterceptor @Inject constructor(
         // JWT Token'ı DataStore'dan al
         val jwtToken = runBlocking { preferencesManager.getJwtToken().first() }
 
-        // Uygulama dilini DataStore'dan al
-        val language = runBlocking { preferencesManager.getLanguage().first() } ?: "tr"
-
-        // Accept-Language formatını düzelt (örn: "tr" -> "tr")
-        val acceptLanguage = when (language) {
-            "tr" -> "tr"
-            "en" -> "en"
-            else -> "tr"
-        }
-
         val requestBuilder = originalRequest.newBuilder()
 
         // API Key'i (BuildConfig'ten gelen) her zaman ekle
@@ -39,11 +29,10 @@ class AuthInterceptor @Inject constructor(
 
         // JWT Token (DataStore'dan gelen) varsa Authorization header'ına ekle
         jwtToken?.let {
-            requestBuilder.addHeader(ApiConstants.HEADER_AUTHORIZATION, "Bearer $it")
+            if (it.isNotEmpty()) {
+                requestBuilder.addHeader(ApiConstants.HEADER_AUTHORIZATION, "Bearer $it")
+            }
         }
-
-        // Accept-Language header'ı ekle (backend artık bunu destekliyor)
-        requestBuilder.addHeader(ApiConstants.HEADER_ACCEPT_LANGUAGE, acceptLanguage)
 
         val newRequest = requestBuilder.build()
         return chain.proceed(newRequest)
