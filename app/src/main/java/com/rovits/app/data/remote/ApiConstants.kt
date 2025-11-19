@@ -8,12 +8,12 @@ object ApiConstants {
     const val HEADER_AUTHORIZATION = "Authorization"
     const val HEADER_CONTENT_TYPE = "Content-Type"
 
-    // Endpoints
+    // Endpoints - "/api" prefix'i eklendi
     object Auth {
-        const val LOGIN = "auth/login"
-        const val REGISTER = "auth/register"
-        const val SOCIAL_LOGIN = "auth/social-login"
-        const val REFRESH = "auth/refresh"
+        const val LOGIN = "api/auth/login"
+        const val REGISTER = "api/auth/register"
+        const val SOCIAL_LOGIN = "api/auth/social-login"
+        const val REFRESH = "api/auth/refresh"
     }
 
     object Places {

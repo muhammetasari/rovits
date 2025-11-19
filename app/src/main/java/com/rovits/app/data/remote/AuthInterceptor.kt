@@ -2,6 +2,9 @@ package com.rovits.app.data.remote
 
 import com.rovits.app.BuildConfig
 import com.rovits.app.data.local.PreferencesManager
+import com.rovits.app.util.LocaleHelper
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -9,7 +12,8 @@ import okhttp3.Response
 import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    @ApplicationContext private val context: Context
 ) : Interceptor {
 
     private val apiKey: String = BuildConfig.API_KEY
@@ -32,10 +36,13 @@ class AuthInterceptor @Inject constructor(
             requestBuilder.addHeader(ApiConstants.HEADER_AUTHORIZATION, "Bearer $it")
         }
 
-        // NOT: Backend Accept-Language header'ını desteklemiyor!
-        // Backend her zaman Türkçe hata mesajları gönderiyor.
-        // Bu nedenle ErrorMessageMapper ile client-side'da Türkçe -> Uygulama Dili çevirisi yapıyoruz.
-        // TODO: Backend güncellendiğinde Accept-Language header'ı eklenebilir.
+        // Accept-Language header ekle (uygulama dilini backend'e bildir)
+        val currentLanguage = LocaleHelper.getCurrentLanguage(context)
+        requestBuilder.addHeader("Accept-Language", currentLanguage.code)
+
+        // Optional: X-Correlation-ID ekle (log tracking için)
+        val correlationId = java.util.UUID.randomUUID().toString()
+        requestBuilder.addHeader("X-Correlation-ID", correlationId)
 
         val newRequest = requestBuilder.build()
         return chain.proceed(newRequest)
