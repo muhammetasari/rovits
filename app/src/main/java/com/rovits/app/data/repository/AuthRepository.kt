@@ -2,14 +2,11 @@ package com.rovits.app.data.repository
 
 import com.rovits.app.data.local.PreferencesManager
 import com.rovits.app.data.remote.api.AuthApiService
-import com.rovits.app.data.remote.dto.LoginRequest
-import com.rovits.app.data.remote.dto.RegisterRequest
-import com.rovits.app.data.remote.dto.SocialLoginRequest
-import com.rovits.app.data.remote.dto.ApiResponse
-import com.rovits.app.data.remote.dto.AuthResponse
+import com.rovits.app.data.remote.dto.*
 import com.rovits.app.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.first
 import java.io.IOException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
@@ -33,7 +30,7 @@ class AuthRepository @Inject constructor(
     }
 
     /**
-     * Generic response handler for new API format
+     * Generic API response handler for new backend format
      */
     private fun <T> handleApiResponse(response: Response<ApiResponse<T>>): Resource<T> {
         return try {
@@ -44,19 +41,16 @@ class AuthRepository @Inject constructor(
                     Log.e(TAG, "Response body is null")
                     Resource.Error(context.getString(R.string.error_unknown))
                 } else if (apiResponse.success && apiResponse.data != null) {
-                    // Success case
                     Resource.Success(apiResponse.data)
                 } else if (!apiResponse.success && apiResponse.error != null) {
-                    // Error case with error detail
                     val errorMessage = errorMessageMapper.mapErrorMessage(apiResponse.error.message)
-                    Log.w(TAG, "API returned error: ${apiResponse.error.code} - $errorMessage")
+                    Log.w(TAG, "API error: ${apiResponse.error.code} - $errorMessage")
                     Resource.Error(errorMessage)
                 } else {
                     Log.e(TAG, "Invalid API response structure")
                     Resource.Error(context.getString(R.string.error_unknown))
                 }
             } else {
-                // HTTP error (4xx, 5xx)
                 val errorMessage = parseErrorFromErrorBody(response.errorBody()?.string())
                 Log.e(TAG, "HTTP error ${response.code()}: $errorMessage")
                 Resource.Error(errorMessage)
@@ -75,25 +69,13 @@ class AuthRepository @Inject constructor(
             if (errorBody.isNullOrEmpty()) {
                 context.getString(R.string.error_unknown_response)
             } else {
-                // Try to parse as ApiResponse with error
                 val gson = com.google.gson.Gson()
                 val apiResponse = gson.fromJson(errorBody, ApiResponse::class.java)
 
                 if (apiResponse?.error != null) {
                     errorMessageMapper.mapErrorMessage(apiResponse.error.message)
                 } else {
-                    // Fallback to old parsing method
-                    val jsonObject = org.json.JSONObject(errorBody)
-                    val messageFromJson = jsonObject.optString("message", "")
-                    val errorFromJson = jsonObject.optString("error", "")
-
-                    val backendMessage = when {
-                        messageFromJson.isNotEmpty() -> messageFromJson
-                        errorFromJson.isNotEmpty() -> errorFromJson
-                        else -> context.getString(R.string.error_cant_parse_error_message)
-                    }
-
-                    errorMessageMapper.mapErrorMessage(backendMessage)
+                    context.getString(R.string.error_cant_parse_error_message)
                 }
             }
         } catch (e: Exception) {
@@ -102,6 +84,7 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    // ==================== LOGIN ====================
     fun login(email: String, password: String): Flow<Resource<String>> = flow {
         try {
             emit(Resource.Loading())
@@ -112,22 +95,13 @@ class AuthRepository @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     val authResponse = result.data!!
-
-                    // Save tokens
-                    preferencesManager.saveJwtToken(authResponse.token)
-                    authResponse.refreshToken?.let {
-                        preferencesManager.saveRefreshToken(it)
-                    }
-                    preferencesManager.saveUserEmail(authResponse.user.email)
-
+                    saveAuthData(authResponse)
                     emit(Resource.Success(authResponse.token))
                 }
                 is Resource.Error -> {
                     emit(Resource.Error(result.message ?: context.getString(R.string.error_unknown)))
                 }
-                is Resource.Loading -> {
-                    // Should not happen here
-                }
+                is Resource.Loading -> {}
             }
         } catch (e: SocketTimeoutException) {
             Log.e(TAG, "Login timeout", e)
@@ -141,6 +115,7 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    // ==================== REGISTER ====================
     fun register(name: String, email: String, password: String): Flow<Resource<String>> = flow {
         try {
             emit(Resource.Loading())
@@ -151,22 +126,13 @@ class AuthRepository @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     val authResponse = result.data!!
-
-                    // Save tokens
-                    preferencesManager.saveJwtToken(authResponse.token)
-                    authResponse.refreshToken?.let {
-                        preferencesManager.saveRefreshToken(it)
-                    }
-                    preferencesManager.saveUserEmail(authResponse.user.email)
-
+                    saveAuthData(authResponse)
                     emit(Resource.Success(authResponse.token))
                 }
                 is Resource.Error -> {
                     emit(Resource.Error(result.message ?: context.getString(R.string.error_unknown)))
                 }
-                is Resource.Loading -> {
-                    // Should not happen here
-                }
+                is Resource.Loading -> {}
             }
         } catch (e: SocketTimeoutException) {
             Log.e(TAG, "Register timeout", e)
@@ -180,6 +146,7 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    // ==================== SOCIAL LOGIN ====================
     fun socialLogin(firebaseToken: String): Flow<Resource<String>> = flow {
         try {
             emit(Resource.Loading())
@@ -190,22 +157,13 @@ class AuthRepository @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     val authResponse = result.data!!
-
-                    // Save tokens
-                    preferencesManager.saveJwtToken(authResponse.token)
-                    authResponse.refreshToken?.let {
-                        preferencesManager.saveRefreshToken(it)
-                    }
-                    preferencesManager.saveUserEmail(authResponse.user.email)
-
+                    saveAuthData(authResponse)
                     emit(Resource.Success(authResponse.token))
                 }
                 is Resource.Error -> {
                     emit(Resource.Error(result.message ?: context.getString(R.string.error_unknown)))
                 }
-                is Resource.Loading -> {
-                    // Should not happen here
-                }
+                is Resource.Loading -> {}
             }
         } catch (e: SocketTimeoutException) {
             Log.e(TAG, "Social login timeout", e)
@@ -219,7 +177,45 @@ class AuthRepository @Inject constructor(
         }
     }
 
-    suspend fun logout() {
+    // ==================== LOGOUT ====================
+    suspend fun logout(): Flow<Resource<Unit>> = flow {
+        try {
+            emit(Resource.Loading())
+
+            // Backend'e logout isteği gönder
+            val response = authApi.logout()
+
+            // Response'u kontrol et (başarısız olsa bile local data temizlenecek)
+            if (response.isSuccessful) {
+                Log.i(TAG, "Logout successful on backend")
+            } else {
+                Log.w(TAG, "Backend logout failed: ${response.code()}")
+            }
+
+            // Her durumda local data'yı temizle
+            clearAuthData()
+            emit(Resource.Success(Unit))
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Logout error", e)
+            // Hata olsa bile local data'yı temizle
+            clearAuthData()
+            emit(Resource.Success(Unit))
+        }
+    }
+
+    // ==================== HELPER METHODS ====================
+    private suspend fun saveAuthData(authResponse: AuthResponse) {
+        preferencesManager.saveJwtToken(authResponse.token)
+        authResponse.refreshToken?.let {
+            preferencesManager.saveRefreshToken(it)
+        }
+        preferencesManager.saveUserEmail(authResponse.user.email)
+        Log.i(TAG, "Auth data saved: ${authResponse.user.email}")
+    }
+
+    private suspend fun clearAuthData() {
         preferencesManager.clearAll()
+        Log.i(TAG, "Auth data cleared")
     }
 }
