@@ -70,12 +70,24 @@ class AuthRepository @Inject constructor(
                 context.getString(R.string.error_unknown_response)
             } else {
                 val gson = com.google.gson.Gson()
-                val apiResponse = gson.fromJson(errorBody, ApiResponse::class.java)
 
-                if (apiResponse?.error != null) {
-                    errorMessageMapper.mapErrorMessage(apiResponse.error.message)
-                } else {
-                    context.getString(R.string.error_cant_parse_error_message)
+                try {
+                    val validationError = gson.fromJson(errorBody, ValidationErrorResponse::class.java)
+                    if (validationError?.errors != null && validationError.errors.isNotEmpty()) {
+                        // İlk field error mesajını göster
+                        val firstError = validationError.errors.first()
+                        errorMessageMapper.mapErrorMessage(firstError.message)
+                    } else {
+                        errorMessageMapper.mapErrorMessage(validationError?.message ?: "")
+                    }
+                } catch (e: Exception) {
+                    // ValidationErrorResponse değilse, normal ApiResponse dene
+                    val apiResponse = gson.fromJson(errorBody, ApiResponse::class.java)
+                    if (apiResponse?.error != null) {
+                        errorMessageMapper.mapErrorMessage(apiResponse.error.message)
+                    } else {
+                        context.getString(R.string.error_cant_parse_error_message)
+                    }
                 }
             }
         } catch (e: Exception) {
