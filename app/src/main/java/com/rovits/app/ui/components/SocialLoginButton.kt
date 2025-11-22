@@ -21,10 +21,12 @@ import com.rovits.app.ui.theme.TextPrimary
 @Composable
 fun SocialLoginButton(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     OutlinedButton(
         onClick = onClick,
+        enabled = enabled,
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp),

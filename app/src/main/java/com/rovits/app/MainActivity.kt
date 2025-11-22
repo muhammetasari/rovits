@@ -1,26 +1,43 @@
 package com.rovits.app
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.rovits.app.ui.screens.ForgotPasswordScreen
+import com.rovits.app.ui.screens.HomeScreen
 import com.rovits.app.ui.screens.LoginScreen
 import com.rovits.app.ui.screens.RegisterScreen
 import com.rovits.app.ui.screens.SplashScreen
 import com.rovits.app.ui.theme.RovitsAppTheme
+import com.rovits.app.ui.viewmodel.AuthViewModel
+import com.rovits.app.utils.LocaleHelper
 
 class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(newBase?.let { LocaleHelper.setLocale(it, LocaleHelper.getPersistedLocale(it)) })
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -41,6 +58,42 @@ class MainActivity : ComponentActivity() {
 fun RovitsNavigation() {
     val navController = rememberNavController()
     val context = LocalContext.current
+    val viewModel: AuthViewModel = viewModel()
+    val authState by viewModel.authState.collectAsState()
+
+    // Google Sign-In configuration
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(context.getString(R.string.default_web_client_id))
+        .requestEmail()
+        .build()
+
+    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+
+    // Google Sign-In launcher
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                account?.let {
+                    viewModel.signInWithGoogle(it, context)
+                }
+            } catch (e: ApiException) {
+                // Handle error
+            }
+        }
+    }
+
+    // Check authentication state for navigation
+    LaunchedEffect(authState.currentUser) {
+        if (authState.currentUser != null && navController.currentDestination?.route == "splash") {
+            navController.navigate("home") {
+                popUpTo("splash") { inclusive = true }
+            }
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -58,37 +111,39 @@ fun RovitsNavigation() {
 
         composable("login") {
             LoginScreen(
+                viewModel = viewModel,
                 onNavigateToForgotPassword = {
                     navController.navigate("forgot_password")
                 },
                 onNavigateToRegister = {
                     navController.navigate("register")
                 },
-                onLoginClick = { email, password ->
-                    // TODO: Implement login logic
-                    Toast.makeText(context, "Login: $email", Toast.LENGTH_SHORT).show()
+                onLoginSuccess = {
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                    }
                 },
                 onGoogleSignInClick = {
-                    // TODO: Implement Google sign in
-                    Toast.makeText(context, "Google Sign In", Toast.LENGTH_SHORT).show()
+                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
                 }
             )
         }
 
         composable("forgot_password") {
             ForgotPasswordScreen(
+                viewModel = viewModel,
                 onBackPressed = {
                     navController.navigateUp()
                 },
-                onSendResetLink = { email ->
-                    // TODO: Implement password reset
-                    Toast.makeText(context, "Reset link sent to: $email", Toast.LENGTH_SHORT).show()
+                onResetSuccess = {
+                    navController.navigateUp()
                 }
             )
         }
 
         composable("register") {
             RegisterScreen(
+                viewModel = viewModel,
                 onBackPressed = {
                     navController.navigateUp()
                 },
@@ -97,17 +152,25 @@ fun RovitsNavigation() {
                         popUpTo("login") { inclusive = true }
                     }
                 },
-                onRegisterClick = { fullName, email, password ->
-                    // TODO: Implement registration logic
-                    Toast.makeText(context, "Register: $fullName, $email", Toast.LENGTH_SHORT).show()
+                onRegisterSuccess = {
+                    navController.navigate("home") {
+                        popUpTo("register") { inclusive = true }
+                    }
                 },
                 onGoogleSignInClick = {
-                    // TODO: Implement Google sign in
-                    Toast.makeText(context, "Google Sign In", Toast.LENGTH_SHORT).show()
-                },
-                onLanguageClick = {
-                    // TODO: Implement language change
-                    Toast.makeText(context, "Language Change", Toast.LENGTH_SHORT).show()
+                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
+                }
+            )
+        }
+
+        composable("home") {
+            HomeScreen(
+                user = authState.currentUser,
+                onLogout = {
+                    viewModel.signOut()
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             )
         }

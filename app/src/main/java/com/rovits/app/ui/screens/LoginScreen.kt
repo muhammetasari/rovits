@@ -1,5 +1,6 @@
 package com.rovits.app.ui.screens
 
+import android.app.Activity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -17,16 +19,20 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rovits.app.R
+import com.rovits.app.data.repository.AuthRepository
 import com.rovits.app.ui.components.*
 import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.theme.TextSecondary
+import com.rovits.app.ui.viewmodel.AuthViewModel
+import com.rovits.app.utils.LocaleHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
+    viewModel: AuthViewModel,
     onNavigateToForgotPassword: () -> Unit,
     onNavigateToRegister: () -> Unit,
-    onLoginClick: (email: String, password: String) -> Unit,
+    onLoginSuccess: () -> Unit,
     onGoogleSignInClick: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
@@ -36,6 +42,26 @@ fun LoginScreen(
     var showPrivacyDialog by remember { mutableStateOf(false) }
     var showLanguageMenu by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+    val authState by viewModel.authState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Handle authentication state
+    LaunchedEffect(authState.isSuccess) {
+        if (authState.isSuccess) {
+            viewModel.clearSuccess()
+            onLoginSuccess()
+        }
+    }
+
+    // Handle errors
+    LaunchedEffect(authState.error) {
+        authState.error?.let { error ->
+            snackbarHostState.showSnackbar(error)
+            viewModel.clearError()
+        }
+    }
+
     // Show dialogs
     if (showTermsDialog) {
         TermsOfUseDialog(onDismiss = { showTermsDialog = false })
@@ -43,6 +69,7 @@ fun LoginScreen(
     if (showPrivacyDialog) {
         PrivacyPolicyDialog(onDismiss = { showPrivacyDialog = false })
     }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -68,13 +95,21 @@ fun LoginScreen(
                             text = {
                                 Column {
                                     Button(
-                                        onClick = { showLanguageMenu = false },
+                                        onClick = {
+                                            showLanguageMenu = false
+                                            LocaleHelper.setLocale(context, LocaleHelper.LANGUAGE_ENGLISH)
+                                            (context as? Activity)?.recreate()
+                                        },
                                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                                     ) {
                                         Text("English")
                                     }
                                     Button(
-                                        onClick = { showLanguageMenu = false },
+                                        onClick = {
+                                            showLanguageMenu = false
+                                            LocaleHelper.setLocale(context, LocaleHelper.LANGUAGE_TURKISH)
+                                            (context as? Activity)?.recreate()
+                                        },
                                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
                                     ) {
                                         Text("Türkçe")
@@ -91,6 +126,9 @@ fun LoginScreen(
                     titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { paddingValues ->
         Column(
@@ -120,7 +158,8 @@ fun LoginScreen(
             RovitsTextField(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = stringResource(id = R.string.email_or_username)
+                placeholder = stringResource(id = R.string.email_or_username),
+                enabled = !authState.isLoading
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -131,6 +170,7 @@ fun LoginScreen(
                 onValueChange = { password = it },
                 placeholder = stringResource(id = R.string.password),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                enabled = !authState.isLoading,
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
@@ -146,7 +186,8 @@ fun LoginScreen(
             // Forgot Password
             TextButton(
                 onClick = onNavigateToForgotPassword,
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier.align(Alignment.End),
+                enabled = !authState.isLoading
             ) {
                 Text(
                     text = stringResource(id = R.string.forgot_password),
@@ -158,10 +199,28 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Login Button
-            LoginButton(
-                text = stringResource(id = R.string.login),
-                onClick = { onLoginClick(email, password) }
-            )
+            Button(
+                onClick = { viewModel.signInWithEmail(email, password, context) },
+                enabled = !authState.isLoading,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                if (authState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.login),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -175,7 +234,10 @@ fun LoginScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary
                 )
-                TextButton(onClick = onNavigateToRegister) {
+                TextButton(
+                    onClick = onNavigateToRegister,
+                    enabled = !authState.isLoading
+                ) {
                     Text(
                         text = stringResource(id = R.string.sign_up),
                         style = MaterialTheme.typography.bodyMedium
@@ -186,7 +248,10 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Google Sign In Button
-            SocialLoginButton(onClick = onGoogleSignInClick)
+            SocialLoginButton(
+                onClick = onGoogleSignInClick,
+                enabled = !authState.isLoading
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -205,10 +270,12 @@ fun LoginScreen(
 fun LoginScreenPreview() {
     RovitsAppTheme {
         LoginScreen(
+            viewModel = AuthViewModel(AuthRepository()),
             onNavigateToForgotPassword = {},
             onNavigateToRegister = {},
-            onLoginClick = { _, _ -> },
+            onLoginSuccess = {},
             onGoogleSignInClick = {}
         )
     }
 }
+

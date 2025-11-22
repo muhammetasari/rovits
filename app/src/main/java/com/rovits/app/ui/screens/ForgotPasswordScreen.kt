@@ -9,22 +9,47 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rovits.app.R
+import com.rovits.app.data.repository.AuthRepository
 import com.rovits.app.ui.components.*
 import com.rovits.app.ui.theme.RovitsAppTheme
+import com.rovits.app.ui.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotPasswordScreen(
+    viewModel: AuthViewModel,
     onBackPressed: () -> Unit,
-    onSendResetLink: (email: String) -> Unit
+    onResetSuccess: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var showTermsDialog by remember { mutableStateOf(false) }
     var showPrivacyDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val authState by viewModel.authState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Handle success
+    LaunchedEffect(authState.isSuccess) {
+        if (authState.isSuccess) {
+            snackbarHostState.showSnackbar(context.getString(R.string.success_password_reset))
+            viewModel.clearSuccess()
+            onResetSuccess()
+        }
+    }
+
+    // Handle errors
+    LaunchedEffect(authState.error) {
+        authState.error?.let { error ->
+            snackbarHostState.showSnackbar(error)
+            viewModel.clearError()
+        }
+    }
 
     // Show dialogs
     if (showTermsDialog) {
@@ -56,6 +81,9 @@ fun ForgotPasswordScreen(
                     titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { paddingValues ->
         Column(
@@ -76,16 +104,35 @@ fun ForgotPasswordScreen(
             RovitsTextField(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = stringResource(id = R.string.email_or_username)
+                placeholder = stringResource(id = R.string.email_or_username),
+                enabled = !authState.isLoading
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             // Send Reset Link Button
-            LoginButton(
-                text = stringResource(id = R.string.send_reset_link),
-                onClick = { onSendResetLink(email) }
-            )
+            Button(
+                onClick = { viewModel.sendPasswordResetEmail(email, context) },
+                enabled = !authState.isLoading,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                if (authState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.send_reset_link),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -104,8 +151,9 @@ fun ForgotPasswordScreen(
 fun ForgotPasswordScreenPreview() {
     RovitsAppTheme {
         ForgotPasswordScreen(
+            viewModel = AuthViewModel(AuthRepository()),
             onBackPressed = {},
-            onSendResetLink = {}
+            onResetSuccess = {}
         )
     }
 }

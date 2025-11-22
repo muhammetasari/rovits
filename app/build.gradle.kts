@@ -72,9 +72,19 @@ dependencies {
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.8.4")
 
-    // Firebase (minimal)
+    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+
+    // Lifecycle & ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
 
     // Testing
     testImplementation(libs.junit)

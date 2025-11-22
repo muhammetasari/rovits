@@ -5,31 +5,33 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rovits.app.R
+import com.rovits.app.data.repository.AuthRepository
 import com.rovits.app.ui.components.*
 import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.theme.TextSecondary
+import com.rovits.app.ui.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
+    viewModel: AuthViewModel,
     onBackPressed: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    onRegisterClick: (fullName: String, email: String, password: String) -> Unit,
-    onGoogleSignInClick: () -> Unit,
-    onLanguageClick: () -> Unit
+    onRegisterSuccess: () -> Unit,
+    onGoogleSignInClick: () -> Unit
 ) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -37,7 +39,26 @@ fun RegisterScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var showTermsDialog by remember { mutableStateOf(false) }
     var showPrivacyDialog by remember { mutableStateOf(false) }
-    var showMenu by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val authState by viewModel.authState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Handle authentication state
+    LaunchedEffect(authState.isSuccess) {
+        if (authState.isSuccess) {
+            viewModel.clearSuccess()
+            onRegisterSuccess()
+        }
+    }
+
+    // Handle errors
+    LaunchedEffect(authState.error) {
+        authState.error?.let { error ->
+            snackbarHostState.showSnackbar(error)
+            viewModel.clearError()
+        }
+    }
 
     // Show dialogs
     if (showTermsDialog) {
@@ -69,6 +90,9 @@ fun RegisterScreen(
                     titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { paddingValues ->
         Column(
@@ -98,7 +122,8 @@ fun RegisterScreen(
             RovitsTextField(
                 value = fullName,
                 onValueChange = { fullName = it },
-                placeholder = stringResource(id = R.string.full_name)
+                placeholder = stringResource(id = R.string.full_name),
+                enabled = !authState.isLoading
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -107,7 +132,8 @@ fun RegisterScreen(
             RovitsTextField(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = stringResource(id = R.string.email)
+                placeholder = stringResource(id = R.string.email),
+                enabled = !authState.isLoading
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -118,6 +144,7 @@ fun RegisterScreen(
                 onValueChange = { password = it },
                 placeholder = stringResource(id = R.string.password),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                enabled = !authState.isLoading,
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
@@ -131,10 +158,28 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             // Register Button
-            LoginButton(
-                text = stringResource(id = R.string.register),
-                onClick = { onRegisterClick(fullName, email, password) }
-            )
+            Button(
+                onClick = { viewModel.signUpWithEmail(fullName, email, password, context) },
+                enabled = !authState.isLoading,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                if (authState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.register),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -157,7 +202,10 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Google Sign In Button
-            SocialLoginButton(onClick = onGoogleSignInClick)
+            SocialLoginButton(
+                onClick = onGoogleSignInClick,
+                enabled = !authState.isLoading
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -171,7 +219,10 @@ fun RegisterScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary
                 )
-                TextButton(onClick = onNavigateToLogin) {
+                TextButton(
+                    onClick = onNavigateToLogin,
+                    enabled = !authState.isLoading
+                ) {
                     Text(
                         text = stringResource(id = R.string.sign_in),
                         style = MaterialTheme.typography.bodyMedium
@@ -196,11 +247,11 @@ fun RegisterScreen(
 fun RegisterScreenPreview() {
     RovitsAppTheme {
         RegisterScreen(
+            viewModel = AuthViewModel(AuthRepository()),
             onBackPressed = {},
             onNavigateToLogin = {},
-            onRegisterClick = { _, _, _ -> },
-            onGoogleSignInClick = {},
-            onLanguageClick = {}
+            onRegisterSuccess = {},
+            onGoogleSignInClick = {}
         )
     }
 }
