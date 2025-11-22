@@ -3,9 +3,7 @@ package com.rovits.app.data.remote.api
 import com.rovits.app.data.remote.ApiConstants
 import com.rovits.app.data.remote.dto.ApiResponse
 import com.rovits.app.data.remote.dto.AuthResponse
-import com.rovits.app.data.remote.dto.LoginRequest
-import com.rovits.app.data.remote.dto.SocialLoginRequest
-import com.rovits.app.data.remote.dto.RegisterRequest
+import com.rovits.app.data.remote.dto.FirebaseTokenRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -13,42 +11,29 @@ import retrofit2.http.POST
 interface AuthApiService {
 
     /**
-     * Login with email and password
+     * Login with Firebase ID token
      *
      * Request: POST /api/auth/login
-     * Body: { "email": "user@example.com", "password": "password123" }
+     * Body: { "firebaseToken": "firebase-id-token-here..." }
      *
      * Response: ApiResponse<AuthResponse>
      */
     @POST(ApiConstants.Auth.LOGIN)
     suspend fun login(
-        @Body request: LoginRequest
+        @Body request: FirebaseTokenRequest
     ): Response<ApiResponse<AuthResponse>>
 
     /**
-     * Register new user
+     * Register new user with Firebase ID token
      *
      * Request: POST /api/auth/register
-     * Body: { "name": "John Doe", "email": "user@example.com", "password": "password123" }
+     * Body: { "firebaseToken": "firebase-id-token-here..." }
      *
      * Response: ApiResponse<AuthResponse>
      */
     @POST(ApiConstants.Auth.REGISTER)
     suspend fun register(
-        @Body request: RegisterRequest
-    ): Response<ApiResponse<AuthResponse>>
-
-    /**
-     * Social login with Firebase token
-     *
-     * Request: POST /api/auth/social-login
-     * Body: { "firebaseToken": "...", "provider": "google" }
-     *
-     * Response: ApiResponse<AuthResponse>
-     */
-    @POST(ApiConstants.Auth.SOCIAL_LOGIN)
-    suspend fun socialLogin(
-        @Body request: SocialLoginRequest
+        @Body request: FirebaseTokenRequest
     ): Response<ApiResponse<AuthResponse>>
 
     /**
@@ -56,7 +41,6 @@ interface AuthApiService {
      *
      * Request: POST /api/auth/logout
      * Headers: Authorization: Bearer <token>
-     * Body (optional): { "refreshToken": "..." }
      *
      * Response: ApiResponse<Unit>
      *
@@ -64,4 +48,17 @@ interface AuthApiService {
      */
     @POST(ApiConstants.Auth.LOGOUT)
     suspend fun logout(): Response<ApiResponse<Unit>>
+
+    /**
+     * Send email verification
+     *
+     * Request: POST /api/auth/send-email-verification
+     * Body: { "firebaseToken": "firebase-id-token-here..." }
+     *
+     * Response: ApiResponse<Unit>
+     */
+    @POST(ApiConstants.Auth.SEND_EMAIL_VERIFICATION)
+    suspend fun sendEmailVerification(
+        @Body request: FirebaseTokenRequest
+    ): Response<ApiResponse<Unit>>
 }

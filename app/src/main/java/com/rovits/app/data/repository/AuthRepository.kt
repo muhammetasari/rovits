@@ -6,9 +6,6 @@ import com.rovits.app.data.remote.dto.*
 import com.rovits.app.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.first
-import java.io.IOException
-import java.net.SocketTimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 import android.content.Context
@@ -34,8 +31,10 @@ class AuthRepository @Inject constructor(
      */
     private fun <T> handleApiResponse(response: Response<ApiResponse<T>>): Resource<T> {
         return try {
+            Log.d(TAG, "Response code: ${response.code()}, isSuccessful: ${response.isSuccessful}")
             if (response.isSuccessful) {
                 val apiResponse = response.body()
+                Log.d(TAG, "Response body success: ${apiResponse?.success}, error code: ${apiResponse?.error?.code}")
 
                 if (apiResponse == null) {
                     Log.e(TAG, "Response body is null")
@@ -43,17 +42,21 @@ class AuthRepository @Inject constructor(
                 } else if (apiResponse.success && apiResponse.data != null) {
                     Resource.Success(apiResponse.data)
                 } else if (!apiResponse.success && apiResponse.error != null) {
-                    val errorMessage = errorMessageMapper.mapErrorMessage(apiResponse.error.message)
-                    Log.w(TAG, "API error: ${apiResponse.error.code} - $errorMessage")
-                    Resource.Error(errorMessage)
+                    // Error code ve message'ı birleştirerek map et
+                    val errorCode = apiResponse.error.code
+                    val errorMessage = apiResponse.error.message
+                    val combinedError = "$errorCode: $errorMessage"
+                    val mappedMessage = errorMessageMapper.mapErrorMessage(combinedError)
+                    Log.w(TAG, "API error: $errorCode - $mappedMessage")
+                    Resource.Error(mappedMessage, errorCode)
                 } else {
                     Log.e(TAG, "Invalid API response structure")
                     Resource.Error(context.getString(R.string.error_unknown))
                 }
             } else {
-                val errorMessage = parseErrorFromErrorBody(response.errorBody()?.string())
-                Log.e(TAG, "HTTP error ${response.code()}: $errorMessage")
-                Resource.Error(errorMessage)
+                val (errorMessage, errorCode) = parseErrorFromErrorBodyWithCode(response.errorBody()?.string())
+                Log.e(TAG, "HTTP error ${response.code()}: $errorMessage ($errorCode)")
+                Resource.Error(errorMessage, errorCode)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error handling API response", e)
@@ -62,135 +65,103 @@ class AuthRepository @Inject constructor(
     }
 
     /**
-     * Parse error from error body (for non-200 responses)
+     * Parse error from error body (for non-200 responses), hem mesaj hem kod döndürür
      */
-    private fun parseErrorFromErrorBody(errorBody: String?): String {
+    private fun parseErrorFromErrorBodyWithCode(errorBody: String?): Pair<String, String?> {
         return try {
             if (errorBody.isNullOrEmpty()) {
-                context.getString(R.string.error_unknown_response)
+                Pair(context.getString(R.string.error_unknown_response), null)
             } else {
                 val gson = com.google.gson.Gson()
-
                 try {
-                    val validationError = gson.fromJson(errorBody, ValidationErrorResponse::class.java)
-                    if (validationError?.errors != null && validationError.errors.isNotEmpty()) {
-                        // İlk field error mesajını göster
-                        val firstError = validationError.errors.first()
-                        errorMessageMapper.mapErrorMessage(firstError.message)
+                    // Önce doğrudan ErrorDetail parse etmeyi dene
+                    val rootObj = gson.fromJson(errorBody, com.google.gson.JsonObject::class.java)
+                    val errorObj = rootObj?.getAsJsonObject("error")
+                    val code = errorObj?.get("code")?.asString
+                    val message = errorObj?.get("message")?.asString
+                    if (code != null && message != null) {
+                        val combined = "$code: $message"
+                        Pair(errorMessageMapper.mapErrorMessage(combined), code)
                     } else {
-                        errorMessageMapper.mapErrorMessage(validationError?.message ?: "")
+                        // Fallback: eski generic parse
+                        val apiResponse = gson.fromJson(errorBody, ApiResponse::class.java)
+                        if (apiResponse?.error != null) {
+                            Pair(errorMessageMapper.mapErrorMessage(apiResponse.error.message), apiResponse.error.code)
+                        } else {
+                            Pair(context.getString(R.string.error_cant_parse_error_message), null)
+                        }
                     }
                 } catch (e: Exception) {
-                    // ValidationErrorResponse değilse, normal ApiResponse dene
-                    val apiResponse = gson.fromJson(errorBody, ApiResponse::class.java)
-                    if (apiResponse?.error != null) {
-                        errorMessageMapper.mapErrorMessage(apiResponse.error.message)
-                    } else {
-                        context.getString(R.string.error_cant_parse_error_message)
-                    }
+                    Log.e(TAG, "Error parsing errorBody as ErrorDetail: $errorBody", e)
+                    Pair(context.getString(R.string.error_parsing_response), null)
                 }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing error body", e)
-            context.getString(R.string.error_parsing_response)
+            Pair(context.getString(R.string.error_parsing_response), null)
         }
     }
 
     // ==================== LOGIN ====================
-    fun login(email: String, password: String): Flow<Resource<String>> = flow {
+    fun login(firebaseToken: String): Flow<Resource<String>> = flow {
         try {
             emit(Resource.Loading())
-
-            val response = authApi.login(LoginRequest(email, password))
+            val response = authApi.login(FirebaseTokenRequest(firebaseToken))
             val result = handleApiResponse(response)
-
             when (result) {
                 is Resource.Success -> {
-                    val authResponse = result.data!!
-                    saveAuthData(authResponse)
-                    emit(Resource.Success(authResponse.token))
+                    val authResponse = result.data
+                    if (authResponse != null) {
+                        preferencesManager.saveJwtToken(authResponse.token)
+                        preferencesManager.saveRefreshToken(authResponse.refreshToken ?: "")
+                        preferencesManager.saveUserEmail(authResponse.user.email)
+                        emit(Resource.Success(authResponse.token))
+                    } else {
+                        emit(Resource.Error(context.getString(R.string.error_unknown)))
+                    }
                 }
-                is Resource.Error -> {
-                    emit(Resource.Error(result.message ?: context.getString(R.string.error_unknown)))
-                }
-                is Resource.Loading -> {}
+                is Resource.Error -> emit(Resource.Error(
+                    result.message ?: context.getString(R.string.error_unknown),
+                    result.errorCode
+                ))
+                else -> {}
             }
-        } catch (e: SocketTimeoutException) {
-            Log.e(TAG, "Login timeout", e)
-            emit(Resource.Error(context.getString(R.string.error_timeout)))
-        } catch (e: IOException) {
-            Log.e(TAG, "Login network error", e)
-            emit(Resource.Error(context.getString(R.string.error_network)))
         } catch (e: Exception) {
-            Log.e(TAG, "Login error", e)
             emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }
 
     // ==================== REGISTER ====================
-    fun register(name: String, email: String, password: String): Flow<Resource<String>> = flow {
+    fun register(firebaseToken: String): Flow<Resource<String>> = flow {
         try {
             emit(Resource.Loading())
-
-            val response = authApi.register(RegisterRequest(name, email, password))
+            val response = authApi.register(FirebaseTokenRequest(firebaseToken))
             val result = handleApiResponse(response)
-
             when (result) {
                 is Resource.Success -> {
-                    val authResponse = result.data!!
-                    saveAuthData(authResponse)
-                    emit(Resource.Success(authResponse.token))
+                    val authResponse = result.data
+                    if (authResponse != null) {
+                        preferencesManager.saveJwtToken(authResponse.token)
+                        preferencesManager.saveRefreshToken(authResponse.refreshToken ?: "")
+                        preferencesManager.saveUserEmail(authResponse.user.email)
+                        emit(Resource.Success(authResponse.token))
+                    } else {
+                        emit(Resource.Error(context.getString(R.string.error_unknown)))
+                    }
                 }
-                is Resource.Error -> {
-                    emit(Resource.Error(result.message ?: context.getString(R.string.error_unknown)))
-                }
-                is Resource.Loading -> {}
+                is Resource.Error -> emit(Resource.Error(
+                    result.message ?: context.getString(R.string.error_unknown),
+                    result.errorCode
+                ))
+                else -> {}
             }
-        } catch (e: SocketTimeoutException) {
-            Log.e(TAG, "Register timeout", e)
-            emit(Resource.Error(context.getString(R.string.error_timeout)))
-        } catch (e: IOException) {
-            Log.e(TAG, "Register network error", e)
-            emit(Resource.Error(context.getString(R.string.error_network)))
         } catch (e: Exception) {
-            Log.e(TAG, "Register error", e)
-            emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
-        }
-    }
-
-    // ==================== SOCIAL LOGIN ====================
-    fun socialLogin(firebaseToken: String): Flow<Resource<String>> = flow {
-        try {
-            emit(Resource.Loading())
-
-            val response = authApi.socialLogin(SocialLoginRequest(firebaseToken, "google"))
-            val result = handleApiResponse(response)
-
-            when (result) {
-                is Resource.Success -> {
-                    val authResponse = result.data!!
-                    saveAuthData(authResponse)
-                    emit(Resource.Success(authResponse.token))
-                }
-                is Resource.Error -> {
-                    emit(Resource.Error(result.message ?: context.getString(R.string.error_unknown)))
-                }
-                is Resource.Loading -> {}
-            }
-        } catch (e: SocketTimeoutException) {
-            Log.e(TAG, "Social login timeout", e)
-            emit(Resource.Error(context.getString(R.string.error_timeout)))
-        } catch (e: IOException) {
-            Log.e(TAG, "Social login network error", e)
-            emit(Resource.Error(context.getString(R.string.error_network)))
-        } catch (e: Exception) {
-            Log.e(TAG, "Social login error", e)
             emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }
 
     // ==================== LOGOUT ====================
-    suspend fun logout(): Flow<Resource<Unit>> = flow {
+    fun logout(): Flow<Resource<Unit>> = flow {
         try {
             emit(Resource.Loading())
 
@@ -213,6 +184,32 @@ class AuthRepository @Inject constructor(
             // Hata olsa bile local data'yı temizle
             clearAuthData()
             emit(Resource.Success(Unit))
+        }
+    }
+
+    // ==================== SEND EMAIL VERIFICATION ====================
+    fun sendEmailVerification(firebaseToken: String): Flow<Resource<Unit>> = flow {
+        try {
+            emit(Resource.Loading())
+            val response = authApi.sendEmailVerification(FirebaseTokenRequest(firebaseToken))
+            val result = handleApiResponse(response)
+            when (result) {
+                is Resource.Success -> {
+                    Log.i(TAG, "Email verification sent successfully")
+                    emit(Resource.Success(Unit))
+                }
+                is Resource.Error -> {
+                    Log.e(TAG, "Email verification failed: ${result.message}")
+                    emit(Resource.Error(
+                        result.message ?: context.getString(R.string.error_unknown),
+                        result.errorCode
+                    ))
+                }
+                else -> {}
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Email verification error", e)
+            emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }
 

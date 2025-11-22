@@ -2,33 +2,15 @@ package com.rovits.app.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
-// Login Request
-data class LoginRequest(
-    @SerializedName("email")
-    val email: String,
-    @SerializedName("password")
-    val password: String
-)
+// Tek tip istek modeli: Firebase ID token
+// Hem login hem register için kullanılır
 
-// Social Login Request (Firebase token)
-data class SocialLoginRequest(
+data class FirebaseTokenRequest(
     @SerializedName("firebaseToken")
-    val firebaseToken: String,
-    @SerializedName("provider")
-    val provider: String // "google" veya "apple"
+    val firebaseToken: String
 )
 
-// Register Request
-data class RegisterRequest(
-    @SerializedName("name")
-    val name: String,
-    @SerializedName("email")
-    val email: String,
-    @SerializedName("password")
-    val password: String
-)
-
-// Auth Response
+// Auth Response (backend'e uygun şekilde güncellendi)
 data class AuthResponse(
     @SerializedName("token")
     val token: String,
@@ -38,12 +20,16 @@ data class AuthResponse(
     val user: UserDto
 )
 
-// User DTO
+// User DTO (backend'e uygun şekilde güncellendi)
 data class UserDto(
     @SerializedName("id")
     val id: String,
     @SerializedName("email")
     val email: String,
     @SerializedName("name")
-    val name: String?
+    val name: String?,
+    @SerializedName("role")
+    val role: String?,
+    @SerializedName("firebaseUid")
+    val firebaseUid: String?
 )

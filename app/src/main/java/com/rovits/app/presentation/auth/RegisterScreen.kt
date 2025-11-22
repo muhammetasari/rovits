@@ -233,7 +233,7 @@ fun RegisterScreen(
                     onDone = {
                         focusManager.clearFocus()
                         if (isFormValid) {
-                            viewModel.register(name, email, password)
+                            viewModel.registerWithEmailPassword(name, email, password)
                         }
                     }
                 ),
@@ -280,7 +280,7 @@ fun RegisterScreen(
 
             // Register Button
             Button(
-                onClick = { viewModel.register(name, email, password) },
+                onClick = { viewModel.registerWithEmailPassword(name, email, password) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading && isFormValid
             ) {

@@ -53,6 +53,17 @@
     <string name="error_forbidden">Erişim yasak.</string>
     <string name="error_not_found">Kaynak bulunamadı.</string>
     <string name="error_too_many_requests">Çok fazla istek. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="error_email_not_verified">E-posta doğrulanmadı. Lütfen önce e-posta adresinizi doğrulayın.</string>
+    <string name="error_user_not_logged_in">Kullanıcı giriş yapmamış. Lütfen önce giriş yapın.</string>
+    <string name="error_send_verification_email">Doğrulama e-postası gönderilemedi. Lütfen tekrar deneyin.</string>
+
+    <!-- Email Verification -->
+    <string name="email_verification_title">E-posta Doğrulama Gerekli</string>
+    <string name="email_verification_message">Devam etmek için lütfen e-posta adresinizi doğrulayın. E-postanıza bir doğrulama bağlantısı gönderdik.</string>
+    <string name="resend_verification_email">Doğrulama E-postasını Tekrar Gönder</string>
+    <string name="verification_email_sent">Doğrulama e-postası başarıyla gönderildi!</string>
+    <string name="verification_email_failed">Doğrulama e-postası gönderilemedi. Lütfen tekrar deneyin.</string>
+    <string name="continue_text">Devam Et</string>
 
     <!-- Home Screen -->
     <string name="welcome_message">Rovits\'e Hoş Geldiniz!</string>

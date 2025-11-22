@@ -1,5 +1,6 @@
 package com.rovits.app.presentation.auth
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -24,7 +25,6 @@ import com.rovits.app.R
 import com.rovits.app.presentation.settings.LanguageViewModel
 import com.rovits.app.util.Language
 import kotlinx.coroutines.launch
-import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +42,8 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showLanguageMenu by remember { mutableStateOf(false) }
+    var showEmailVerificationDialog by remember { mutableStateOf(false) }
+    var currentFirebaseToken by remember { mutableStateOf("") }
 
     val isLoading = loginState is LoginState.Loading
 
@@ -69,9 +71,19 @@ fun LoginScreen(
 
     // Login success durumunda navigate et
     LaunchedEffect(loginState) {
-        if (loginState is LoginState.Success) {
-            onLoginSuccess()
-            viewModel.resetState()
+        when (loginState) {
+            is LoginState.Success -> {
+                onLoginSuccess()
+                viewModel.resetState()
+            }
+            is LoginState.EmailNotVerified -> {
+                currentFirebaseToken = (loginState as LoginState.EmailNotVerified).firebaseToken
+                showEmailVerificationDialog = true
+            }
+            is LoginState.VerificationEmailSent -> {
+                // Email gönderildi mesajı gösterilecek
+            }
+            else -> {}
         }
     }
 
@@ -175,7 +187,7 @@ fun LoginScreen(
 
             // Login Button
             Button(
-                onClick = { viewModel.login(email, password) },
+                onClick = { viewModel.loginWithEmailPassword(email, password) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading && email.isNotEmpty() && password.isNotEmpty()
             ) {
@@ -229,7 +241,11 @@ fun LoginScreen(
             }
 
             // Error Messages
-            val errorMessage = (loginState as? LoginState.Error)?.message
+            val errorMessage = when (loginState) {
+                is LoginState.Error -> (loginState as? LoginState.Error)?.message
+                is LoginState.EmailNotVerified -> stringResource(R.string.error_email_not_verified)
+                else -> null
+            }
 
             if (errorMessage != null) {
                 Log.e("LoginScreen", "Login error: $errorMessage")
@@ -239,7 +255,83 @@ fun LoginScreen(
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+
+            // Verification email sent success message
+            if (loginState is LoginState.VerificationEmailSent) {
+                Text(
+                    text = stringResource(R.string.verification_email_sent),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
+    }
+
+    // Email Verification Dialog
+    if (showEmailVerificationDialog) {
+        val isEmailSent = loginState is LoginState.VerificationEmailSent
+
+        AlertDialog(
+            onDismissRequest = {
+                showEmailVerificationDialog = false
+                viewModel.resetState()
+            },
+            title = { Text(stringResource(R.string.email_verification_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.email_verification_message))
+
+                    if (isEmailSent) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.verification_email_sent),
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                if (isEmailSent) {
+                    TextButton(
+                        onClick = {
+                            showEmailVerificationDialog = false
+                            viewModel.resetState()
+                        }
+                    ) {
+                        Text(stringResource(R.string.continue_text))
+                    }
+                } else {
+                    TextButton(
+                        onClick = {
+                            viewModel.sendEmailVerification(currentFirebaseToken)
+                        },
+                        enabled = loginState !is LoginState.Loading
+                    ) {
+                        if (loginState is LoginState.Loading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(stringResource(R.string.resend_verification_email))
+                        }
+                    }
+                }
+            },
+            dismissButton = {
+                if (!isEmailSent) {
+                    TextButton(
+                        onClick = {
+                            showEmailVerificationDialog = false
+                            viewModel.resetState()
+                        }
+                    ) {
+                        Text(stringResource(R.string.back))
+                    }
+                }
+            }
+        )
     }
 }

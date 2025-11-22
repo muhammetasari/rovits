@@ -12,9 +12,9 @@ object ApiConstants {
     object Auth {
         const val LOGIN = "api/auth/login"
         const val REGISTER = "api/auth/register"
-        const val SOCIAL_LOGIN = "api/auth/social-login"
-        const val LOGOUT = "api/auth/logout"  // ✅ YENİ
+        const val LOGOUT = "api/auth/logout"
         const val REFRESH = "api/auth/refresh"
+        const val SEND_EMAIL_VERIFICATION = "api/auth/send-email-verification"
     }
 
     object Places {

@@ -52,6 +52,17 @@
     <string name="error_forbidden">Access forbidden.</string>
     <string name="error_not_found">Resource not found.</string>
     <string name="error_too_many_requests">Too many requests. Please try again later.</string>
+    <string name="error_email_not_verified">Email not verified. Please verify your email address first.</string>
+    <string name="error_user_not_logged_in">User not logged in. Please login first.</string>
+    <string name="error_send_verification_email">Failed to send verification email. Please try again.</string>
+
+    <!-- Email Verification -->
+    <string name="email_verification_title">Email Verification Required</string>
+    <string name="email_verification_message">Please verify your email address to continue. We\'ve sent a verification link to your email.</string>
+    <string name="resend_verification_email">Resend Verification Email</string>
+    <string name="verification_email_sent">Verification email sent successfully!</string>
+    <string name="verification_email_failed">Failed to send verification email. Please try again.</string>
+    <string name="continue_text">Continue</string>
 
     <!-- Home Screen -->
     <string name="welcome_message">Welcome to Rovits!</string>
