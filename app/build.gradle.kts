@@ -66,6 +66,12 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    // Material Icons Extended
+    implementation("androidx.compose.material:material-icons-extended:1.7.5")
+
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.8.4")
+
     // Firebase (minimal)
     implementation(platform(libs.firebase.bom))
     implementation("com.google.firebase:firebase-analytics")

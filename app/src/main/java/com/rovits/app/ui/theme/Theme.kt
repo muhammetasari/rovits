@@ -10,8 +10,29 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme()
-private val LightColorScheme = lightColorScheme()
+private val DarkColorScheme = darkColorScheme(
+    primary = PrimaryOrange,
+    onPrimary = BackgroundWhite,
+    secondary = PrimaryOrangeDark,
+    onSecondary = BackgroundWhite,
+    background = TextPrimary,
+    onBackground = BackgroundWhite,
+    surface = TextPrimary,
+    onSurface = BackgroundWhite,
+    error = ErrorRed
+)
+
+private val LightColorScheme = lightColorScheme(
+    primary = PrimaryOrange,
+    onPrimary = BackgroundWhite,
+    secondary = PrimaryOrangeDark,
+    onSecondary = BackgroundWhite,
+    background = BackgroundWhite,
+    onBackground = TextPrimary,
+    surface = BackgroundWhite,
+    onSurface = TextPrimary,
+    error = ErrorRed
+)
 
 @Composable
 fun RovitsAppTheme(

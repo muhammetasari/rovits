@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Outer Circle -->
+    <path
+        android:pathData="M60,60m-55,0a55,55 0,1 1,110 0a55,55 0,1 1,-110 0"
+        android:strokeWidth="2"
+        android:strokeColor="#1A1A1A"
+        android:fillColor="#FFFFFF"/>
+
+    <!-- Letter R -->
+    <path
+        android:pathData="M45,40 L55,40 Q65,40 65,50 Q65,55 60,57 L67,72 L60,72 L54,58 L51,58 L51,72 L45,72 Z M51,45 L51,53 L55,53 Q60,53 60,49 Q60,45 55,45 Z"
+        android:fillColor="#1A1A1A"/>
+</vector>
+
