@@ -1,5 +1,7 @@
 package com.rovits.app.di
 
+import android.content.Context
+import com.rovits.app.BuildConfig
 import com.rovits.app.data.local.PreferencesManager
 import com.rovits.app.data.remote.ApiConstants
 import com.rovits.app.data.remote.AuthInterceptor
@@ -7,6 +9,7 @@ import com.rovits.app.data.remote.api.AuthApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -14,7 +17,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
-import com.rovits.app.BuildConfig
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -23,9 +25,10 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideAuthInterceptor(
-        preferencesManager: PreferencesManager
+        preferencesManager: PreferencesManager,
+        @ApplicationContext context: Context
     ): AuthInterceptor {
-        return AuthInterceptor(preferencesManager)
+        return AuthInterceptor(preferencesManager, context)
     }
 
     @Provides

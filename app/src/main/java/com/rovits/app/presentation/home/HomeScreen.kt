@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -19,14 +17,15 @@ import com.rovits.app.R
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onLogout: () -> Unit,
-    onNavigateToLanguage: () -> Unit // YENİ
+    onNavigateToLanguage: () -> Unit
 ) {
-    val logoutCompleted by viewModel.logoutCompleted.collectAsStateWithLifecycle()
+    val logoutState by viewModel.logoutState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(logoutCompleted) {
-        if (logoutCompleted) {
+    // Logout başarılı olunca navigate et
+    LaunchedEffect(logoutState) {
+        if (logoutState is LogoutState.Success) {
             onLogout()
-            viewModel.onLogoutCompleted()
+            viewModel.resetLogoutState()
         }
     }
 
@@ -50,9 +49,11 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // Language Button
             OutlinedButton(
                 onClick = onNavigateToLanguage,
-                modifier = Modifier.fillMaxWidth(0.6f)
+                modifier = Modifier.fillMaxWidth(0.6f),
+                enabled = logoutState !is LogoutState.Loading
             ) {
                 Icon(
                     imageVector = Icons.Default.Language,
@@ -62,11 +63,29 @@ fun HomeScreen(
                 Text(stringResource(R.string.change_language))
             }
 
+            // Logout Button
             Button(
                 onClick = { viewModel.logout() },
-                modifier = Modifier.fillMaxWidth(0.6f)
+                modifier = Modifier.fillMaxWidth(0.6f),
+                enabled = logoutState !is LogoutState.Loading
             ) {
-                Text(stringResource(R.string.logout))
+                if (logoutState is LogoutState.Loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(stringResource(R.string.logout))
+                }
+            }
+
+            // Error message (nadiren gösterilir)
+            if (logoutState is LogoutState.Error) {
+                Text(
+                    text = (logoutState as LogoutState.Error).message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }

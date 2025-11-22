@@ -2,14 +2,11 @@ package com.rovits.app.data.repository
 
 import com.rovits.app.data.local.PreferencesManager
 import com.rovits.app.data.remote.api.AuthApiService
-import com.rovits.app.data.remote.dto.LoginRequest
-import com.rovits.app.data.remote.dto.RegisterRequest
-import com.rovits.app.data.remote.dto.SocialLoginRequest
+import com.rovits.app.data.remote.dto.*
 import com.rovits.app.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import okhttp3.ResponseBody // YENİ IMPORT
-import org.json.JSONObject // YENİ IMPORT
+import kotlinx.coroutines.flow.first
 import java.io.IOException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
@@ -18,6 +15,7 @@ import android.content.Context
 import com.rovits.app.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import android.util.Log
+import retrofit2.Response
 
 @Singleton
 class AuthRepository @Inject constructor(
@@ -27,149 +25,209 @@ class AuthRepository @Inject constructor(
     private val errorMessageMapper: com.rovits.app.util.ErrorMessageMapper
 ) {
 
+    companion object {
+        private const val TAG = "AuthRepository"
+    }
+
     /**
-     * Retrofit'in hata gövdesini (errorBody) JSON'a dönüştürür
-     * ve içindeki "message" alanını alır.
-     * Backend'den gelen mesajları ErrorMessageMapper ile uygulamanın diline çevirir.
-     *
-     * NOT: Backend Accept-Language header'ını desteklemiyor!
-     * Backend her zaman Türkçe hata mesajları gönderiyor.
-     * Bu fonksiyon Türkçe mesajları alıp uygulama dilinde gösterilmek üzere çeviriyor.
-     * TODO: Backend güncellendiğinde Accept-Language desteği eklenebilir.
+     * Generic API response handler for new backend format
      */
-    private fun parseErrorMessage(errorBody: ResponseBody?): String {
+    private fun <T> handleApiResponse(response: Response<ApiResponse<T>>): Resource<T> {
         return try {
-            val errorJsonString = errorBody?.string()
-            if (errorJsonString.isNullOrEmpty()) {
-                Log.w("AuthRepository", "Error body is null or empty")
-                context.getString(R.string.error_unknown_response)
-            } else {
-                val jsonObject = JSONObject(errorJsonString)
-                // optString boş string döner, null değil
-                val messageFromJson = jsonObject.optString("message", "")
-                val errorFromJson = jsonObject.optString("error", "")
+            if (response.isSuccessful) {
+                val apiResponse = response.body()
 
-                val backendMessage = when {
-                    messageFromJson.isNotEmpty() -> messageFromJson
-                    errorFromJson.isNotEmpty() -> errorFromJson
-                    else -> context.getString(R.string.error_cant_parse_error_message)
+                if (apiResponse == null) {
+                    Log.e(TAG, "Response body is null")
+                    Resource.Error(context.getString(R.string.error_unknown))
+                } else if (apiResponse.success && apiResponse.data != null) {
+                    Resource.Success(apiResponse.data)
+                } else if (!apiResponse.success && apiResponse.error != null) {
+                    val errorMessage = errorMessageMapper.mapErrorMessage(apiResponse.error.message)
+                    Log.w(TAG, "API error: ${apiResponse.error.code} - $errorMessage")
+                    Resource.Error(errorMessage)
+                } else {
+                    Log.e(TAG, "Invalid API response structure")
+                    Resource.Error(context.getString(R.string.error_unknown))
                 }
-
-                Log.d("AuthRepository", "Backend error message: $backendMessage")
-
-                // Backend'den gelen mesajı map et (Türkçe -> Uygulama dili)
-                val mappedMessage = errorMessageMapper.mapErrorMessage(backendMessage)
-
-                Log.d("AuthRepository", "Mapped error message: $mappedMessage")
-
-                mappedMessage
+            } else {
+                val errorMessage = parseErrorFromErrorBody(response.errorBody()?.string())
+                Log.e(TAG, "HTTP error ${response.code()}: $errorMessage")
+                Resource.Error(errorMessage)
             }
         } catch (e: Exception) {
-            Log.e("AuthRepository", "Error parsing error message", e)
+            Log.e(TAG, "Error handling API response", e)
+            Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown))
+        }
+    }
+
+    /**
+     * Parse error from error body (for non-200 responses)
+     */
+    private fun parseErrorFromErrorBody(errorBody: String?): String {
+        return try {
+            if (errorBody.isNullOrEmpty()) {
+                context.getString(R.string.error_unknown_response)
+            } else {
+                val gson = com.google.gson.Gson()
+
+                try {
+                    val validationError = gson.fromJson(errorBody, ValidationErrorResponse::class.java)
+                    if (validationError?.errors != null && validationError.errors.isNotEmpty()) {
+                        // İlk field error mesajını göster
+                        val firstError = validationError.errors.first()
+                        errorMessageMapper.mapErrorMessage(firstError.message)
+                    } else {
+                        errorMessageMapper.mapErrorMessage(validationError?.message ?: "")
+                    }
+                } catch (e: Exception) {
+                    // ValidationErrorResponse değilse, normal ApiResponse dene
+                    val apiResponse = gson.fromJson(errorBody, ApiResponse::class.java)
+                    if (apiResponse?.error != null) {
+                        errorMessageMapper.mapErrorMessage(apiResponse.error.message)
+                    } else {
+                        context.getString(R.string.error_cant_parse_error_message)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing error body", e)
             context.getString(R.string.error_parsing_response)
         }
     }
 
+    // ==================== LOGIN ====================
     fun login(email: String, password: String): Flow<Resource<String>> = flow {
         try {
             emit(Resource.Loading())
 
             val response = authApi.login(LoginRequest(email, password))
+            val result = handleApiResponse(response)
 
-            if (response.isSuccessful && response.body() != null) {
-                val authResponse = response.body()!!
-
-                // Token'ları kaydet
-                preferencesManager.saveJwtToken(authResponse.token)
-                authResponse.refreshToken?.let {
-                    preferencesManager.saveRefreshToken(it)
+            when (result) {
+                is Resource.Success -> {
+                    val authResponse = result.data!!
+                    saveAuthData(authResponse)
+                    emit(Resource.Success(authResponse.token))
                 }
-                preferencesManager.saveUserEmail(authResponse.user.email)
-
-                emit(Resource.Success(authResponse.token))
-            } else {
-                val errorMessage = parseErrorMessage(response.errorBody())
-                emit(Resource.Error(errorMessage))
+                is Resource.Error -> {
+                    emit(Resource.Error(result.message ?: context.getString(R.string.error_unknown)))
+                }
+                is Resource.Loading -> {}
             }
         } catch (e: SocketTimeoutException) {
-            Log.e("AuthRepository", "Login timeout", e)
+            Log.e(TAG, "Login timeout", e)
             emit(Resource.Error(context.getString(R.string.error_timeout)))
         } catch (e: IOException) {
-            Log.e("AuthRepository", "Login network error", e)
+            Log.e(TAG, "Login network error", e)
             emit(Resource.Error(context.getString(R.string.error_network)))
         } catch (e: Exception) {
-            Log.e("AuthRepository", "Login error", e)
+            Log.e(TAG, "Login error", e)
             emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }
 
+    // ==================== REGISTER ====================
     fun register(name: String, email: String, password: String): Flow<Resource<String>> = flow {
         try {
             emit(Resource.Loading())
+
             val response = authApi.register(RegisterRequest(name, email, password))
+            val result = handleApiResponse(response)
 
-            if (response.isSuccessful && response.body() != null) {
-                val authResponse = response.body()!!
-
-                // Token'ları kaydet (kayıt sonrası otomatik giriş)
-                preferencesManager.saveJwtToken(authResponse.token)
-                authResponse.refreshToken?.let {
-                    preferencesManager.saveRefreshToken(it)
+            when (result) {
+                is Resource.Success -> {
+                    val authResponse = result.data!!
+                    saveAuthData(authResponse)
+                    emit(Resource.Success(authResponse.token))
                 }
-                preferencesManager.saveUserEmail(authResponse.user.email)
-
-                emit(Resource.Success(authResponse.token))
-            } else {
-                val errorMessage = parseErrorMessage(response.errorBody())
-                emit(Resource.Error(errorMessage))
+                is Resource.Error -> {
+                    emit(Resource.Error(result.message ?: context.getString(R.string.error_unknown)))
+                }
+                is Resource.Loading -> {}
             }
         } catch (e: SocketTimeoutException) {
-            Log.e("AuthRepository", "Register timeout", e)
+            Log.e(TAG, "Register timeout", e)
             emit(Resource.Error(context.getString(R.string.error_timeout)))
         } catch (e: IOException) {
-            Log.e("AuthRepository", "Register network error", e)
+            Log.e(TAG, "Register network error", e)
             emit(Resource.Error(context.getString(R.string.error_network)))
         } catch (e: Exception) {
-            Log.e("AuthRepository", "Register error", e)
+            Log.e(TAG, "Register error", e)
             emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }
 
-
+    // ==================== SOCIAL LOGIN ====================
     fun socialLogin(firebaseToken: String): Flow<Resource<String>> = flow {
         try {
             emit(Resource.Loading())
 
             val response = authApi.socialLogin(SocialLoginRequest(firebaseToken, "google"))
+            val result = handleApiResponse(response)
 
-            if (response.isSuccessful && response.body() != null) {
-                val authResponse = response.body()!!
-
-                // Token'ları kaydet
-                preferencesManager.saveJwtToken(authResponse.token)
-                authResponse.refreshToken?.let {
-                    preferencesManager.saveRefreshToken(it)
+            when (result) {
+                is Resource.Success -> {
+                    val authResponse = result.data!!
+                    saveAuthData(authResponse)
+                    emit(Resource.Success(authResponse.token))
                 }
-                preferencesManager.saveUserEmail(authResponse.user.email)
-
-                emit(Resource.Success(authResponse.token))
-            } else {
-                val errorMessage = parseErrorMessage(response.errorBody())
-                emit(Resource.Error(errorMessage))
+                is Resource.Error -> {
+                    emit(Resource.Error(result.message ?: context.getString(R.string.error_unknown)))
+                }
+                is Resource.Loading -> {}
             }
         } catch (e: SocketTimeoutException) {
-            Log.e("AuthRepository", "Social login timeout", e)
+            Log.e(TAG, "Social login timeout", e)
             emit(Resource.Error(context.getString(R.string.error_timeout)))
         } catch (e: IOException) {
-            Log.e("AuthRepository", "Social login network error", e)
+            Log.e(TAG, "Social login network error", e)
             emit(Resource.Error(context.getString(R.string.error_network)))
         } catch (e: Exception) {
-            Log.e("AuthRepository", "Social login error", e)
+            Log.e(TAG, "Social login error", e)
             emit(Resource.Error(e.localizedMessage ?: context.getString(R.string.error_unknown)))
         }
     }
 
-    suspend fun logout() {
+    // ==================== LOGOUT ====================
+    suspend fun logout(): Flow<Resource<Unit>> = flow {
+        try {
+            emit(Resource.Loading())
+
+            // Backend'e logout isteği gönder
+            val response = authApi.logout()
+
+            // Response'u kontrol et (başarısız olsa bile local data temizlenecek)
+            if (response.isSuccessful) {
+                Log.i(TAG, "Logout successful on backend")
+            } else {
+                Log.w(TAG, "Backend logout failed: ${response.code()}")
+            }
+
+            // Her durumda local data'yı temizle
+            clearAuthData()
+            emit(Resource.Success(Unit))
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Logout error", e)
+            // Hata olsa bile local data'yı temizle
+            clearAuthData()
+            emit(Resource.Success(Unit))
+        }
+    }
+
+    // ==================== HELPER METHODS ====================
+    private suspend fun saveAuthData(authResponse: AuthResponse) {
+        preferencesManager.saveJwtToken(authResponse.token)
+        authResponse.refreshToken?.let {
+            preferencesManager.saveRefreshToken(it)
+        }
+        preferencesManager.saveUserEmail(authResponse.user.email)
+        Log.i(TAG, "Auth data saved: ${authResponse.user.email}")
+    }
+
+    private suspend fun clearAuthData() {
         preferencesManager.clearAll()
+        Log.i(TAG, "Auth data cleared")
     }
 }
