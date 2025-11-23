@@ -1,5 +1,6 @@
 package com.rovits.app.ui.screens
 
+import android.util.Patterns
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -8,6 +9,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +41,10 @@ fun RegisterScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var showTermsDialog by remember { mutableStateOf(false) }
     var showPrivacyDialog by remember { mutableStateOf(false) }
+
+    val isEmailValid = remember(email) {
+        email.isEmpty() || Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
 
     val context = LocalContext.current
     val authState by viewModel.authState.collectAsState()
@@ -81,7 +87,7 @@ fun RegisterScreen(
                     IconButton(onClick = onBackPressed) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(id = R.string.content_description_back)
                         )
                     }
                 },
@@ -133,7 +139,9 @@ fun RegisterScreen(
                 value = email,
                 onValueChange = { email = it },
                 placeholder = stringResource(id = R.string.email),
-                enabled = !authState.isLoading
+                enabled = !authState.isLoading,
+                isError = !isEmailValid,
+                errorMessage = if (!isEmailValid) stringResource(id = R.string.error_invalid_email_format) else null
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -149,18 +157,23 @@ fun RegisterScreen(
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            contentDescription = if (passwordVisible) stringResource(id = R.string.content_description_hide_password) else stringResource(id = R.string.content_description_show_password)
                         )
                     }
                 }
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Password strength indicator
+            PasswordStrengthIndicator(password = password)
 
             Spacer(modifier = Modifier.height(32.dp))
 
             // Register Button
             Button(
                 onClick = { viewModel.signUpWithEmail(fullName, email, password, context) },
-                enabled = !authState.isLoading,
+                enabled = !authState.isLoading && fullName.isNotBlank() && email.isNotBlank() && password.isNotBlank() && isEmailValid,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -242,6 +255,64 @@ fun RegisterScreen(
     }
 }
 
+@Composable
+private fun PasswordStrengthIndicator(password: String) {
+    if (password.isEmpty()) return
+
+    val score by remember(password) { mutableStateOf(calculatePasswordScore(password)) }
+
+    val (label, color) = when {
+        score < 0.34f -> stringResource(id = R.string.password_weak) to MaterialTheme.colorScheme.error
+        score < 0.67f -> stringResource(id = R.string.password_medium) to MaterialTheme.colorScheme.primary
+        else -> stringResource(id = R.string.password_strong) to MaterialTheme.colorScheme.secondary
+    }
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 4.dp)) {
+        LinearProgressIndicator(
+            progress = { score },
+            color = color,
+            trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                color = color
+            )
+        }
+    }
+}
+
+private fun calculatePasswordScore(password: String): Float {
+    var score = 0f
+    // length weight
+    score += when {
+        password.length >= 12 -> 0.4f
+        password.length >= 8 -> 0.25f
+        password.length >= 5 -> 0.12f
+        else -> 0f
+    }
+    // has digit
+    if (password.any { it.isDigit() }) score += 0.2f
+    // has uppercase
+    if (password.any { it.isUpperCase() }) score += 0.2f
+    // has special char
+    if (password.any { !it.isLetterOrDigit() }) score += 0.2f
+
+    return score.coerceIn(0f, 1f)
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun RegisterScreenPreview() {
@@ -255,4 +326,3 @@ fun RegisterScreenPreview() {
         )
     }
 }
-

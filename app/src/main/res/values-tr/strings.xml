@@ -72,4 +72,14 @@
     <string name="success_register">Kayıt başarılı</string>
     <string name="success_password_reset">Şifre sıfırlama e-postası gönderildi</string>
     <string name="success_logout">Çıkış yapıldı</string>
+
+    <!-- Content Descriptions -->
+    <string name="content_description_back">Geri</string>
+    <string name="content_description_show_password">Şifreyi göster</string>
+    <string name="content_description_hide_password">Şifreyi gizle</string>
+
+    <!-- Password Strength -->
+    <string name="password_weak">Zayıf</string>
+    <string name="password_medium">Orta</string>
+    <string name="password_strong">Güçlü</string>
 </resources>

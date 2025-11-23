@@ -61,7 +61,7 @@
     <string name="error_network">Network error. Please check your connection</string>
     <string name="error_unknown">An unknown error occurred</string>
     <string name="error_validation">Validation error</string>
-    <string name="error_invalid_email_format">Please enter a valid email address</string>
+    <string name="error_invalid_email_format">Invalid email format</string>
     <string name="error_password_too_short">Password must be at least 6 characters</string>
     <string name="error_full_name_required">Full name is required</string>
     <string name="error_email_empty">Email cannot be empty</string>
@@ -72,6 +72,16 @@
     <string name="success_register">Registration successful</string>
     <string name="success_password_reset">Password reset email sent</string>
     <string name="success_logout">Logged out successfully</string>
+
+    <!-- Content Descriptions -->
+    <string name="content_description_back">Back</string>
+    <string name="content_description_show_password">Show password</string>
+    <string name="content_description_hide_password">Hide password</string>
+
+    <!-- Password Strength -->
+    <string name="password_weak">Weak</string>
+    <string name="password_medium">Medium</string>
+    <string name="password_strong">Strong</string>
 
     <!-- Firebase -->
     <string name="default_web_client_id" translatable="false">1036460419015-8vd47s2nr1m1odi5s0kb72577s16p7ak.apps.googleusercontent.com</string>

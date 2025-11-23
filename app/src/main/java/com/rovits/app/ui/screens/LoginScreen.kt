@@ -1,6 +1,7 @@
 package com.rovits.app.ui.screens
 
 import android.app.Activity
+import android.util.Patterns
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -41,6 +42,8 @@ fun LoginScreen(
     var showTermsDialog by remember { mutableStateOf(false) }
     var showPrivacyDialog by remember { mutableStateOf(false) }
     var showLanguageMenu by remember { mutableStateOf(false) }
+    var isEmailValid by remember { mutableStateOf(false) }
+    var emailTouched by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val authState by viewModel.authState.collectAsState()
@@ -87,6 +90,7 @@ fun LoginScreen(
                         )
                     }
                     if (showLanguageMenu) {
+                        val currentLanguage = LocaleHelper.getCurrentLanguageName(context)
                         AlertDialog(
                             onDismissRequest = { showLanguageMenu = false },
                             title = {
@@ -100,7 +104,13 @@ fun LoginScreen(
                                             LocaleHelper.setLocale(context, LocaleHelper.LANGUAGE_ENGLISH)
                                             (context as? Activity)?.recreate()
                                         },
-                                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (currentLanguage == "English") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                            contentColor = if (currentLanguage == "English") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
                                     ) {
                                         Text("English")
                                     }
@@ -110,7 +120,13 @@ fun LoginScreen(
                                             LocaleHelper.setLocale(context, LocaleHelper.LANGUAGE_TURKISH)
                                             (context as? Activity)?.recreate()
                                         },
-                                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (currentLanguage == "Türkçe") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                            contentColor = if (currentLanguage == "Türkçe") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
                                     ) {
                                         Text("Türkçe")
                                     }
@@ -143,23 +159,22 @@ fun LoginScreen(
             // Logo
             RovitsLogo(size = 120.dp)
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(60.dp))
 
-            // Subtitle
-            Text(
-                text = stringResource(id = R.string.login_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary
-            )
 
-            Spacer(modifier = Modifier.height(32.dp))
 
             // Email/Username TextField
             RovitsTextField(
                 value = email,
-                onValueChange = { email = it },
-                placeholder = stringResource(id = R.string.email_or_username),
-                enabled = !authState.isLoading
+                onValueChange = {
+                    email = it
+                    emailTouched = true
+                    isEmailValid = Patterns.EMAIL_ADDRESS.matcher(it).matches()
+                },
+                placeholder = stringResource(id = R.string.email),
+                enabled = !authState.isLoading,
+                isError = !isEmailValid && emailTouched,
+                errorMessage = if (!isEmailValid && emailTouched) stringResource(id = R.string.error_invalid_email_format) else null
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -200,8 +215,12 @@ fun LoginScreen(
 
             // Login Button
             Button(
-                onClick = { viewModel.signInWithEmail(email, password, context) },
-                enabled = !authState.isLoading,
+                onClick = {
+                    if (isEmailValid) {
+                        viewModel.signInWithEmail(email, password, context)
+                    }
+                },
+                enabled = !authState.isLoading && isEmailValid && password.isNotEmpty(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -278,4 +297,3 @@ fun LoginScreenPreview() {
         )
     }
 }
-

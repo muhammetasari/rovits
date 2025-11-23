@@ -1,6 +1,8 @@
 package com.rovits.app.ui.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -26,35 +28,48 @@ fun RovitsTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = true,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    isError: Boolean = false,
+    errorMessage: String? = null
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = {
+    Column(modifier = modifier) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = {
+                Text(
+                    text = placeholder,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = trailingIcon,
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            singleLine = singleLine,
+            enabled = enabled,
+            isError = isError,
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = TextPrimary,
+                unfocusedBorderColor = BorderGray,
+                focusedTextColor = TextPrimary,
+                unfocusedTextColor = TextPrimary,
+                cursorColor = TextPrimary
+            ),
+            textStyle = MaterialTheme.typography.bodyMedium
+        )
+        if (isError && errorMessage != null) {
             Text(
-                text = placeholder,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
             )
-        },
-        modifier = modifier.fillMaxWidth(),
-        trailingIcon = trailingIcon,
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        singleLine = singleLine,
-        enabled = enabled,
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = TextPrimary,
-            unfocusedBorderColor = BorderGray,
-            focusedTextColor = TextPrimary,
-            unfocusedTextColor = TextPrimary,
-            cursorColor = TextPrimary
-        ),
-        textStyle = MaterialTheme.typography.bodyMedium
-    )
+        }
+    }
 }
 
 @Preview(showBackground = true)
@@ -70,3 +85,16 @@ fun RovitsTextFieldPreview() {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun RovitsTextFieldErrorPreview() {
+    RovitsAppTheme {
+        RovitsTextField(
+            value = "invalid-email",
+            onValueChange = { },
+            placeholder = "Email or Username",
+            isError = true,
+            errorMessage = "Invalid email format."
+        )
+    }
+}

@@ -2,12 +2,15 @@ package com.rovits.app.util.error
 
 import android.content.Context
 import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.rovits.app.R
 import java.io.IOException
 
 object ErrorMapper {
 
     fun mapToMessage(context: Context, exception: Exception): String {
+        Firebase.crashlytics.recordException(exception)
         return when (exception) {
             is AppException.AuthError -> mapAuthError(context, exception.code)
             is AppException.NetworkError -> context.getString(R.string.error_network)
@@ -55,4 +58,3 @@ object ErrorMapper {
         }
     }
 }
-
