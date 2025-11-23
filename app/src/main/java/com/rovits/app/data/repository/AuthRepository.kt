@@ -1,6 +1,5 @@
 package com.rovits.app.data.repository
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.GoogleAuthProvider
@@ -111,13 +110,16 @@ class AuthRepository {
     }
 
     // Sign in with Google
-    suspend fun signInWithGoogle(account: GoogleSignInAccount): AuthResult<User> {
+    suspend fun signInWithGoogle(idToken: String): AuthResult<User> {
         return try {
-            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            android.util.Log.d("AuthRepository", "signInWithGoogle: Creating credential with idToken")
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            android.util.Log.d("AuthRepository", "signInWithGoogle: Signing in with Firebase")
             val result = auth.signInWithCredential(credential).await()
             val firebaseUser = result.user
 
             if (firebaseUser != null) {
+                android.util.Log.d("AuthRepository", "signInWithGoogle: Success - User: ${firebaseUser.email}")
                 AuthResult.Success(
                     User(
                         uid = firebaseUser.uid,
@@ -127,14 +129,12 @@ class AuthRepository {
                     )
                 )
             } else {
+                android.util.Log.e("AuthRepository", "signInWithGoogle: Firebase user is null")
                 AuthResult.Error(AppException.AuthError("ERROR_USER_NOT_FOUND"))
             }
-        } catch (e: FirebaseAuthException) {
-            AuthResult.Error(AppException.AuthError(e.errorCode, e.message))
-        } catch (e: IOException) {
-            AuthResult.Error(AppException.NetworkError(e.message))
         } catch (e: Exception) {
-            AuthResult.Error(AppException.UnknownError(e.message))
+            android.util.Log.e("AuthRepository", "signInWithGoogle: Exception - ${e.message}", e)
+            AuthResult.Error(AppException.AuthError(e.localizedMessage ?: "ERROR_UNKNOWN"))
         }
     }
 
@@ -157,4 +157,3 @@ class AuthRepository {
         auth.signOut()
     }
 }
-

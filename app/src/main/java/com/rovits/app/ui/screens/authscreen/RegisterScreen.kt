@@ -1,4 +1,4 @@
-package com.rovits.app.ui.screens
+package com.rovits.app.ui.screens.authscreen
 
 import android.util.Patterns
 import androidx.compose.foundation.layout.*

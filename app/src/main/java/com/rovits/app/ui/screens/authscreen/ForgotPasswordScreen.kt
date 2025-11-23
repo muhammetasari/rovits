@@ -1,4 +1,4 @@
-package com.rovits.app.ui.screens
+package com.rovits.app.ui.screens.authscreen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -157,4 +157,3 @@ fun ForgotPasswordScreenPreview() {
         )
     }
 }
-

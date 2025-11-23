@@ -3,12 +3,10 @@ package com.rovits.app.ui.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.rovits.app.R
 import com.rovits.app.data.model.AuthResult
 import com.rovits.app.data.model.AuthState
 import com.rovits.app.data.repository.AuthRepository
-import com.rovits.app.util.error.AppException
 import com.rovits.app.util.error.ErrorMapper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -137,12 +135,14 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
         }
     }
 
-    fun signInWithGoogle(account: GoogleSignInAccount, context: Context) {
+    fun signInWithGoogle(idToken: String, context: Context) {
+        android.util.Log.d("AuthViewModel", "signInWithGoogle called with idToken: ${idToken.take(20)}...")
         viewModelScope.launch {
             _authState.value = _authState.value.copy(isLoading = true, error = null, isSuccess = false)
 
-            when (val result = repository.signInWithGoogle(account)) {
+            when (val result = repository.signInWithGoogle(idToken)) {
                 is AuthResult.Success -> {
+                    android.util.Log.d("AuthViewModel", "Google Sign-In successful: ${result.data.email}")
                     _authState.value = AuthState(
                         isLoading = false,
                         currentUser = result.data,
@@ -151,6 +151,7 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
                     )
                 }
                 is AuthResult.Error -> {
+                    android.util.Log.e("AuthViewModel", "Google Sign-In failed: ${result.exception.message}")
                     _authState.value = _authState.value.copy(
                         isLoading = false,
                         error = ErrorMapper.mapToMessage(context, result.exception),
@@ -215,4 +216,3 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 }
-

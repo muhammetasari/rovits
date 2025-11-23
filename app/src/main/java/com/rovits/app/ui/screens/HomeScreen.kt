@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rovits.app.R
 import com.rovits.app.data.model.User
+import com.rovits.app.ui.components.ProfileInfoRow
 import com.rovits.app.ui.components.RovitsLogo
 import com.rovits.app.ui.theme.RovitsAppTheme
 
@@ -132,23 +133,6 @@ fun HomeScreen(
     }
 }
 
-@Composable
-private fun ProfileInfoRow(label: String, value: String) {
-    Column {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
@@ -163,4 +147,3 @@ fun HomeScreenPreview() {
         )
     }
 }
-

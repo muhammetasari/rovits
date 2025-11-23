@@ -41,15 +41,15 @@ fun SplashScreen(
         contentAlignment = Alignment.Center
     ) {
         // Logo in center
-        RovitsLogo(size = 120.dp)
+        RovitsLogo(size = 240.dp)
 
         // Rotating circular progress indicator around logo
         CircularProgressIndicator(
             modifier = Modifier
-                .size(180.dp)
+                .size(240.dp)
                 .rotate(rotation),
             color = PrimaryOrange,
-            strokeWidth = 3.dp,
+            strokeWidth = 5.dp,
             trackColor = PrimaryOrange.copy(alpha = 0.2f)
         )
     }

@@ -21,17 +21,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.rovits.app.ui.screens.ForgotPasswordScreen
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.identity.BeginSignInResult
+import com.google.android.gms.auth.api.identity.Identity
+import com.rovits.app.ui.screens.authscreen.ForgotPasswordScreen
 import com.rovits.app.ui.screens.HomeScreen
-import com.rovits.app.ui.screens.LoginScreen
-import com.rovits.app.ui.screens.RegisterScreen
+import com.rovits.app.ui.screens.authscreen.LoginScreen
+import com.rovits.app.ui.screens.authscreen.RegisterScreen
 import com.rovits.app.ui.screens.SplashScreen
 import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.viewmodel.AuthViewModel
 import com.rovits.app.utils.LocaleHelper
+import androidx.compose.runtime.remember
 
 class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: Context?) {
@@ -61,28 +62,39 @@ fun RovitsNavigation() {
     val viewModel: AuthViewModel = viewModel()
     val authState by viewModel.authState.collectAsState()
 
-    // Google Sign-In configuration
-    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestIdToken(context.getString(R.string.default_web_client_id))
-        .requestEmail()
-        .build()
+    // Google Identity Services (GIS) One Tap Client ve SignInRequest
+    val oneTapClient = remember { Identity.getSignInClient(context) }
+    val signInRequest = remember {
+        BeginSignInRequest.Builder()
+            .setGoogleIdTokenRequestOptions(
+                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                    .setSupported(true)
+                    .setServerClientId(context.getString(R.string.default_web_client_id))
+                    .setFilterByAuthorizedAccounts(false)
+                    .build()
+            )
+            .setAutoSelectEnabled(true)
+            .build()
+    }
 
-    val googleSignInClient = GoogleSignIn.getClient(context, gso)
-
-    // Google Sign-In launcher
-    val googleSignInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
+    // GIS One Tap için launcher
+    val oneTapLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
-                val account = task.getResult(ApiException::class.java)
-                account?.let {
-                    viewModel.signInWithGoogle(it, context)
+                val credential = oneTapClient.getSignInCredentialFromIntent(result.data)
+                val idToken = credential.googleIdToken
+                if (idToken != null) {
+                    viewModel.signInWithGoogle(idToken, context)
+                } else {
+                    android.util.Log.e("GoogleSignIn", "ID Token is null")
                 }
-            } catch (e: ApiException) {
-                // Handle error
+            } catch (e: Exception) {
+                android.util.Log.e("GoogleSignIn", "Error getting credential", e)
             }
+        } else {
+            android.util.Log.e("GoogleSignIn", "Sign-In cancelled or failed. Result code: ${result.resultCode}")
         }
     }
 
@@ -124,7 +136,16 @@ fun RovitsNavigation() {
                     }
                 },
                 onGoogleSignInClick = {
-                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
+                    oneTapClient.beginSignIn(signInRequest)
+                        .addOnSuccessListener { result: BeginSignInResult ->
+                            android.util.Log.d("GoogleSignIn", "Sign-In request successful")
+                            oneTapLauncher.launch(
+                                androidx.activity.result.IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
+                            )
+                        }
+                        .addOnFailureListener { e ->
+                            android.util.Log.e("GoogleSignIn", "Sign-In request failed", e)
+                        }
                 }
             )
         }
@@ -158,7 +179,16 @@ fun RovitsNavigation() {
                     }
                 },
                 onGoogleSignInClick = {
-                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
+                    oneTapClient.beginSignIn(signInRequest)
+                        .addOnSuccessListener { result: BeginSignInResult ->
+                            android.util.Log.d("GoogleSignIn", "Sign-In request successful (Register)")
+                            oneTapLauncher.launch(
+                                androidx.activity.result.IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
+                            )
+                        }
+                        .addOnFailureListener { e ->
+                            android.util.Log.e("GoogleSignIn", "Sign-In request failed (Register)", e)
+                        }
                 }
             )
         }
@@ -167,13 +197,14 @@ fun RovitsNavigation() {
             HomeScreen(
                 user = authState.currentUser,
                 onLogout = {
-                    viewModel.signOut()
-                    navController.navigate("login") {
-                        popUpTo(0) { inclusive = true }
+                    oneTapClient.signOut().addOnCompleteListener {
+                        viewModel.signOut()
+                        navController.navigate("login") {
+                            popUpTo(0) { inclusive = true }
+                        }
                     }
                 }
             )
         }
     }
 }
-

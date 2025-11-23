@@ -1,4 +1,4 @@
-package com.rovits.app.ui.screens
+package com.rovits.app.ui.screens.authscreen
 
 import android.app.Activity
 import android.util.Patterns
@@ -17,12 +17,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rovits.app.R
-import com.rovits.app.data.repository.AuthRepository
 import com.rovits.app.ui.components.*
-import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.theme.TextSecondary
 import com.rovits.app.ui.viewmodel.AuthViewModel
 import com.rovits.app.utils.LocaleHelper
@@ -157,11 +154,9 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center
         ) {
             // Logo
-            RovitsLogo(size = 120.dp)
+            RovitsLogo(size = 240.dp)
 
-            Spacer(modifier = Modifier.height(60.dp))
-
-
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Email/Username TextField
             RovitsTextField(
@@ -264,7 +259,7 @@ fun LoginScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Google Sign In Button
             SocialLoginButton(
@@ -284,12 +279,15 @@ fun LoginScreen(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+/*
+// Preview fonksiyonu yoruma alındı - AuthViewModel context gerektirdiği için Preview çalışmaz
+// Eğer preview gerekirse, context almayan bir Mock ViewModel oluşturulmalı
+@Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
     RovitsAppTheme {
         LoginScreen(
-            viewModel = AuthViewModel(AuthRepository()),
+            viewModel = AuthViewModel(),
             onNavigateToForgotPassword = {},
             onNavigateToRegister = {},
             onLoginSuccess = {},
@@ -297,3 +295,4 @@ fun LoginScreenPreview() {
         )
     }
 }
+*/
