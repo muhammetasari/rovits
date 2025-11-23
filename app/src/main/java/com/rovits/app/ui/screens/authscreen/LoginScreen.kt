@@ -12,11 +12,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rovits.app.R
 import com.rovits.app.ui.components.*
@@ -46,6 +48,9 @@ fun LoginScreen(
     val authState by viewModel.authState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Define scroll behavior for TopAppBar
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
     // Handle authentication state
     LaunchedEffect(authState.isSuccess) {
         if (authState.isSuccess) {
@@ -71,13 +76,11 @@ fun LoginScreen(
     }
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = stringResource(id = R.string.login),
-                        style = MaterialTheme.typography.titleLarge
-                    )
+
                 },
                 actions = {
                     IconButton(onClick = { showLanguageMenu = true }) {
@@ -137,7 +140,8 @@ fun LoginScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onBackground
-                )
+                ),
+                scrollBehavior = scrollBehavior
             )
         },
         snackbarHost = {
@@ -156,7 +160,7 @@ fun LoginScreen(
             // Logo
             RovitsLogo(size = 240.dp)
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(36.dp))
 
             // Email/Username TextField
             RovitsTextField(
@@ -279,20 +283,89 @@ fun LoginScreen(
     }
 }
 
-/*
-// Preview fonksiyonu yoruma alındı - AuthViewModel context gerektirdiği için Preview çalışmaz
-// Eğer preview gerekirse, context almayan bir Mock ViewModel oluşturulmalı
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    RovitsAppTheme {
-        LoginScreen(
-            viewModel = AuthViewModel(),
-            onNavigateToForgotPassword = {},
-            onNavigateToRegister = {},
-            onLoginSuccess = {},
-            onGoogleSignInClick = {}
-        )
+    MaterialTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            RovitsLogo(size = 240.dp)
+
+            Spacer(modifier = Modifier.height(36.dp))
+
+            RovitsTextField(
+                value = "",
+                onValueChange = {},
+                placeholder = "Email"
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            RovitsTextField(
+                value = "",
+                onValueChange = {},
+                placeholder = "Password",
+                visualTransformation = PasswordVisualTransformation()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextButton(
+                onClick = {},
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(
+                    text = "Forgot Password?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(
+                    text = "Login",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Don't have an account?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary
+                )
+                TextButton(onClick = {}) {
+                    Text(
+                        text = "Sign Up",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            SocialLoginButton(onClick = {})
+        }
     }
 }
-*/

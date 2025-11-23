@@ -2,11 +2,14 @@ package com.rovits.app.ui.screens
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Flight
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rovits.app.ui.components.RovitsLogo
@@ -20,7 +23,7 @@ fun SplashScreen(
 ) {
     // Launch effect to navigate after delay
     LaunchedEffect(Unit) {
-        delay(2500) // 2.5 seconds
+        delay(2750)
         onNavigateToLogin()
     }
 
@@ -30,7 +33,7 @@ fun SplashScreen(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = LinearEasing),
+            animation = tween(3000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "rotation"
@@ -43,15 +46,22 @@ fun SplashScreen(
         // Logo in center
         RovitsLogo(size = 240.dp)
 
-        // Rotating circular progress indicator around logo
-        CircularProgressIndicator(
+        // Rotating airplane icon around logo
+        Box(
             modifier = Modifier
-                .size(240.dp)
+                .size(261.dp)
                 .rotate(rotation),
-            color = PrimaryOrange,
-            strokeWidth = 5.dp,
-            trackColor = PrimaryOrange.copy(alpha = 0.2f)
-        )
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Icon(
+                imageVector = Icons.Default.Flight,
+                contentDescription = "Loading",
+                tint = PrimaryOrange,
+                modifier = Modifier
+                    .size(32.dp)
+                    .graphicsLayer(rotationZ = 90f) // Uçağı yörünge yönüne çevir
+            )
+        }
     }
 }
 

@@ -96,7 +96,7 @@ fun ForgotPasswordScreen(
             verticalArrangement = Arrangement.Center
         ) {
             // Logo
-            RovitsLogo(size = 120.dp)
+            RovitsLogo(size = 240.dp)
 
             Spacer(modifier = Modifier.height(48.dp))
 

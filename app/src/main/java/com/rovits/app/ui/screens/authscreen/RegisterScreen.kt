@@ -111,7 +111,7 @@ fun RegisterScreen(
             verticalArrangement = Arrangement.Center
         ) {
             // Logo
-            RovitsLogo(size = 100.dp)
+            RovitsLogo(size = 240.dp)
 
             Spacer(modifier = Modifier.height(16.dp))
 
