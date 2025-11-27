@@ -8,15 +8,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rovits.app.R
-import com.rovits.app.ui.theme.BorderGray
 import com.rovits.app.ui.theme.RovitsAppTheme
-import com.rovits.app.ui.theme.TextPrimary
 
 @Composable
 fun SocialLoginButton(
@@ -31,10 +28,10 @@ fun SocialLoginButton(
             .fillMaxWidth()
             .height(56.dp),
         shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, BorderGray),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = Color.White,
-            contentColor = TextPrimary
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {
         Row(
@@ -63,4 +60,3 @@ fun SocialLoginButtonPreview() {
         SocialLoginButton(onClick = {})
     }
 }
-

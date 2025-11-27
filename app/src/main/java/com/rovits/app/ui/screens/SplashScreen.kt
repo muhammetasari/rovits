@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Flight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,7 +14,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rovits.app.ui.components.RovitsLogo
-import com.rovits.app.ui.theme.PrimaryOrange
 import com.rovits.app.ui.theme.RovitsAppTheme
 import kotlinx.coroutines.delay
 
@@ -56,7 +56,7 @@ fun SplashScreen(
             Icon(
                 imageVector = Icons.Default.Flight,
                 contentDescription = "Loading",
-                tint = PrimaryOrange,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .size(32.dp)
                     .graphicsLayer(rotationZ = 90f) // Uçağı yörünge yönüne çevir
@@ -72,4 +72,3 @@ fun SplashScreenPreview() {
         SplashScreen(onNavigateToLogin = {})
     }
 }
-

@@ -23,7 +23,6 @@ import com.rovits.app.R
 import com.rovits.app.data.repository.AuthRepository
 import com.rovits.app.ui.components.*
 import com.rovits.app.ui.theme.RovitsAppTheme
-import com.rovits.app.ui.theme.TextSecondary
 import com.rovits.app.ui.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -119,7 +118,7 @@ fun RegisterScreen(
             Text(
                 text = stringResource(id = R.string.register_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -206,7 +205,7 @@ fun RegisterScreen(
                 Text(
                     text = stringResource(id = R.string.or),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 HorizontalDivider(modifier = Modifier.weight(1f))
@@ -230,7 +229,7 @@ fun RegisterScreen(
                 Text(
                     text = stringResource(id = R.string.already_have_account),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 TextButton(
                     onClick = onNavigateToLogin,
@@ -311,18 +310,4 @@ private fun calculatePasswordScore(password: String): Float {
     if (password.any { !it.isLetterOrDigit() }) score += 0.2f
 
     return score.coerceIn(0f, 1f)
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun RegisterScreenPreview() {
-    RovitsAppTheme {
-        RegisterScreen(
-            viewModel = AuthViewModel(AuthRepository()),
-            onBackPressed = {},
-            onNavigateToLogin = {},
-            onRegisterSuccess = {},
-            onGoogleSignInClick = {}
-        )
-    }
 }

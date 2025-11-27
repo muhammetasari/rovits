@@ -9,10 +9,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.rovits.app.ui.theme.PrimaryOrange
 import com.rovits.app.ui.theme.RovitsAppTheme
 
 @Composable
@@ -30,10 +28,10 @@ fun LoginButton(
         enabled = enabled,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryOrange,
-            contentColor = Color.White,
-            disabledContainerColor = PrimaryOrange.copy(alpha = 0.5f),
-            disabledContentColor = Color.White.copy(alpha = 0.5f)
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+            disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
         )
     ) {
         Text(

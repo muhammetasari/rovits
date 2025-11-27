@@ -9,13 +9,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.rovits.app.ui.theme.BorderGray
 import com.rovits.app.ui.theme.RovitsAppTheme
-import com.rovits.app.ui.theme.TextPrimary
 
 @Composable
 fun RovitsTextField(
@@ -40,7 +37,7 @@ fun RovitsTextField(
                 Text(
                     text = placeholder,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             modifier = Modifier.fillMaxWidth(),
@@ -53,11 +50,11 @@ fun RovitsTextField(
             isError = isError,
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = TextPrimary,
-                unfocusedBorderColor = BorderGray,
-                focusedTextColor = TextPrimary,
-                unfocusedTextColor = TextPrimary,
-                cursorColor = TextPrimary
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.primary
             ),
             textStyle = MaterialTheme.typography.bodyMedium
         )

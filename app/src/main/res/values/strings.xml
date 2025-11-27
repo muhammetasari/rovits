@@ -48,6 +48,18 @@
     <string name="logout">Logout</string>
     <string name="profile">Profile</string>
 
+    <!-- Profile Screen -->
+    <string name="account">Account</string>
+    <string name="settings">Settings</string>
+    <string name="profile_details">Profile Details</string>
+    <string name="password_settings">Password</string>
+    <string name="saved">Saved</string>
+    <string name="journey">Journey</string>
+    <string name="edit_profile_photo">Edit profile photo</string>
+    <string name="content_description_settings">Settings</string>
+    <string name="content_description_edit">Edit</string>
+    <string name="content_description_navigate">Navigate</string>
+
     <!-- Error Messages -->
     <string name="error_invalid_email">Invalid email address</string>
     <string name="error_wrong_password">Wrong password</string>
@@ -85,4 +97,10 @@
 
     <!-- Firebase -->
     <string name="default_web_client_id" translatable="false">1036460419015-i9rvhdvnnumi2v7ji6br45i8fqmgjj55.apps.googleusercontent.com</string>
+
+    <!-- Exit Dialog -->
+    <string name="exit_app_title">Exit App</string>
+    <string name="exit_app_message">Do you want to exit the app?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

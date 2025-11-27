@@ -12,23 +12,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.auth.api.identity.Identity
-import com.rovits.app.ui.screens.authscreen.ForgotPasswordScreen
-import com.rovits.app.ui.screens.HomeScreen
-import com.rovits.app.ui.screens.authscreen.LoginScreen
-import com.rovits.app.ui.screens.authscreen.RegisterScreen
-import com.rovits.app.ui.screens.SplashScreen
+import com.rovits.app.navigation.Screen
+import com.rovits.app.navigation.authNavGraph
+import com.rovits.app.navigation.homeNavGraph
+import com.rovits.app.navigation.profileNavGraph
 import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.viewmodel.AuthViewModel
 import com.rovits.app.utils.LocaleHelper
@@ -99,113 +95,28 @@ fun RovitsNavigation() {
         }
     }
 
-    // Check authentication state for navigation
-    LaunchedEffect(authState.currentUser) {
-        if (authState.currentUser != null && navController.currentDestination?.route == "splash") {
-            navController.navigate("home") {
-                popUpTo("splash") { inclusive = true }
-            }
-        }
-    }
 
     NavHost(
         navController = navController,
-        startDestination = "splash"
+        startDestination = Screen.Splash.route
     ) {
-        composable("splash") {
-            SplashScreen(
-                onNavigateToLogin = {
-                    navController.navigate("login") {
-                        popUpTo("splash") { inclusive = true }
-                    }
+        authNavGraph(
+            navController = navController,
+            viewModel = viewModel,
+            oneTapClient = oneTapClient,
+            signInRequest = signInRequest,
+            oneTapLauncher = oneTapLauncher
+        )
+        homeNavGraph(navController = navController)
+        profileNavGraph(
+            navController = navController,
+            user = authState.currentUser,
+            onLogout = {
+                viewModel.signOut()
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(Screen.Home.route) { inclusive = true }
                 }
-            )
-        }
-
-        composable("login") {
-            LoginScreen(
-                viewModel = viewModel,
-                onNavigateToForgotPassword = {
-                    navController.navigate("forgot_password")
-                },
-                onNavigateToRegister = {
-                    navController.navigate("register")
-                },
-                onLoginSuccess = {
-                    navController.navigate("home") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                },
-                onGoogleSignInClick = {
-                    oneTapClient.beginSignIn(signInRequest)
-                        .addOnSuccessListener { result: BeginSignInResult ->
-                            android.util.Log.d("GoogleSignIn", "Sign-In request successful")
-                            oneTapLauncher.launch(
-                                androidx.activity.result.IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
-                            )
-                        }
-                        .addOnFailureListener { e ->
-                            android.util.Log.e("GoogleSignIn", "Sign-In request failed", e)
-                        }
-                }
-            )
-        }
-
-        composable("forgot_password") {
-            ForgotPasswordScreen(
-                viewModel = viewModel,
-                onBackPressed = {
-                    navController.navigateUp()
-                },
-                onResetSuccess = {
-                    navController.navigateUp()
-                }
-            )
-        }
-
-        composable("register") {
-            RegisterScreen(
-                viewModel = viewModel,
-                onBackPressed = {
-                    navController.navigateUp()
-                },
-                onNavigateToLogin = {
-                    navController.navigate("login") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                },
-                onRegisterSuccess = {
-                    navController.navigate("home") {
-                        popUpTo("register") { inclusive = true }
-                    }
-                },
-                onGoogleSignInClick = {
-                    oneTapClient.beginSignIn(signInRequest)
-                        .addOnSuccessListener { result: BeginSignInResult ->
-                            android.util.Log.d("GoogleSignIn", "Sign-In request successful (Register)")
-                            oneTapLauncher.launch(
-                                androidx.activity.result.IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
-                            )
-                        }
-                        .addOnFailureListener { e ->
-                            android.util.Log.e("GoogleSignIn", "Sign-In request failed (Register)", e)
-                        }
-                }
-            )
-        }
-
-        composable("home") {
-            HomeScreen(
-                user = authState.currentUser,
-                onLogout = {
-                    oneTapClient.signOut().addOnCompleteListener {
-                        viewModel.signOut()
-                        navController.navigate("login") {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
-                }
-            )
-        }
+            }
+        )
     }
 }

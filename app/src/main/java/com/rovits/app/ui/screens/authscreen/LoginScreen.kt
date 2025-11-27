@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rovits.app.R
 import com.rovits.app.ui.components.*
-import com.rovits.app.ui.theme.TextSecondary
 import com.rovits.app.ui.viewmodel.AuthViewModel
 import com.rovits.app.utils.LocaleHelper
 
@@ -206,7 +205,7 @@ fun LoginScreen(
                 Text(
                     text = stringResource(id = R.string.forgot_password),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -250,7 +249,7 @@ fun LoginScreen(
                 Text(
                     text = stringResource(id = R.string.no_account),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 TextButton(
                     onClick = onNavigateToRegister,
@@ -323,7 +322,7 @@ fun LoginScreenPreview() {
                 Text(
                     text = "Forgot Password?",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -353,7 +352,7 @@ fun LoginScreenPreview() {
                 Text(
                     text = "Don't have an account?",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 TextButton(onClick = {}) {
                     Text(

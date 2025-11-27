@@ -48,6 +48,18 @@
     <string name="logout">Çıkış Yap</string>
     <string name="profile">Profil</string>
 
+    <!-- Profile Screen -->
+    <string name="account">Hesap</string>
+    <string name="settings">Ayarlar</string>
+    <string name="profile_details">Profil Detayları</string>
+    <string name="password_settings">Şifre</string>
+    <string name="saved">Kaydedilenler</string>
+    <string name="journey">Seyahatlerim</string>
+    <string name="edit_profile_photo">Profil fotoğrafını düzenle</string>
+    <string name="content_description_settings">Ayarlar</string>
+    <string name="content_description_edit">Düzenle</string>
+    <string name="content_description_navigate">Git</string>
+
     <!-- Error Messages -->
     <string name="error_invalid_email">Geçersiz e-posta adresi</string>
     <string name="error_wrong_password">Hatalı şifre</string>
@@ -82,4 +94,10 @@
     <string name="password_weak">Zayıf</string>
     <string name="password_medium">Orta</string>
     <string name="password_strong">Güçlü</string>
+
+    <!-- Exit Dialog -->
+    <string name="exit_app_title">Uygulamadan Çık</string>
+    <string name="exit_app_message">Uygulamadan çıkmak istiyor musunuz?</string>
+    <string name="yes">Evet</string>
+    <string name="no">Hayır</string>
 </resources>

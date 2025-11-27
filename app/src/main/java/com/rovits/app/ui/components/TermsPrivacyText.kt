@@ -12,8 +12,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import com.rovits.app.R
 import com.rovits.app.ui.theme.RovitsAppTheme
-import com.rovits.app.ui.theme.TextSecondary
-import com.rovits.app.ui.theme.TextPrimary
 
 @Composable
 fun TermsPrivacyText(
@@ -34,7 +32,7 @@ fun TermsPrivacyText(
             // Text before terms
             withStyle(
                 style = SpanStyle(
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = MaterialTheme.typography.bodySmall.fontSize
                 )
             ) {
@@ -45,7 +43,7 @@ fun TermsPrivacyText(
             pushStringAnnotation(tag = "TERMS", annotation = "terms")
             withStyle(
                 style = SpanStyle(
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.primary,
                     fontSize = MaterialTheme.typography.bodySmall.fontSize,
                     textDecoration = TextDecoration.Underline
                 )
@@ -57,7 +55,7 @@ fun TermsPrivacyText(
             // Text between terms and privacy
             withStyle(
                 style = SpanStyle(
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = MaterialTheme.typography.bodySmall.fontSize
                 )
             ) {
@@ -68,7 +66,7 @@ fun TermsPrivacyText(
             pushStringAnnotation(tag = "PRIVACY", annotation = "privacy")
             withStyle(
                 style = SpanStyle(
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.primary,
                     fontSize = MaterialTheme.typography.bodySmall.fontSize,
                     textDecoration = TextDecoration.Underline
                 )
@@ -81,7 +79,7 @@ fun TermsPrivacyText(
             if (privacyStart + privacyText.length < fullText.length) {
                 withStyle(
                     style = SpanStyle(
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = MaterialTheme.typography.bodySmall.fontSize
                     )
                 ) {
@@ -92,7 +90,7 @@ fun TermsPrivacyText(
             // Fallback if strings not found
             withStyle(
                 style = SpanStyle(
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = MaterialTheme.typography.bodySmall.fontSize
                 )
             ) {
@@ -128,4 +126,3 @@ fun TermsPrivacyTextPreview() {
         )
     }
 }
-
