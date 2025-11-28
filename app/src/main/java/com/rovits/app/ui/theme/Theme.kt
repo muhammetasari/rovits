@@ -1,20 +1,12 @@
 package com.rovits.app.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 
-// Sadece ana marka renklerini tanımlıyoruz - Geri kalan her şey Material Design 3 standartlarından gelecek
-private val RovitsOrange = Color(0xFF83331D)
-private val RovitsOrangeDark = Color(0xFFE56B47)
-private val RovitsOrangeLight = Color(0xFFFF9A7F)
 
 /**
  * Dark theme color scheme using Material Design 3 guidelines
@@ -26,24 +18,24 @@ private val DarkColorScheme = darkColorScheme(
     onPrimaryContainer = Color.White,
 
     secondary = RovitsOrangeLight,
-    onSecondary = Color(0xFF1A1A1A),
+    onSecondary = Gray900,
 
-    tertiary = Color(0xFFF57C00),  // Warning orange
+    tertiary = WarningOrange,
     onTertiary = Color.White,
 
-    background = Color(0xFF121212),
-    onBackground = Color(0xFFF5F5F5),
+    background = DarkBackground,
+    onBackground = Gray50,
 
-    surface = Color(0xFF1E1E1E),
-    onSurface = Color(0xFFF5F5F5),
-    surfaceVariant = Color(0xFF2C2C2C),
-    onSurfaceVariant = Color(0xFFB3B3B3),
+    surface = DarkSurface,
+    onSurface = Gray50,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = Gray400,
 
-    error = Color(0xFFCF6679),
+    error = DarkError,
     onError = Color.White,
 
-    outline = Color(0xFF3E3E3E),
-    outlineVariant = Color(0xFF2C2C2C)
+    outline = DarkOutline,
+    outlineVariant = DarkSurfaceVariant
 )
 
 /**
@@ -52,58 +44,49 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = RovitsOrange,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFE5DC),
-    onPrimaryContainer = Color(0xFF1A1A1A),
+    primaryContainer = LightPrimaryContainer,
+    onPrimaryContainer = Gray900,
 
     secondary = RovitsOrangeDark,
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFF5F5F5),
-    onSecondaryContainer = Color(0xFF1A1A1A),
+    secondaryContainer = Gray50,
+    onSecondaryContainer = Gray900,
 
-    tertiary = Color(0xFF388E3C),  // Success green
+    tertiary = SuccessGreen,
     onTertiary = Color.White,
 
     background = Color.White,
-    onBackground = Color(0xFF1A1A1A),
+    onBackground = Gray900,
 
     surface = Color.White,
-    onSurface = Color(0xFF1A1A1A),
-    surfaceVariant = Color(0xFFF5F5F5),
-    onSurfaceVariant = Color(0xFF666666),
+    onSurface = Gray900,
+    surfaceVariant = Gray50,
+    onSurfaceVariant = Gray600,
 
-    error = Color(0xFFD32F2F),
+    error = ErrorRed,
     onError = Color.White,
-    errorContainer = Color(0xFFFFEBEE),
-    onErrorContainer = Color(0xFFB71C1C),
+    errorContainer = LightErrorContainer,
+    onErrorContainer = LightOnErrorContainer,
 
-    outline = Color(0xFFE0E0E0),
-    outlineVariant = Color(0xFFCCCCCC)
+    outline = Gray200,
+    outlineVariant = LightOutlineVariant
 )
 
 /**
- * Rovits App Theme - Uses Material Design 3 with dynamic color support
+ * Rovits App Theme - Material Design 3 standartlarına uygun özel tema sistemi
  *
- * Dynamic colors are enabled by default on Android 12+ devices, allowing the app
- * to adapt to the user's system theme automatically.
+ * Dinamik tema desteği kaldırılmıştır. Uygulama, tüm cihazlarda tutarlı bir görünüm için
+ * özel olarak tanımlanmış renk paletini kullanır.
  *
- * @param darkTheme Whether to use dark theme. Defaults to system setting.
- * @param dynamicColor Whether to use dynamic colors from Android 12+. Defaults to true.
- * @param content The composable content to theme.
+ * @param darkTheme Dark theme kullanılıp kullanılmayacağı. Varsayılan olarak sistem ayarını takip eder.
+ * @param content Temalı içerik composable'ı.
  */
 @Composable
 fun RovitsAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

@@ -27,7 +27,8 @@ import com.rovits.app.ui.theme.RovitsAppTheme
 fun ProfileScreen(
     user: User?,
     onLogout: () -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToThemeDemo: () -> Unit = {}
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -142,6 +143,13 @@ fun ProfileScreen(
                 onClick = { /* Navigate to journey */ }
             )
 
+            ProfileMenuItem(
+                icon = Icons.Default.Palette,
+                title = stringResource(id = R.string.theme_demo),
+                hasTrailingIcon = true,
+                onClick = onNavigateToThemeDemo
+            )
+
             Spacer(modifier = Modifier.height(8.dp))
 
             ProfileMenuItem(
@@ -236,7 +244,8 @@ fun ProfileScreenPreview() {
         ProfileScreen(
             user = null,
             onLogout = {},
-            onNavigateBack = {}
+            onNavigateBack = {},
+            onNavigateToThemeDemo = {}
         )
     }
 }

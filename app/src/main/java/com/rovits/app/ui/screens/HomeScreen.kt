@@ -93,7 +93,7 @@ fun HomeScreen(
 fun CustomBottomBar(navController: NavController) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 8.dp,
+        tonalElevation = 0.dp, // Arka planı ekranla aynı renk yapmak için 0dp
         modifier = Modifier.height(80.dp) // Görseldeki gibi biraz yüksek
     ) {
         val navItems = listOf(
