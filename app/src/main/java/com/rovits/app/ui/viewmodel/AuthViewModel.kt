@@ -212,6 +212,14 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
         _authState.value = _authState.value.copy(isSuccess = false)
     }
 
+    fun setGoogleSignInError(message: String) {
+        _authState.value = _authState.value.copy(googleSignInError = message)
+    }
+
+    fun clearGoogleSignInError() {
+        _authState.value = _authState.value.copy(googleSignInError = null)
+    }
+
     private fun isValidEmail(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }

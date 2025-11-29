@@ -13,7 +13,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.rovits.app.R
-import com.rovits.app.ui.components.*
+import com.rovits.app.ui.components.RovitsLogo
+import com.rovits.app.ui.components.TermsOfUseDialog
+import com.rovits.app.ui.components.PrivacyPolicyDialog
+import com.rovits.app.ui.components.TermsPrivacyText
 import com.rovits.app.ui.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,11 +101,28 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             // Email/Username TextField
-            RovitsTextField(
+            OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                placeholder = stringResource(id = R.string.email_or_username),
-                enabled = !authState.isLoading
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.email_or_username),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !authState.isLoading,
+                singleLine = true,
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                ),
+                textStyle = MaterialTheme.typography.bodyMedium
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -114,6 +134,7 @@ fun ForgotPasswordScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )

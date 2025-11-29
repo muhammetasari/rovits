@@ -4,6 +4,7 @@ data class AuthState(
     val isLoading: Boolean = false,
     val currentUser: User? = null,
     val error: String? = null,
-    val isSuccess: Boolean = false
+    val isSuccess: Boolean = false,
+    val googleSignInError: String? = null
 )
 

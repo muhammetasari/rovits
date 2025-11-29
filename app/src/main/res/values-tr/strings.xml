@@ -79,6 +79,10 @@
     <string name="error_full_name_required">İsim soyisim zorunludur</string>
     <string name="error_email_empty">E-posta boş olamaz</string>
     <string name="error_password_empty">Şifre boş olamaz</string>
+    <string name="error_google_sign_in_token">Google ile giriş başarısız: ID token alınamadı</string>
+    <string name="error_google_sign_in_credential">Google ile giriş başarısız: Kimlik bilgileri alınamadı</string>
+    <string name="error_google_sign_in_failed">Google ile giriş başarısız. Lütfen tekrar deneyin</string>
+    <string name="error_google_sign_in_cancelled">Giriş iptal edildi</string>
 
     <!-- Success Messages -->
     <string name="success_login">Giriş başarılı</string>
