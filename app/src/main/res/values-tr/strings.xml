@@ -7,7 +7,7 @@
 
     <!-- Login Screen -->
     <string name="login">Giriş Yap</string>
-    <string name="login_subtitle">E-posta ve şifrenizi girin</string>
+    <string name="login_subtitle">E-posta ve şifrenizi girin.</string>
     <string name="email_or_username">Mail Adresi veya Kullanıcı Adı</string>
     <string name="password">Şifre</string>
     <string name="forgot_password">Şifremi Unuttum</string>
@@ -21,7 +21,7 @@
 
     <!-- Register Screen -->
     <string name="register">Kayıt Ol</string>
-    <string name="register_subtitle">Hesabınızı oluşturun</string>
+    <string name="register_subtitle">Hesabınızı oluşturun.</string>
     <string name="full_name">İsim Soyisim</string>
     <string name="email">Mail</string>
     <string name="already_have_account">Zaten hesabınız var mı?</string>
@@ -31,7 +31,7 @@
     <string name="select_language">Dil Seçin</string>
 
     <!-- Terms and Privacy -->
-    <string name="terms_privacy_text">Giriş yaparak, Kullanım Koşulları ve Gizlilik Politikası\'nı kabul ediyorum</string>
+    <string name="terms_privacy_text">Giriş yaparak, Kullanım Koşulları ve Gizlilik Politikası\'nı kabul ediyorum.</string>
     <string name="terms_of_use">Kullanım Koşulları</string>
     <string name="privacy_policy">Gizlilik Politikası</string>
 
@@ -62,33 +62,33 @@
     <string name="content_description_navigate">Git</string>
 
     <!-- Error Messages -->
-    <string name="error_invalid_email">Geçersiz e-posta adresi</string>
-    <string name="error_wrong_password">Hatalı şifre</string>
-    <string name="error_user_not_found">Kullanıcı bulunamadı</string>
-    <string name="error_user_disabled">Bu hesap devre dışı bırakılmış</string>
-    <string name="error_too_many_requests">Çok fazla istek. Lütfen daha sonra tekrar deneyin</string>
-    <string name="error_email_already_in_use">Bu e-posta adresi zaten kullanımda</string>
-    <string name="error_weak_password">Şifre çok zayıf. En az 6 karakter kullanın</string>
-    <string name="error_operation_not_allowed">İşleme izin verilmiyor</string>
-    <string name="error_auth_failed">Kimlik doğrulama başarısız</string>
-    <string name="error_network">Ağ hatası. Lütfen bağlantınızı kontrol edin</string>
-    <string name="error_unknown">Bilinmeyen bir hata oluştu</string>
-    <string name="error_validation">Doğrulama hatası</string>
-    <string name="error_invalid_email_format">Lütfen geçerli bir e-posta adresi girin</string>
-    <string name="error_password_too_short">Şifre en az 6 karakter olmalıdır</string>
-    <string name="error_full_name_required">İsim soyisim zorunludur</string>
-    <string name="error_email_empty">E-posta boş olamaz</string>
-    <string name="error_password_empty">Şifre boş olamaz</string>
-    <string name="error_google_sign_in_token">Google ile giriş başarısız: ID token alınamadı</string>
-    <string name="error_google_sign_in_credential">Google ile giriş başarısız: Kimlik bilgileri alınamadı</string>
-    <string name="error_google_sign_in_failed">Google ile giriş başarısız. Lütfen tekrar deneyin</string>
-    <string name="error_google_sign_in_cancelled">Giriş iptal edildi</string>
+    <string name="error_invalid_email">Geçersiz e-posta adresi.</string>
+    <string name="error_wrong_password">Hatalı şifre.</string>
+    <string name="error_user_not_found">Kullanıcı bulunamadı.</string>
+    <string name="error_user_disabled">Bu hesap devre dışı bırakılmış.</string>
+    <string name="error_too_many_requests">Çok fazla istek. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="error_email_already_in_use">Bu e-posta adresi zaten kullanımda.</string>
+    <string name="error_weak_password">Şifre çok zayıf. En az 6 karakter kullanın.</string>
+    <string name="error_operation_not_allowed">İşleme izin verilmiyor.</string>
+    <string name="error_auth_failed">Kimlik doğrulama başarısız.</string>
+    <string name="error_network">Ağ hatası. Lütfen bağlantınızı kontrol edin.</string>
+    <string name="error_unknown">Bilinmeyen bir hata oluştu.</string>
+    <string name="error_validation">Doğrulama hatası.</string>
+    <string name="error_invalid_email_format">Lütfen geçerli bir e-posta adresi girin.</string>
+    <string name="error_password_too_short">Şifre en az 6 karakter olmalıdır.</string>
+    <string name="error_full_name_required">İsim soyisim zorunludur.</string>
+    <string name="error_email_empty">E-posta boş olamaz.</string>
+    <string name="error_password_empty">Şifre boş olamaz.</string>
+    <string name="error_google_sign_in_token">Google ile giriş başarısız: ID token alınamadı.</string>
+    <string name="error_google_sign_in_credential">Google ile giriş başarısız: Kimlik bilgileri alınamadı.</string>
+    <string name="error_google_sign_in_failed">Google ile giriş başarısız. Lütfen tekrar deneyin.</string>
+    <string name="error_google_sign_in_cancelled">Giriş iptal edildi.</string>
 
     <!-- Success Messages -->
-    <string name="success_login">Giriş başarılı</string>
-    <string name="success_register">Kayıt başarılı</string>
-    <string name="success_password_reset">Şifre sıfırlama e-postası gönderildi</string>
-    <string name="success_logout">Çıkış yapıldı</string>
+    <string name="success_login">Giriş başarılı.</string>
+    <string name="success_register">Kayıt başarılı.</string>
+    <string name="success_password_reset">Şifre sıfırlama e-postası gönderildi.</string>
+    <string name="success_logout">Çıkış yapıldı.</string>
 
     <!-- Content Descriptions -->
     <string name="content_description_back">Geri</string>
