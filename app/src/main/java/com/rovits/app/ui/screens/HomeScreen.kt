@@ -93,13 +93,13 @@ fun HomeScreen(
 fun CustomBottomBar(navController: NavController) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp, // Arka planı ekranla aynı renk yapmak için 0dp
-        modifier = Modifier.height(80.dp) // Görseldeki gibi biraz yüksek
+        tonalElevation = 0.dp,
+        modifier = Modifier.height(80.dp)
     ) {
         val navItems = listOf(
             Icons.Outlined.Home,
             Icons.Outlined.FavoriteBorder,
-            Icons.Outlined.Explore, // Pusula yerine
+            Icons.Outlined.Explore,
             Icons.Outlined.CalendarToday,
             Icons.Outlined.Person
         )

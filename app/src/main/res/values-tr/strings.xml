@@ -61,6 +61,16 @@
     <string name="content_description_edit">Düzenle</string>
     <string name="content_description_navigate">Git</string>
 
+    <!-- Settings Screen -->
+    <string name="dark_mode">Karanlık Mod</string>
+    <string name="language_settings">Dil</string>
+    <string name="notification_settings">Bildirim</string>
+    <string name="privacy_settings">Gizlilik</string>
+    <string name="account_settings">Hesap</string>
+    <string name="about_application">Uygulama Hakkında</string>
+    <string name="feedback">Geri Bildirim</string>
+    <string name="support">Destek</string>
+
     <!-- Error Messages -->
     <string name="error_invalid_email">Geçersiz e-posta adresi.</string>
     <string name="error_wrong_password">Hatalı şifre.</string>
@@ -83,6 +93,14 @@
     <string name="error_google_sign_in_credential">Google ile giriş başarısız: Kimlik bilgileri alınamadı.</string>
     <string name="error_google_sign_in_failed">Google ile giriş başarısız. Lütfen tekrar deneyin.</string>
     <string name="error_google_sign_in_cancelled">Giriş iptal edildi.</string>
+
+    <!-- Firebase Auth Error Messages -->
+    <string name="error_auth_token_expired">Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.</string>
+    <string name="error_auth_token_invalid">Geçersiz oturum. Lütfen tekrar giriş yapın.</string>
+    <string name="error_requires_recent_login">Bu işlem hassastır ve yakın zamanda kimlik doğrulaması gerektirir. Lütfen tekrar denemeden önce tekrar giriş yapın.</string>
+    <string name="error_invalid_credential">E-posta adresiniz veya şifreniz hatalı. Lütfen bilgilerinizi kontrol edip tekrar deneyin.</string>
+    <string name="error_account_exists_with_different_credential">Aynı e-posta adresine sahip ancak farklı oturum açma kimlik bilgilerine sahip bir hesap zaten var.</string>
+    <string name="error_invalid_action_code">İşlem kodu geçersiz. Bu, kodun hatalı biçimlendirilmesi, süresinin dolması veya daha önce kullanılmış olması durumunda olabilir.</string>
 
     <!-- Success Messages -->
     <string name="success_login">Giriş başarılı.</string>

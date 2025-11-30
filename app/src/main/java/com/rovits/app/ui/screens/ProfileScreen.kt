@@ -28,7 +28,8 @@ fun ProfileScreen(
     user: User?,
     onLogout: () -> Unit,
     onNavigateBack: () -> Unit,
-    onNavigateToThemeDemo: () -> Unit = {}
+    onNavigateToThemeDemo: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -52,7 +53,7 @@ fun ProfileScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Settings action */ }) {
+                    IconButton(onClick = onNavigateToSettings) {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = stringResource(id = R.string.content_description_settings),
@@ -249,4 +250,3 @@ fun ProfileScreenPreview() {
         )
     }
 }
-

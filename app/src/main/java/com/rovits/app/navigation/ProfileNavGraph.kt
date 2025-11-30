@@ -6,6 +6,9 @@ import androidx.navigation.compose.composable
 import com.rovits.app.data.model.User
 import com.rovits.app.ui.screens.ProfileScreen
 import com.rovits.app.ui.theme.demo.ThemeDemoScreen
+import com.rovits.app.ui.screens.SettingsScreen
+
+
 
 fun NavGraphBuilder.profileNavGraph(
     navController: NavController,
@@ -17,12 +20,19 @@ fun NavGraphBuilder.profileNavGraph(
             user = user,
             onLogout = onLogout,
             onNavigateBack = { navController.popBackStack() },
-            onNavigateToThemeDemo = { navController.navigate(Screen.ThemeDemo.route) }
+            onNavigateToThemeDemo = { navController.navigate(Screen.ThemeDemo.route) },
+            onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
         )
     }
 
     composable(Screen.ThemeDemo.route) {
         ThemeDemoScreen(
+            onNavigateBack = { navController.popBackStack() }
+        )
+    }
+
+    composable (Screen.Settings.route) {
+        SettingsScreen(
             onNavigateBack = { navController.popBackStack() }
         )
     }
