@@ -1,75 +1,84 @@
 package com.rovits.app.ui.theme
-
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
-
-/**
- * Dark theme color scheme using Material Design 3 guidelines
- */
-private val DarkColorScheme = darkColorScheme(
-    primary = RovitsOrange,
-    onPrimary = Color.White,
-    primaryContainer = RovitsOrangeDark,
-    onPrimaryContainer = Color.White,
-
-    secondary = RovitsOrangeLight,
-    onSecondary = Gray900,
-
-    tertiary = WarningOrange,
-    onTertiary = Color.White,
-
-    background = DarkBackground,
-    onBackground = Gray50,
-
-    surface = DarkSurface,
-    onSurface = Gray50,
-    surfaceVariant = DarkSurfaceVariant,
-    onSurfaceVariant = Gray400,
-
-    error = DarkError,
-    onError = Color.White,
-
-    outline = DarkOutline,
-    outlineVariant = DarkSurfaceVariant
+private val LightColorScheme = lightColorScheme(
+    primary = primaryLight,
+    onPrimary = onPrimaryLight,
+    primaryContainer = primaryContainerLight,
+    onPrimaryContainer = onPrimaryContainerLight,
+    secondary = secondaryLight,
+    onSecondary = onSecondaryLight,
+    secondaryContainer = secondaryContainerLight,
+    onSecondaryContainer = onSecondaryContainerLight,
+    tertiary = tertiaryLight,
+    onTertiary = onTertiaryLight,
+    tertiaryContainer = tertiaryContainerLight,
+    onTertiaryContainer = onTertiaryContainerLight,
+    error = errorLight,
+    onError = onErrorLight,
+    errorContainer = errorContainerLight,
+    onErrorContainer = onErrorContainerLight,
+    background = backgroundLight,
+    onBackground = onBackgroundLight,
+    surface = surfaceLight,
+    onSurface = onSurfaceLight,
+    surfaceVariant = surfaceVariantLight,
+    onSurfaceVariant = onSurfaceVariantLight,
+    outline = outlineLight,
+    outlineVariant = outlineVariantLight,
+    scrim = scrimLight,
+    inverseSurface = inverseSurfaceLight,
+    inverseOnSurface = inverseOnSurfaceLight,
+    inversePrimary = inversePrimaryLight,
+    surfaceDim = surfaceDimLight,
+    surfaceBright = surfaceBrightLight,
+    surfaceContainerLowest = surfaceContainerLowestLight,
+    surfaceContainerLow = surfaceContainerLowLight,
+    surfaceContainer = surfaceContainerLight,
+    surfaceContainerHigh = surfaceContainerHighLight,
+    surfaceContainerHighest = surfaceContainerHighestLight,
 )
 
-/**
- * Light theme color scheme using Material Design 3 guidelines
- */
-private val LightColorScheme = lightColorScheme(
-    primary = RovitsOrange,
-    onPrimary = Color.White,
-    primaryContainer = LightPrimaryContainer,
-    onPrimaryContainer = Gray900,
-
-    secondary = RovitsOrangeDark,
-    onSecondary = Color.White,
-    secondaryContainer = Gray50,
-    onSecondaryContainer = Gray900,
-
-    tertiary = SuccessGreen,
-    onTertiary = Color.White,
-
-    background = Color.White,
-    onBackground = Gray900,
-
-    surface = Color.White,
-    onSurface = Gray900,
-    surfaceVariant = Gray50,
-    onSurfaceVariant = Gray600,
-
-    error = ErrorRed,
-    onError = Color.White,
-    errorContainer = LightErrorContainer,
-    onErrorContainer = LightOnErrorContainer,
-
-    outline = Gray200,
-    outlineVariant = LightOutlineVariant
+private val DarkColorScheme = darkColorScheme(
+    primary = primaryDark,
+    onPrimary = onPrimaryDark,
+    primaryContainer = primaryContainerDark,
+    onPrimaryContainer = onPrimaryContainerDark,
+    secondary = secondaryDark,
+    onSecondary = onSecondaryDark,
+    secondaryContainer = secondaryContainerDark,
+    onSecondaryContainer = onSecondaryContainerDark,
+    tertiary = tertiaryDark,
+    onTertiary = onTertiaryDark,
+    tertiaryContainer = tertiaryContainerDark,
+    onTertiaryContainer = onTertiaryContainerDark,
+    error = errorDark,
+    onError = onErrorDark,
+    errorContainer = errorContainerDark,
+    onErrorContainer = onErrorContainerDark,
+    background = backgroundDark,
+    onBackground = onBackgroundDark,
+    surface = surfaceDark,
+    onSurface = onSurfaceDark,
+    surfaceVariant = surfaceVariantDark,
+    onSurfaceVariant = onSurfaceVariantDark,
+    outline = outlineDark,
+    outlineVariant = outlineVariantDark,
+    scrim = scrimDark,
+    inverseSurface = inverseSurfaceDark,
+    inverseOnSurface = inverseOnSurfaceDark,
+    inversePrimary = inversePrimaryDark,
+    surfaceDim = surfaceDimDark,
+    surfaceBright = surfaceBrightDark,
+    surfaceContainerLowest = surfaceContainerLowestDark,
+    surfaceContainerLow = surfaceContainerLowDark,
+    surfaceContainer = surfaceContainerDark,
+    surfaceContainerHigh = surfaceContainerHighDark,
+    surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
 /**
@@ -94,3 +103,6 @@ fun RovitsAppTheme(
         content = content
     )
 }
+
+
+
