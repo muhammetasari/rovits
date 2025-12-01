@@ -1,211 +1,144 @@
 package com.rovits.app.ui.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Feedback
-import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.rovits.app.R
-import com.rovits.app.ui.common.StandardLayout
-import com.rovits.app.ui.theme.RovitsAppTheme
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.rovits.app.ui.components.ThemeSelectionDialog
+import com.rovits.app.ui.viewmodel.ThemeViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit = {},
+    themeViewModel: ThemeViewModel = viewModel()
 ) {
-    val navController = rememberNavController()
-    StandardLayout(
-        onNavigateBack = onNavigateBack,
-        topAppBarTitle = stringResource(id = R.string.settings),
-        showTopBar = true,
-        showBackButton = true,
-        showBottomBar = false,
-        navController = navController
+    val currentTheme by themeViewModel.themeConfig.collectAsState()
+    var showThemeDialog by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Settings") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Navigate back"
+                        )
+                    }
+                }
+            )
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(paddingValues)
-                .padding(vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(vertical = 16.dp)
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.small
-                        )
-                    ) {
-                Column(
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                        .padding(horizontal = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Menu Items
-                    SettingsMenuItem(
-                        icon = Icons.Default.DarkMode,
-                        title = stringResource(id = R.string.dark_mode),
-                        hasTrailingIcon = false,
-                        showSwitchesButton = true,
-                        onClick = { /* Navigate to theme demo */ }
-                    )
-                    SettingsMenuItem(
-                        icon = Icons.Outlined.Notifications,
-                        title = stringResource(id = R.string.notification_settings),
-                        hasTrailingIcon = true,
-                        onClick = { /* Navigate to profile details */ }
-                    )
+            // Theme Section
+            SettingsSectionHeader(title = "Appearance")
 
-                    SettingsMenuItem(
-                        icon = Icons.Default.GTranslate,
-                        title = stringResource(id = R.string.language_settings),
-                        hasTrailingIcon = true,
-                        onClick = { /* Navigate to password */ }
-                    )
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(vertical = 16.dp)
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.small
-                    )
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                        .padding(horizontal = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Menu Items
-                    SettingsMenuItem(
-                        icon = Icons.Outlined.Info,
-                        title = stringResource(id = R.string.about_application),
-                        hasTrailingIcon = true,
-                        onClick = { /* Navigate to theme demo */ }
-                    )
-                    SettingsMenuItem(
-                        icon = Icons.Outlined.Feedback,
-                        title = stringResource(id = R.string.feedback),
-                        hasTrailingIcon = true,
-                        onClick = { /* Navigate to feedback */ }
-                    )
-
-                    SettingsMenuItem(
-                        icon = Icons.Default.Support,
-                        title = stringResource(id = R.string.support),
-                        hasTrailingIcon = true,
-                        onClick = { /* Navigate to Support */ }
-                    )
-                }
-            }
-
-        }
-    }
-}
-
-@Composable
-fun SettingsMenuItem(
-    icon: ImageVector,
-    title: String,
-    onClick: () -> Unit,
-    hasTrailingIcon: Boolean = false,
-    showSwitchesButton: Boolean = false,
-    switchState: Boolean = false,
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = MaterialTheme.shapes.medium,
-        onClick = onClick
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Icon Container
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            // Title
-            Text(
-                text = title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f)
+            SettingsItem(
+                title = "Theme",
+                subtitle = currentTheme.getDisplayName(),
+                icon = Icons.Default.Brightness4,
+                onClick = { showThemeDialog = true }
             )
 
-            // Trailing Arrow Icon
-            if (hasTrailingIcon) {
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = stringResource(id = R.string.content_description_navigate),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            if (showSwitchesButton) {
-                var localSwitchState by remember { mutableStateOf(switchState) }
-                Switch(
-                    checked = localSwitchState,
-                    onCheckedChange = { localSwitchState = it },
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
-                )
-            }
+            // Add more settings sections here as needed
+        }
+
+        // Theme Selection Dialog
+        if (showThemeDialog) {
+            ThemeSelectionDialog(
+                currentTheme = currentTheme,
+                onThemeSelected = { newTheme ->
+                    themeViewModel.updateThemeConfig(newTheme)
+                    showThemeDialog = false
+                },
+                onDismiss = { showThemeDialog = false }
+            )
         }
     }
 }
 
-@Preview(showBackground = true)
+
+
+/**
+ * A section header for grouping settings.
+ *
+ * @param title The title text for the section
+ */
 @Composable
-fun SettingScreenPreview() {
-    RovitsAppTheme {
-        SettingsScreen(
-            onNavigateBack = { /* no-op */ }
+private fun SettingsSectionHeader(
+    title: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 16.dp)
+    )
+}
+
+/**
+ * A single settings item row.
+ *
+ * @param title The main title of the setting
+ * @param subtitle The current value or description
+ * @param icon The icon to display on the left
+ * @param onClick Callback invoked when the item is clicked
+ */
+@Composable
+private fun SettingsItem(
+    title: String,
+    subtitle: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(24.dp)
         )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }

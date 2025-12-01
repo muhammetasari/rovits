@@ -1589,7 +1589,7 @@ private fun ComponentsSection(snackbarHostState: SnackbarHostState) {
 @Preview(name = "Light Theme", showBackground = true)
 @Composable
 private fun ThemeDemoLightPreview() {
-    RovitsAppTheme(darkTheme = false) {
+    RovitsAppTheme( ) {
         ThemeDemoScreen()
     }
 }
@@ -1598,7 +1598,7 @@ private fun ThemeDemoLightPreview() {
 @Preview(name = "Dark Theme", showBackground = true)
 @Composable
 private fun ThemeDemoDarkPreview() {
-    RovitsAppTheme(darkTheme = true) {
+    RovitsAppTheme() {
         ThemeDemoScreen()
     }
 }

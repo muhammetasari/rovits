@@ -4,6 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import com.rovits.app.data.model.AppThemeConfig
 
 /**
  * Açık tema için renk şeması.
@@ -169,14 +170,22 @@ private val DarkColorScheme = darkColorScheme(
  * Dinamik tema desteği kaldırılmıştır. Uygulama, tüm cihazlarda tutarlı bir görünüm için
  * özel olarak tanımlanmış renk paletini kullanır.
  *
- * @param darkTheme Dark theme kullanılıp kullanılmayacağı. Varsayılan olarak sistem ayarını takip eder.
+ * @param themeConfig The theme configuration to apply (FOLLOW_SYSTEM, LIGHT, or DARK)
  * @param content Temalı içerik composable'ı.
  */
 @Composable
 fun RovitsAppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    themeConfig: AppThemeConfig = AppThemeConfig.FOLLOW_SYSTEM,
     content: @Composable () -> Unit
 ) {
+    val systemInDarkTheme = isSystemInDarkTheme()
+
+    val darkTheme = when (themeConfig) {
+        AppThemeConfig.FOLLOW_SYSTEM -> systemInDarkTheme
+        AppThemeConfig.LIGHT -> false
+        AppThemeConfig.DARK -> true
+    }
+
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(

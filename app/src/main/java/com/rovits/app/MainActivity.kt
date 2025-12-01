@@ -27,6 +27,7 @@ import com.rovits.app.navigation.homeNavGraph
 import com.rovits.app.navigation.profileNavGraph
 import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.viewmodel.AuthViewModel
+import com.rovits.app.ui.viewmodel.ThemeViewModel
 import com.rovits.app.utils.LocaleHelper
 import androidx.compose.runtime.remember
 
@@ -43,7 +44,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            RovitsAppTheme {
+            // Initialize ThemeViewModel to observe theme changes
+            val themeViewModel: ThemeViewModel = viewModel()
+            val themeConfig by themeViewModel.themeConfig.collectAsState()
+
+            RovitsAppTheme(themeConfig = themeConfig) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
