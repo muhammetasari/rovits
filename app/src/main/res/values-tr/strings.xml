@@ -123,4 +123,9 @@
     <string name="exit_app_message">Uygulamadan çıkmak istiyor musunuz?</string>
     <string name="yes">Evet</string>
     <string name="no">Hayır</string>
+
+    <!-- Theme Selection Dialog -->
+    <string name="choose_theme">Tema Seç</string>
+    <string name="ok">Tamam</string>
+    <string name="cancel">İptal</string>
 </resources>

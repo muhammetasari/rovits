@@ -33,7 +33,7 @@ fun NavGraphBuilder.profileNavGraph(
 
     composable (Screen.Settings.route) {
         SettingsScreen(
-            onNavigateBack = { navController.popBackStack() }
+            onNavigateBack = { navController.popBackStack() },
         )
     }
 }

@@ -12,9 +12,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.rovits.app.ui.components.ListMenuItem
+import com.rovits.app.ui.components.ListMenuItemStyle
 import com.rovits.app.ui.components.RovitsLogo
 import com.rovits.app.ui.components.TermsOfUseDialog
 import com.rovits.app.ui.components.PrivacyPolicyDialog
@@ -1582,6 +1587,245 @@ private fun ComponentsSection(snackbarHostState: SnackbarHostState) {
                 )
             )
         }
+
+        // List Menu Items Section
+        ListMenuItemsSection()
+    }
+}
+
+@Composable
+private fun ListMenuItemsSection() {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text(
+            text = "📋 List Menu Items",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Text(
+            text = "Basit Kullanım",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        // 1. Basit menu item
+        ListMenuItem(
+            icon = Icons.Default.Person,
+            title = "Profil",
+            onClick = { /* Tıklama işlemi */ },
+            hasTrailingIcon = true
+        )
+
+        // 2. Alt başlıklı menu item
+        ListMenuItem(
+            icon = Icons.Default.Settings,
+            title = "Ayarlar",
+            subtitle = "Uygulama tercihlerini yönet",
+            onClick = { /* Tıklama işlemi */ },
+            hasTrailingIcon = true
+        )
+
+        Text(
+            text = "Switch ile Kullanım",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        // 3. Switch button ile
+        var isDarkMode by remember { mutableStateOf(false) }
+        ListMenuItem(
+            icon = Icons.Default.DarkMode,
+            title = "Karanlık Mod",
+            subtitle = "Gece temasını etkinleştir",
+            onClick = { /* İsteğe bağlı */ },
+            showSwitchesButton = true,
+            switchState = isDarkMode,
+            onSwitchChange = { isDarkMode = it }
+        )
+
+        Text(
+            text = "Badge ve Özelleştirilmiş Stiller",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        // 4. Badge ile bildirim sayısı
+        ListMenuItem(
+            icon = Icons.Default.Notifications,
+            title = "Bildirimler",
+            subtitle = "Yeni mesajlar",
+            onClick = { /* Tıklama işlemi */ },
+            badge = "5",
+            hasTrailingIcon = true
+        )
+
+        // 5. Özelleştirilmiş renkler
+        ListMenuItem(
+            icon = Icons.Default.Favorite,
+            title = "Favoriler",
+            subtitle = "Beğendiğin içerikler",
+            onClick = { /* Tıklama işlemi */ },
+            hasTrailingIcon = true,
+            style = ListMenuItemStyle(
+                iconBackgroundColor = Color(0xFFFFEBEE),
+                iconTintColor = Color(0xFFE91E63),
+                titleFontSize = 18.sp
+            )
+        )
+
+        Text(
+            text = "Seçili Durum ve Animasyonlar",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        // 6. Seçili durum gösterimi
+        var isSelected by remember { mutableStateOf(false) }
+        ListMenuItem(
+            icon = Icons.Default.CheckCircle,
+            title = "Seçilebilir Item",
+            subtitle = if (isSelected) "Seçildi" else "Seçmek için tıkla",
+            onClick = { isSelected = !isSelected },
+            selected = isSelected,
+            style = ListMenuItemStyle(
+                backgroundColor = MaterialTheme.colorScheme.surface,
+                selectedBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                cardElevation = 2.dp
+            )
+        )
+
+        Text(
+            text = "Devre Dışı ve Long Press",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        // 7. Devre dışı bırakılmış
+        ListMenuItem(
+            icon = Icons.Default.Block,
+            title = "Devre Dışı Item",
+            subtitle = "Bu öğe tıklanamaz",
+            onClick = { /* Çalışmaz */ },
+            enabled = false,
+            hasTrailingIcon = true
+        )
+
+        // 8. Long press desteği
+        var longPressCount by remember { mutableStateOf(0) }
+        ListMenuItem(
+            icon = Icons.Default.TouchApp,
+            title = "Uzun Bas",
+            subtitle = "Uzun basma sayısı: $longPressCount",
+            onClick = { /* Normal tıklama */ },
+            onLongClick = { longPressCount++ }
+        )
+
+        Text(
+            text = "Özel İçerik",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        // 9. Özel trailing content
+        ListMenuItem(
+            icon = Icons.Default.Star,
+            title = "Değerlendirme",
+            subtitle = "4.5 / 5.0",
+            onClick = { /* Tıklama işlemi */ },
+            trailingContent = {
+                Row {
+                    repeat(5) { index ->
+                        Icon(
+                            imageVector = if (index < 4) Icons.Default.Star else Icons.Default.StarBorder,
+                            contentDescription = null,
+                            tint = Color(0xFFFFB300),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+        )
+
+        // 10. Özel leading content
+        ListMenuItem(
+            icon = Icons.Default.Person, // Kullanılmayacak
+            title = "Özel Avatar",
+            subtitle = "Custom leading content",
+            onClick = { /* Tıklama işlemi */ },
+            hasTrailingIcon = true,
+            leadingContent = {
+                Surface(
+                    modifier = Modifier.size(50.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.primaryContainer
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "AB",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+            }
+        )
+
+        Text(
+            text = "Gelişmiş Özelleştirme",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        // 11. Tam özelleştirilmiş stil
+        ListMenuItem(
+            icon = Icons.Default.Palette,
+            title = "Özel Tasarım",
+            subtitle = "Tüm parametreler özelleştirildi",
+            onClick = { /* Tıklama işlemi */ },
+            hasTrailingIcon = true,
+            style = ListMenuItemStyle(
+                iconSize = 56.dp,
+                iconContentSize = 28.dp,
+                iconBackgroundColor = Color(0xFFE3F2FD),
+                iconTintColor = Color(0xFF1976D2),
+                titleFontSize = 20.sp,
+                subtitleFontSize = 15.sp,
+                horizontalPadding = 20.dp,
+                verticalPadding = 20.dp,
+                verticalSpacing = 6.dp,
+                cardElevation = 4.dp,
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        )
+
+        // 12. Bilgi kartı görünümü
+        var expanded by remember { mutableStateOf(false) }
+        ListMenuItem(
+            icon = Icons.Default.Info,
+            title = "Detaylı Bilgi",
+            subtitle = if (expanded) "Tıklayarak daralt" else "Tıklayarak genişlet",
+            onClick = { expanded = !expanded },
+            badge = if (expanded) "AÇIK" else null,
+            style = ListMenuItemStyle(
+                cardElevation = if (expanded) 8.dp else 2.dp,
+                backgroundColor = if (expanded)
+                    MaterialTheme.colorScheme.secondaryContainer
+                else
+                    MaterialTheme.colorScheme.surface,
+                cardShape = MaterialTheme.shapes.large
+            )
+        )
     }
 }
 
@@ -1602,4 +1846,3 @@ private fun ThemeDemoDarkPreview() {
         ThemeDemoScreen()
     }
 }
-

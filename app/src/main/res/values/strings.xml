@@ -126,4 +126,9 @@
     <string name="exit_app_message">Do you want to exit the app?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+
+    <!-- Theme Selection Dialog -->
+    <string name="choose_theme">Choose Theme</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>
