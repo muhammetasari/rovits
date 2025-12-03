@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Preview
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -31,7 +32,7 @@ fun StandardBottomBar(navController: NavController) {
                     // TODO: İkonları projenize uygun olanlarla değiştirin
                     when (index) {
                         0 -> Icon(Icons.Default.Home, contentDescription = item)
-                        1 -> Icon(Icons.Default.Search, contentDescription = item)
+                        1 -> Icon(Icons.Default.Preview, contentDescription = item)
                         2 -> Icon(Icons.Default.DateRange, contentDescription = item)
                         3 -> Icon(Icons.Default.AccountCircle, contentDescription = item)
                         4 -> Icon(Icons.Default.Settings, contentDescription = item)
@@ -41,16 +42,14 @@ fun StandardBottomBar(navController: NavController) {
                 selected = selectedItem == index,
                 onClick = {
                     selectedItem = index
-                    // TODO: Buraya yönlendirme mantığını ekleyin
-                    /*
                     when(index) {
-                        0 -> navController.navigate("home_route") { popUpTo(navController.graph.startDestinationId) { saveState = true }; launchSingleTop = true; restoreState = true }
-                        1 -> navController.navigate("search_route") { popUpTo(navController.graph.startDestinationId) { saveState = true }; launchSingleTop = true; restoreState = true }
-                        2 -> navController.navigate("appointment_route") { popUpTo(navController.graph.startDestinationId) { saveState = true }; launchSingleTop = true; restoreState = true }
-                        3 -> navController.navigate("profile_route") { popUpTo(navController.graph.startDestinationId) { saveState = true }; launchSingleTop = true; restoreState = true }
-                        4 -> navController.navigate("settings_route") { popUpTo(navController.graph.startDestinationId) { saveState = true }; launchSingleTop = true; restoreState = true }
+                        0 -> navController.navigate("home")
+                        1 -> navController.navigate("theme_demo")
+                        //2 -> navController.navigate("")
+                        3 -> navController.navigate("profile")
+                        4 -> navController.navigate("settings")
+
                     }
-                    */
                 }
             )
         }

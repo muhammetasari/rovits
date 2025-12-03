@@ -1,11 +1,17 @@
 package com.rovits.app.ui.common
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -19,6 +25,8 @@ fun StandardLayout(
     showBackButton: Boolean = true,
     showBottomBar: Boolean = true,
     navController: NavController,
+    topAppBarActions: @Composable RowScope.() -> Unit = {},
+    scrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -28,7 +36,9 @@ fun StandardLayout(
                 StandartTopAppBar(
                     title = topAppBarTitle,
                     showBackButton = showBackButton,
-                    onNavigateBack = onNavigateBack
+                    onNavigateBack = onNavigateBack,
+                    actions = topAppBarActions,
+                    scrollBehavior = scrollBehavior
                 )
             }
         },
@@ -45,6 +55,7 @@ fun StandardLayout(
 /**
  * StandardLayout için önizleme fonksiyonu.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun StandardLayoutPreview() {
@@ -57,6 +68,8 @@ fun StandardLayoutPreview() {
         showBottomBar = true,
         navController = navController
     ) { paddingValues ->
-        // Örnek içerik
+        // Örnek içerik - paddingValues kullanılarak preview uyarısı giderildi
+        Box(modifier = Modifier.padding(paddingValues)) {
+        }
     }
 }

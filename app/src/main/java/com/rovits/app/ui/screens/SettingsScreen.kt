@@ -1,5 +1,6 @@
 package com.rovits.app.ui.screens
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -11,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,6 +25,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rovits.app.ui.viewmodel.ThemeViewModel
 import com.rovits.app.ui.components.ThemeSelectionDialog
 import com.rovits.app.ui.components.ListMenuItem
+import com.rovits.app.ui.components.LanguageSelectionDialog
+import com.rovits.app.utils.LocaleHelper
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,6 +38,7 @@ fun SettingsScreen(
     val viewModel = themeViewModel ?: viewModel()
     val currentTheme by viewModel.themeConfig.collectAsState()
     var showThemeDialog by remember { mutableStateOf(false) }
+    var showLanguageDialog by remember { mutableStateOf(false) }
     val navController = rememberNavController()
 
     SettingsScreenContent(
@@ -41,6 +46,8 @@ fun SettingsScreen(
         currentTheme = currentTheme,
         showThemeDialog = showThemeDialog,
         onShowThemeDialog = { showThemeDialog = it },
+        showLanguageDialog = showLanguageDialog,
+        onShowLanguageDialog = { showLanguageDialog = it },
         onThemeSelected = { newTheme ->
             viewModel.updateThemeConfig(newTheme)
         },
@@ -55,10 +62,13 @@ fun SettingsScreenContent(
     currentTheme: AppThemeConfig = AppThemeConfig.FOLLOW_SYSTEM,
     showThemeDialog: Boolean = false,
     onShowThemeDialog: (Boolean) -> Unit = {},
+    showLanguageDialog: Boolean = false,
+    onShowLanguageDialog: (Boolean) -> Unit = {},
     onThemeSelected: (AppThemeConfig) -> Unit = {},
     navController: androidx.navigation.NavHostController? = null
 )
  {
+    val context = LocalContext.current
     StandardLayout(
         onNavigateBack = onNavigateBack,
         topAppBarTitle = stringResource(id = R.string.settings),
@@ -97,6 +107,7 @@ fun SettingsScreenContent(
                         title = stringResource(id = R.string.dark_mode),
                         subtitle = currentTheme.getDisplayName(),
                         onClick = { onShowThemeDialog(true) }
+
                     )
                     ListMenuItem(
                         icon = Icons.Outlined.Notifications,
@@ -107,7 +118,8 @@ fun SettingsScreenContent(
                     ListMenuItem(
                         icon = Icons.Default.GTranslate,
                         title = stringResource(id = R.string.language_settings),
-                        onClick = { /* Navigate to password */ }
+                        subtitle = LocaleHelper.getCurrentLanguageName(context),
+                        onClick = { onShowLanguageDialog(true) }
                     )
                 }
             }
@@ -149,7 +161,6 @@ fun SettingsScreenContent(
                     )
                 }
             }
-
         }
 
         // Theme Selection Dialog
@@ -161,6 +172,13 @@ fun SettingsScreenContent(
                     onShowThemeDialog(false)
                 },
                 onDismiss = { onShowThemeDialog(false) }
+            )
+        }
+
+        //Language Selection Dialog
+        if (showLanguageDialog) {
+            LanguageSelectionDialog(
+                onDismiss = { onShowLanguageDialog(false) }
             )
         }
     }

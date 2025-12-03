@@ -68,6 +68,7 @@ data class ListMenuItemStyle(
  * @param enabled Whether the item is enabled and clickable
  * @param selected Whether the item is in selected state
  * @param onLongClick Optional long press action
+ * @param onDismiss Optional dismiss action
  * @param style Custom style configuration
  * @param leadingContent Optional custom leading content (overrides default icon)
  */
@@ -88,6 +89,7 @@ fun ListMenuItem(
     enabled: Boolean = true,
     selected: Boolean = false,
     onLongClick: (() -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null,
     style: ListMenuItemStyle = ListMenuItemStyle(),
     leadingContent: (@Composable () -> Unit)? = null
 ) {

@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +26,7 @@ import com.rovits.app.ui.components.TermsOfUseDialog
 import com.rovits.app.ui.components.PrivacyPolicyDialog
 import com.rovits.app.ui.components.TermsPrivacyText
 import com.rovits.app.ui.theme.RovitsAppTheme
+import com.rovits.app.ui.common.StandartTopAppBar
 import kotlinx.coroutines.launch
 
 /**
@@ -39,22 +41,15 @@ fun ThemeDemoScreen(
     onNavigateBack: () -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
-                title = { Text("Tema Demosu") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Geri"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+            StandartTopAppBar(
+                title = "Tema Demosu",
+                showBackButton = true,
+                onNavigateBack = onNavigateBack,
+                scrollBehavior = scrollBehavior
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -1834,15 +1829,6 @@ private fun ListMenuItemsSection() {
 @Composable
 private fun ThemeDemoLightPreview() {
     RovitsAppTheme( ) {
-        ThemeDemoScreen()
-    }
-}
-
-// Preview for Dark Theme
-@Preview(name = "Dark Theme", showBackground = true)
-@Composable
-private fun ThemeDemoDarkPreview() {
-    RovitsAppTheme() {
         ThemeDemoScreen()
     }
 }

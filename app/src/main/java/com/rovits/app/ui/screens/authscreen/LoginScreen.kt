@@ -90,7 +90,6 @@ fun LoginScreen(
         topBar = {
             TopAppBar(
                 title = {
-
                 },
                 actions = {
                     IconButton(onClick = { showLanguageMenu = true }) {
