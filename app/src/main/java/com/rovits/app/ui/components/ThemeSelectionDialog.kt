@@ -1,14 +1,10 @@
 package com.rovits.app.ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.rovits.app.R
 import com.rovits.app.data.model.AppThemeConfig
@@ -31,6 +27,48 @@ fun ThemeSelectionDialog(
     onThemeSelected: (AppThemeConfig) -> Unit,
     onDismiss: () -> Unit
 ) {
+    /**
+     * A single theme option button.
+     *
+     * @param theme The theme configuration this option represents
+     * @param isSelected Whether this option is currently selected
+     * @param onOptionSelected Callback invoked when this option is clicked
+     */
+    @Composable
+    fun ThemeOption(
+        theme: AppThemeConfig,
+        isSelected: Boolean,
+        onOptionSelected: () -> Unit
+    ) {
+        if (isSelected) {
+            Button(
+                onClick = onOptionSelected,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(
+                    text = theme.getDisplayName(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        } else {
+            OutlinedButton(
+                onClick = onOptionSelected,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = theme.getDisplayName(),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -41,9 +79,7 @@ fun ThemeSelectionDialog(
         },
         text = {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .selectableGroup(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 AppThemeConfig.entries.forEach { themeConfig ->
@@ -66,43 +102,5 @@ fun ThemeSelectionDialog(
             }
         }
     )
-}
-
-/**
- * A single theme option row with a radio button.
- *
- * @param theme The theme configuration this option represents
- * @param isSelected Whether this option is currently selected
- * @param onOptionSelected Callback invoked when this option is clicked
- */
-@Composable
-private fun ThemeOption(
-    theme: AppThemeConfig,
-    isSelected: Boolean,
-    onOptionSelected: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .selectable(
-                selected = isSelected,
-                onClick = onOptionSelected,
-                role = Role.RadioButton
-            )
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = isSelected,
-            onClick = null // null because the entire row is clickable
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = theme.getDisplayName(),
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
-        )
-    }
 }
 
