@@ -141,4 +141,11 @@
     <!-- Language names -->
     <string name="english">English</string>
     <string name="turkish">Türkçe</string>
+
+    <!-- Bottom Navigation Bar -->
+    <string name="bottom_bar_home">Home</string>
+    <string name="bottom_bar_search">Search</string>
+    <string name="bottom_bar_appointment">Appointment</string>
+    <string name="bottom_bar_profile">Profile</string>
+    <string name="bottom_bar_settings">Settings</string>
 </resources>
