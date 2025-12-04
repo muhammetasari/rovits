@@ -29,7 +29,6 @@ fun StandardBottomBar(navController: NavController) {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 icon = {
-                    // TODO: İkonları projenize uygun olanlarla değiştirin
                     when (index) {
                         0 -> Icon(Icons.Default.Home, contentDescription = item)
                         1 -> Icon(Icons.Default.Preview, contentDescription = item)
