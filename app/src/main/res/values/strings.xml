@@ -47,6 +47,32 @@
     <string name="about_application_title">About Application</string>
     <string name="about_application_content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</string>
 
+    <!-- Permissions Control Dialog -->
+    <string name="permissions_control_title">Permissions</string>
+    <string name="permissions_control_subtitle">Control the following permissions</string>
+    <string name="permission_camera">Camera</string>
+    <string name="permission_camera_desc">To take photos and record videos</string>
+    <string name="permission_location">Location</string>
+    <string name="permission_location_desc">To determine your location</string>
+    <string name="permission_storage">Storage</string>
+    <string name="permission_storage_desc">To save and read files</string>
+    <string name="permission_notifications">Notifications</string>
+    <string name="permission_notifications_desc">To communicate with you</string>
+    <string name="permission_granted">Granted</string>
+    <string name="notification_permission">Notifications</string>
+    <string name="notification_permission_desc">To send you important updates and notifications</string>
+    <string name="location_permission">Location</string>
+    <string name="location_permission_desc">To determine your current location</string>
+    <string name="camera_permission">Camera</string>
+    <string name="camera_permission_desc">To take photos and record videos</string>
+    <string name="microphone_permission">Microphone</string>
+    <string name="microphone_permission_desc">To record audio</string>
+    <string name="storage_permission">Storage</string>
+    <string name="storage_permission_desc">To save and read files from your device</string>
+    <string name="permission_denied">Denied</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="save">Save</string>
+
     <!-- Home Screen -->
     <string name="welcome">Welcome</string>
     <string name="logout">Logout</string>

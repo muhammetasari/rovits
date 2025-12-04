@@ -27,6 +27,7 @@ import com.rovits.app.ui.components.ThemeSelectionDialog
 import com.rovits.app.ui.components.AboutApplicationDialog
 import com.rovits.app.ui.components.ListMenuItem
 import com.rovits.app.ui.components.LanguageSelectionDialog
+import com.rovits.app.ui.components.PermissionsControlDialog
 import com.rovits.app.utils.LocaleHelper
 
 
@@ -41,6 +42,7 @@ fun SettingsScreen(
     var showThemeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
+    var showPermissionsDialog by remember { mutableStateOf(false) }
     val navController = rememberNavController()
 
     SettingsScreenContent(
@@ -52,6 +54,8 @@ fun SettingsScreen(
         onShowLanguageDialog = { showLanguageDialog = it },
         showAboutDialog = showAboutDialog,
         onShowAboutDialog = { showAboutDialog = it },
+        showPermissionsDialog = showPermissionsDialog,
+        onShowPermissionsDialog = { showPermissionsDialog = it },
         onThemeSelected = { newTheme ->
             viewModel.updateThemeConfig(newTheme)
         },
@@ -70,6 +74,8 @@ fun SettingsScreenContent(
     onShowLanguageDialog: (Boolean) -> Unit = {},
     showAboutDialog: Boolean = false,
     onShowAboutDialog: (Boolean) -> Unit = {},
+    showPermissionsDialog: Boolean = false,
+    onShowPermissionsDialog: (Boolean) -> Unit = {},
     onThemeSelected: (AppThemeConfig) -> Unit = {},
     navController: androidx.navigation.NavHostController? = null
 )
@@ -118,7 +124,7 @@ fun SettingsScreenContent(
                     ListMenuItem(
                         icon = Icons.Outlined.Notifications,
                         title = stringResource(id = R.string.notification_settings),
-                        onClick = { /* Navigate to profile details */ }
+                        onClick = { onShowPermissionsDialog(true) }
                     )
 
                     ListMenuItem(
@@ -192,6 +198,11 @@ fun SettingsScreenContent(
         if (showAboutDialog) {
             AboutApplicationDialog(
                 onDismiss = { onShowAboutDialog(false) }
+            )
+        }
+        if (showPermissionsDialog) {
+            PermissionsControlDialog(
+                onDismiss = { onShowPermissionsDialog(false) }
             )
         }
     }

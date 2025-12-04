@@ -47,6 +47,32 @@
     <string name="about_application_title">Uygulama Hakkında</string>
     <string name="about_application_content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</string>
 
+    <!-- Permissions Control Dialog -->
+    <string name="permissions_control_title">İzinler</string>
+    <string name="permissions_control_subtitle">Aşağıdaki izinleri kontrol edin</string>
+    <string name="permission_camera">Kamera</string>
+    <string name="permission_camera_desc">Fotoğraf çekmek ve video kaydetmek için</string>
+    <string name="permission_location">Konum</string>
+    <string name="permission_location_desc">Konumunuzu belirlemek için</string>
+    <string name="permission_storage">Depolama</string>
+    <string name="permission_storage_desc">Dosyaları kaydetmek ve okumak için</string>
+    <string name="permission_notifications">Bildirimler</string>
+    <string name="permission_notifications_desc">Sizinle iletişim kurmak için</string>
+    <string name="permission_granted">İzin verildi</string>
+    <string name="notification_permission">Bildirimler</string>
+    <string name="notification_permission_desc">Önemli güncellemeler ve bildirimler göndermek için</string>
+    <string name="location_permission">Konum</string>
+    <string name="location_permission_desc">Mevcut konumunuzu belirlemek için</string>
+    <string name="camera_permission">Kamera</string>
+    <string name="camera_permission_desc">Fotoğraf çekmek ve video kaydetmek için</string>
+    <string name="microphone_permission">Mikrofon</string>
+    <string name="microphone_permission_desc">Ses kaydetmek için</string>
+    <string name="storage_permission">Depolama</string>
+    <string name="storage_permission_desc">Cihazınızdan dosya kaydetmek ve okumak için</string>
+    <string name="permission_denied">İzin reddedildi</string>
+    <string name="grant_permission">İzin Ver</string>
+    <string name="save">Kaydet</string>
+
     <!-- Home Screen -->
     <string name="welcome">Hoş Geldiniz</string>
     <string name="logout">Çıkış Yap</string>
