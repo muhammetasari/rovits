@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.rovits.app.R
@@ -27,6 +28,8 @@ fun ThemeSelectionDialog(
     onThemeSelected: (AppThemeConfig) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
+
     /**
      * A single theme option button.
      *
@@ -51,7 +54,7 @@ fun ThemeSelectionDialog(
                 )
             ) {
                 Text(
-                    text = theme.getDisplayName(),
+                    text = theme.getDisplayName(context),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -62,7 +65,7 @@ fun ThemeSelectionDialog(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = theme.getDisplayName(),
+                    text = theme.getDisplayName(context),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

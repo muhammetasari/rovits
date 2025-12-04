@@ -100,6 +100,8 @@ fun LoginScreen(
                     }
                     if (showLanguageMenu) {
                         val currentLanguage = LocaleHelper.getCurrentLanguageName(context)
+                        val english = stringResource(id = R.string.english)
+                        val turkish = stringResource(id = R.string.turkish)
                         AlertDialog(
                             onDismissRequest = { showLanguageMenu = false },
                             title = {
@@ -117,11 +119,11 @@ fun LoginScreen(
                                             .fillMaxWidth()
                                             .padding(vertical = 4.dp),
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (currentLanguage == "English") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                            contentColor = if (currentLanguage == "English") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                            containerColor = if (currentLanguage == english) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                            contentColor = if (currentLanguage == english) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     ) {
-                                        Text("English")
+                                        Text(text = english)
                                     }
                                     Button(
                                         onClick = {
@@ -133,11 +135,11 @@ fun LoginScreen(
                                             .fillMaxWidth()
                                             .padding(vertical = 4.dp),
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (currentLanguage == "Türkçe") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                            contentColor = if (currentLanguage == "Türkçe") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                            containerColor = if (currentLanguage == turkish) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                            contentColor = if (currentLanguage == turkish) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     ) {
-                                        Text("Türkçe")
+                                        Text(text = turkish)
                                     }
                                 }
                             },

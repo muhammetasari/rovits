@@ -44,11 +44,11 @@ object LocaleHelper {
     }
 
     fun getCurrentLanguageName(context: Context): String {
+        // Use localized string resources for the display name of the language
         return when (getPersistedLocale(context)) {
-            LANGUAGE_TURKISH -> "Türkçe"
-            LANGUAGE_ENGLISH -> "English"
-            else -> "English"
+            LANGUAGE_TURKISH -> context.getString(com.rovits.app.R.string.turkish)
+            LANGUAGE_ENGLISH -> context.getString(com.rovits.app.R.string.english)
+            else -> context.getString(com.rovits.app.R.string.english)
         }
     }
 }
-

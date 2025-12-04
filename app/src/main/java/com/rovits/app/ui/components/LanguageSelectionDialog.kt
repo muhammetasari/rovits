@@ -39,6 +39,8 @@ fun LanguageSelectionDialog(
 ) {
     val context = LocalContext.current
     val currentLanguage = LocaleHelper.getCurrentLanguageName(context)
+    val english = stringResource(id = R.string.english)
+    val turkish = stringResource(id = R.string.turkish)
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -57,17 +59,17 @@ fun LanguageSelectionDialog(
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (currentLanguage == "English")
+                        containerColor = if (currentLanguage == english)
                             MaterialTheme.colorScheme.primary
                         else
                             MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = if (currentLanguage == "English")
+                        contentColor = if (currentLanguage == english)
                             MaterialTheme.colorScheme.onPrimary
                         else
                             MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
-                    Text("English")
+                    Text(text = english)
                 }
                 Button(
                     onClick = {
@@ -79,17 +81,17 @@ fun LanguageSelectionDialog(
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (currentLanguage == "Türkçe")
+                        containerColor = if (currentLanguage == turkish)
                             MaterialTheme.colorScheme.primary
                         else
                             MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = if (currentLanguage == "Türkçe")
+                        contentColor = if (currentLanguage == turkish)
                             MaterialTheme.colorScheme.onPrimary
                         else
                             MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
-                    Text("Türkçe")
+                    Text(text = turkish)
                 }
             }
         },

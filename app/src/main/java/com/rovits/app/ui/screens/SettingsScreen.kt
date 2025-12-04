@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rovits.app.ui.viewmodel.ThemeViewModel
 import com.rovits.app.ui.components.ThemeSelectionDialog
+import com.rovits.app.ui.components.AboutApplicationDialog
 import com.rovits.app.ui.components.ListMenuItem
 import com.rovits.app.ui.components.LanguageSelectionDialog
 import com.rovits.app.utils.LocaleHelper
@@ -39,6 +40,7 @@ fun SettingsScreen(
     val currentTheme by viewModel.themeConfig.collectAsState()
     var showThemeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showAboutDialog by remember { mutableStateOf(false) }
     val navController = rememberNavController()
 
     SettingsScreenContent(
@@ -48,6 +50,8 @@ fun SettingsScreen(
         onShowThemeDialog = { showThemeDialog = it },
         showLanguageDialog = showLanguageDialog,
         onShowLanguageDialog = { showLanguageDialog = it },
+        showAboutDialog = showAboutDialog,
+        onShowAboutDialog = { showAboutDialog = it },
         onThemeSelected = { newTheme ->
             viewModel.updateThemeConfig(newTheme)
         },
@@ -64,6 +68,8 @@ fun SettingsScreenContent(
     onShowThemeDialog: (Boolean) -> Unit = {},
     showLanguageDialog: Boolean = false,
     onShowLanguageDialog: (Boolean) -> Unit = {},
+    showAboutDialog: Boolean = false,
+    onShowAboutDialog: (Boolean) -> Unit = {},
     onThemeSelected: (AppThemeConfig) -> Unit = {},
     navController: androidx.navigation.NavHostController? = null
 )
@@ -105,7 +111,7 @@ fun SettingsScreenContent(
                         onLongClick = { /* Navigate to theme demo */ },
                         icon = Icons.Default.DarkMode,
                         title = stringResource(id = R.string.dark_mode),
-                        subtitle = currentTheme.getDisplayName(),
+                        subtitle = currentTheme.getDisplayName(context),
                         onClick = { onShowThemeDialog(true) }
 
                     )
@@ -144,7 +150,7 @@ fun SettingsScreenContent(
                         icon = Icons.Outlined.Info,
                         title = stringResource(id = R.string.about_application),
                         hasTrailingIcon = true,
-                        onClick = { /* Navigate to theme demo */ }
+                        onClick = { onShowAboutDialog(true) }
                     )
                     ListMenuItem(
                         icon = Icons.Outlined.Feedback,
@@ -179,6 +185,13 @@ fun SettingsScreenContent(
         if (showLanguageDialog) {
             LanguageSelectionDialog(
                 onDismiss = { onShowLanguageDialog(false) }
+            )
+        }
+
+        // About Application Dialog
+        if (showAboutDialog) {
+            AboutApplicationDialog(
+                onDismiss = { onShowAboutDialog(false) }
             )
         }
     }

@@ -1,5 +1,8 @@
 package com.rovits.app.data.model
 
+import android.content.Context
+import com.rovits.app.R
+
 /**
  * Enum class representing the app's theme configuration options.
  *
@@ -21,10 +24,10 @@ enum class AppThemeConfig {
     /**
      * Returns a user-friendly display name for the theme option
      */
-    fun getDisplayName(): String = when (this) {
-        FOLLOW_SYSTEM -> "System Default"
-        LIGHT -> "Light"
-        DARK -> "Dark"
+    fun getDisplayName(context: Context): String = when (this) {
+        FOLLOW_SYSTEM -> context.getString(R.string.theme_system_default)
+        LIGHT -> context.getString(R.string.theme_light)
+        DARK -> context.getString(R.string.theme_dark)
     }
 
     companion object {
