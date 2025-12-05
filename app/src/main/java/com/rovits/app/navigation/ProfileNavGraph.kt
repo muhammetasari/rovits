@@ -17,6 +17,7 @@ fun NavGraphBuilder.profileNavGraph(
 ) {
     composable(Screen.Profile.route) {
         ProfileScreen(
+            navController = navController,
             user = user,
             onLogout = onLogout,
             onNavigateBack = { navController.popBackStack() },
@@ -31,9 +32,9 @@ fun NavGraphBuilder.profileNavGraph(
         )
     }
 
-    composable (Screen.Settings.route) {
+    composable(Screen.Settings.route) {
         SettingsScreen(
-            onNavigateBack = { navController.popBackStack() },
+            navController = navController
         )
     }
 }

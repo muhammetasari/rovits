@@ -11,7 +11,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -19,12 +18,12 @@ import androidx.navigation.compose.rememberNavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StandardLayout(
-    onNavigateBack: () -> Unit,
-    topAppBarTitle: String = "",
+    navController: NavController,
+    title: String? = null,
     showTopBar: Boolean = true,
     showBackButton: Boolean = true,
     showBottomBar: Boolean = true,
-    navController: NavController,
+    onNavigateBack: () -> Unit = { navController.popBackStack() },
     topAppBarActions: @Composable RowScope.() -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
     content: @Composable (PaddingValues) -> Unit
@@ -34,7 +33,7 @@ fun StandardLayout(
         topBar = {
             if (showTopBar) {
                 StandartTopAppBar(
-                    title = topAppBarTitle,
+                    title = title ?: "",
                     showBackButton = showBackButton,
                     onNavigateBack = onNavigateBack,
                     actions = topAppBarActions,
@@ -61,12 +60,11 @@ fun StandardLayout(
 fun StandardLayoutPreview() {
     val navController = rememberNavController()
     StandardLayout(
-        onNavigateBack = {},
-        topAppBarTitle = "Başlık",
+        navController = navController,
+        title = "Başlık",
         showTopBar = true,
         showBackButton = true,
-        showBottomBar = true,
-        navController = navController
+        showBottomBar = true
     ) { paddingValues ->
         // Örnek içerik - paddingValues kullanılarak preview uyarısı giderildi
         Box(modifier = Modifier.padding(paddingValues)) {

@@ -77,6 +77,7 @@
     <string name="welcome">Hoş Geldiniz</string>
     <string name="logout">Çıkış Yap</string>
     <string name="profile">Profil</string>
+    <string name="home_content">Ana Sayfa İçeriği</string>
 
     <!-- Profile Screen -->
     <string name="account">Hesap</string>

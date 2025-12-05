@@ -1,6 +1,5 @@
 package com.rovits.app.ui.screens
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -16,12 +15,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rovits.app.R
 import com.rovits.app.data.model.AppThemeConfig
 import com.rovits.app.ui.common.StandardLayout
 import com.rovits.app.ui.theme.RovitsAppTheme
-import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rovits.app.ui.viewmodel.ThemeViewModel
 import com.rovits.app.ui.components.ThemeSelectionDialog
 import com.rovits.app.ui.components.AboutApplicationDialog
@@ -34,7 +34,7 @@ import com.rovits.app.utils.LocaleHelper
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onNavigateBack: () -> Unit = {},
+    navController: NavController,
     themeViewModel: ThemeViewModel? = null
 ) {
     val viewModel = themeViewModel ?: viewModel()
@@ -43,10 +43,9 @@ fun SettingsScreen(
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
     var showPermissionsDialog by remember { mutableStateOf(false) }
-    val navController = rememberNavController()
 
     SettingsScreenContent(
-        onNavigateBack = onNavigateBack,
+        navController = navController,
         currentTheme = currentTheme,
         showThemeDialog = showThemeDialog,
         onShowThemeDialog = { showThemeDialog = it },
@@ -58,15 +57,14 @@ fun SettingsScreen(
         onShowPermissionsDialog = { showPermissionsDialog = it },
         onThemeSelected = { newTheme ->
             viewModel.updateThemeConfig(newTheme)
-        },
-        navController = navController
+        }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreenContent(
-    onNavigateBack: () -> Unit = {},
+    navController: NavController,
     currentTheme: AppThemeConfig = AppThemeConfig.FOLLOW_SYSTEM,
     showThemeDialog: Boolean = false,
     onShowThemeDialog: (Boolean) -> Unit = {},
@@ -76,18 +74,16 @@ fun SettingsScreenContent(
     onShowAboutDialog: (Boolean) -> Unit = {},
     showPermissionsDialog: Boolean = false,
     onShowPermissionsDialog: (Boolean) -> Unit = {},
-    onThemeSelected: (AppThemeConfig) -> Unit = {},
-    navController: androidx.navigation.NavHostController? = null
-)
- {
+    onThemeSelected: (AppThemeConfig) -> Unit = {}
+) {
     val context = LocalContext.current
     StandardLayout(
-        onNavigateBack = onNavigateBack,
-        topAppBarTitle = stringResource(id = R.string.settings),
+        navController = navController,
+        title = stringResource(id = R.string.settings),
         showTopBar = true,
         showBackButton = true,
-        showBottomBar = false,
-        navController = navController ?: rememberNavController()
+        showBottomBar = true,
+        onNavigateBack = { navController.popBackStack() }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -210,10 +206,10 @@ fun SettingsScreenContent(
 
 @Preview(showBackground = true)
 @Composable
-fun SettingScreenPreview() {
+fun SettingsScreenPreview() {
     RovitsAppTheme {
         SettingsScreenContent(
-            onNavigateBack = { /* no-op */ }
+            navController = rememberNavController()
         )
     }
 }

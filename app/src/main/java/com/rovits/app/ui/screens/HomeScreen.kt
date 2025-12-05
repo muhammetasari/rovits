@@ -30,7 +30,7 @@ fun HomeScreen(
     val yesText = stringResource(id = R.string.yes)
     val noText = stringResource(id = R.string.no)
 
-    // Geri tuşu yakalama
+    // İki kez hızlıca geri tuşuna basıldığında çıkış diyaloğu göster
     BackHandler(enabled = true) {
         val now = System.currentTimeMillis()
         if (now - lastBackPressTime < 500) {
@@ -59,29 +59,28 @@ fun HomeScreen(
     }
 
     StandardLayout(
+        navController = navController,
         showTopBar = false,
         showBottomBar = true,
-        onNavigateBack = { /* Ana sayfa, geri gitmez */ },
-        navController = navController,
+        onNavigateBack = { /* Ana sayfa, geri gitmez */ }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Content()
-        }
+        HomeContent(modifier = Modifier.padding(paddingValues))
     }
 }
 
 @Composable
-fun Content() {
-    Text(
-        text = "Ana Sayfa İçeriği",
-        style = MaterialTheme.typography.bodyLarge
-    )
+fun HomeContent(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = stringResource(id = R.string.home_content),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
 }
 
 @Preview(showBackground = true)
