@@ -60,7 +60,7 @@ com.rovits.app/
 
 ### Composable Fonksiyonlar
 - Composable fonksiyon isimleri PascalCase olmalı
-- Her Composable için `@Preview` annotasyonu ekle
+- Her Composable için `@Preview` annotasyonu ekle Mocklanması gereken yerleri örneğin Firebase gibi alanları mock ile geçiştir.
 - Modifier parametresini her zaman ilk parametre olarak al
 - State hoisting prensibini uygula
 
