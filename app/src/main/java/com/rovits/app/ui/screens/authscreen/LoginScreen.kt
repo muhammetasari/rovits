@@ -12,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -20,17 +19,22 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.rovits.app.R
+import com.rovits.app.ui.common.StandardLayout
 import com.rovits.app.ui.components.RovitsLogo
 import com.rovits.app.ui.components.TermsOfUseDialog
 import com.rovits.app.ui.components.PrivacyPolicyDialog
 import com.rovits.app.ui.components.TermsPrivacyText
+import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.viewmodel.AuthViewModel
 import com.rovits.app.utils.LocaleHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
+    navController: NavController,
     viewModel: AuthViewModel,
     onNavigateToForgotPassword: () -> Unit,
     onNavigateToRegister: () -> Unit,
@@ -48,10 +52,6 @@ fun LoginScreen(
 
     val context = LocalContext.current
     val authState by viewModel.authState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    // Define scroll behavior for TopAppBar
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     // Handle authentication state
     LaunchedEffect(authState.isSuccess) {
@@ -64,7 +64,7 @@ fun LoginScreen(
     // Handle errors
     LaunchedEffect(authState.error) {
         authState.error?.let { error ->
-            snackbarHostState.showSnackbar(error)
+            // Show error in UI - handled by SnackBar in content
             viewModel.clearError()
         }
     }
@@ -72,7 +72,7 @@ fun LoginScreen(
     // Handle Google Sign-In errors
     LaunchedEffect(authState.googleSignInError) {
         authState.googleSignInError?.let { error ->
-            snackbarHostState.showSnackbar(error)
+            // Show error in UI - handled by SnackBar in content
             viewModel.clearGoogleSignInError()
         }
     }
@@ -85,79 +85,70 @@ fun LoginScreen(
         PrivacyPolicyDialog(onDismiss = { showPrivacyDialog = false })
     }
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            TopAppBar(
-                title = {
-                },
-                actions = {
-                    IconButton(onClick = { showLanguageMenu = true }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.language_24),
-                            contentDescription = stringResource(id = R.string.language)
-                        )
-                    }
-                    if (showLanguageMenu) {
-                        val currentLanguage = LocaleHelper.getCurrentLanguageName(context)
-                        val english = stringResource(id = R.string.english)
-                        val turkish = stringResource(id = R.string.turkish)
-                        AlertDialog(
-                            onDismissRequest = { showLanguageMenu = false },
-                            title = {
-                                Text(text = stringResource(id = R.string.select_language))
-                            },
-                            text = {
-                                Column {
-                                    Button(
-                                        onClick = {
-                                            showLanguageMenu = false
-                                            LocaleHelper.setLocale(context, LocaleHelper.LANGUAGE_ENGLISH)
-                                            (context as? Activity)?.recreate()
-                                        },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 4.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (currentLanguage == english) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                            contentColor = if (currentLanguage == english) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    ) {
-                                        Text(text = english)
-                                    }
-                                    Button(
-                                        onClick = {
-                                            showLanguageMenu = false
-                                            LocaleHelper.setLocale(context, LocaleHelper.LANGUAGE_TURKISH)
-                                            (context as? Activity)?.recreate()
-                                        },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 4.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (currentLanguage == turkish) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                            contentColor = if (currentLanguage == turkish) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    ) {
-                                        Text(text = turkish)
-                                    }
-                                }
-                            },
-                            confirmButton = {},
-                            dismissButton = {}
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
-                ),
-                scrollBehavior = scrollBehavior
-            )
+    StandardLayout(
+        navController = navController,
+        title = "",
+        showTopBar = true,
+        showBackButton = false,
+        showBottomBar = false,
+        topAppBarActions = {
+            IconButton(onClick = { showLanguageMenu = true }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.language_24),
+                    contentDescription = stringResource(id = R.string.language)
+                )
+            }
+            if (showLanguageMenu) {
+                val currentLanguage = LocaleHelper.getCurrentLanguageName(context)
+                val english = stringResource(id = R.string.english)
+                val turkish = stringResource(id = R.string.turkish)
+                AlertDialog(
+                    onDismissRequest = { showLanguageMenu = false },
+                    title = {
+                        Text(text = stringResource(id = R.string.select_language))
+                    },
+                    text = {
+                        Column {
+                            Button(
+                                onClick = {
+                                    showLanguageMenu = false
+                                    LocaleHelper.setLocale(context, LocaleHelper.LANGUAGE_ENGLISH)
+                                    (context as? Activity)?.recreate()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (currentLanguage == english) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                    contentColor = if (currentLanguage == english) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            ) {
+                                Text(text = english)
+                            }
+                            Button(
+                                onClick = {
+                                    showLanguageMenu = false
+                                    LocaleHelper.setLocale(context, LocaleHelper.LANGUAGE_TURKISH)
+                                    (context as? Activity)?.recreate()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (currentLanguage == turkish) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                    contentColor = if (currentLanguage == turkish) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            ) {
+                                Text(text = turkish)
+                            }
+                        }
+                    },
+                    confirmButton = {},
+                    dismissButton = {}
+                )
+            }
         },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
+        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -243,7 +234,7 @@ fun LoginScreen(
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            contentDescription = if (passwordVisible) stringResource(id = R.string.content_description_hide_password) else stringResource(id = R.string.content_description_show_password)
                         )
                     }
                 }
@@ -341,7 +332,7 @@ fun LoginScreen(
                 ) {
                     androidx.compose.foundation.Image(
                         painter = painterResource(id = R.drawable.google_logo),
-                        contentDescription = "Google Logo",
+                        contentDescription = stringResource(id = R.string.content_description_navigate),
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -367,113 +358,16 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    MaterialTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            RovitsLogo(size = 240.dp)
-
-            Spacer(modifier = Modifier.height(36.dp))
-
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                placeholder = {
-                    Text(
-                        text = "Email",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                placeholder = {
-                    Text(
-                        text = "Password",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
-                singleLine = true,
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            TextButton(
-                onClick = {},
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text(
-                    text = "Forgot Password?",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text(
-                    text = "Login",
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Don't have an account?",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                TextButton(onClick = {}) {
-                    Text(
-                        text = "Sign Up",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
-            ) {
-                Text("Connect with Google")
-            }
-        }
+    RovitsAppTheme {
+        val navController = rememberNavController()
+        LoginScreen(
+            navController = navController,
+            viewModel = AuthViewModel(),
+            onNavigateToForgotPassword = {},
+            onNavigateToRegister = {},
+            onLoginSuccess = {},
+            onGoogleSignInClick = {}
+        )
     }
 }
+

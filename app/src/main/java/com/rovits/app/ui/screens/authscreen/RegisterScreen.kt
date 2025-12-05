@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -14,20 +13,27 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.rovits.app.R
+import com.rovits.app.ui.common.StandardLayout
 import com.rovits.app.ui.components.RovitsLogo
 import com.rovits.app.ui.components.TermsOfUseDialog
 import com.rovits.app.ui.components.PrivacyPolicyDialog
 import com.rovits.app.ui.components.TermsPrivacyText
+import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.viewmodel.AuthViewModel
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
+    navController: NavController,
     viewModel: AuthViewModel,
     onBackPressed: () -> Unit,
     onNavigateToLogin: () -> Unit,
@@ -73,32 +79,14 @@ fun RegisterScreen(
         PrivacyPolicyDialog(onDismiss = { showPrivacyDialog = false })
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.register),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackPressed) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.content_description_back)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
-                )
-            )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
+    StandardLayout(
+        navController = navController,
+        title = stringResource(id = R.string.register),
+        showTopBar = true,
+        showBackButton = true,
+        showBottomBar = false,
+        onNavigateBack = onBackPressed,
+        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -294,8 +282,8 @@ fun RegisterScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     androidx.compose.foundation.Image(
-                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.google_logo),
-                        contentDescription = "Google Logo",
+                        painter = painterResource(id = R.drawable.google_logo),
+                        contentDescription = stringResource(id = R.string.content_description_navigate),
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -397,4 +385,20 @@ private fun calculatePasswordScore(password: String): Float {
     if (password.any { !it.isLetterOrDigit() }) score += 0.2f
 
     return score.coerceIn(0f, 1f)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview() {
+    RovitsAppTheme {
+        val navController = rememberNavController()
+        RegisterScreen(
+            navController = navController,
+            viewModel = AuthViewModel(),
+            onBackPressed = {},
+            onNavigateToLogin = {},
+            onRegisterSuccess = {},
+            onGoogleSignInClick = {}
+        )
+    }
 }

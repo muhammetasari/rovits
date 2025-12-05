@@ -41,6 +41,7 @@ fun NavGraphBuilder.authNavGraph(
     }
     composable(Screen.Login.route) {
         LoginScreen(
+            navController = navController,
             viewModel = viewModel,
             onNavigateToForgotPassword = {
                 navController.navigate(Screen.ForgotPassword.route)
@@ -66,6 +67,7 @@ fun NavGraphBuilder.authNavGraph(
     }
     composable(Screen.ForgotPassword.route) {
         ForgotPasswordScreen(
+            navController = navController,
             viewModel = viewModel,
             onBackPressed = { navController.navigateUp() },
             onResetSuccess = { navController.navigateUp() }
@@ -73,6 +75,7 @@ fun NavGraphBuilder.authNavGraph(
     }
     composable(Screen.Register.route) {
         RegisterScreen(
+            navController = navController,
             viewModel = viewModel,
             onBackPressed = { navController.navigateUp() },
             onNavigateToLogin = {

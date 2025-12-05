@@ -37,7 +37,7 @@ fun ProfileScreen(
         title = stringResource(id = R.string.account),
         showTopBar = true,
         showBackButton = false,
-        showBottomBar = true,
+        showBottomBar = false,
         onNavigateBack = onNavigateBack,
         topAppBarActions = {
             IconButton(onClick = onNavigateToSettings) {

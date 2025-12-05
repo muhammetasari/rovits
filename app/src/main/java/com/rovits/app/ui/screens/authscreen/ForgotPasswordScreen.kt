@@ -3,8 +3,6 @@ package com.rovits.app.ui.screens.authscreen
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,16 +10,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.rovits.app.R
+import com.rovits.app.ui.common.StandardLayout
 import com.rovits.app.ui.components.RovitsLogo
 import com.rovits.app.ui.components.TermsOfUseDialog
 import com.rovits.app.ui.components.PrivacyPolicyDialog
 import com.rovits.app.ui.components.TermsPrivacyText
+import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotPasswordScreen(
+    navController: NavController,
     viewModel: AuthViewModel,
     onBackPressed: () -> Unit,
     onResetSuccess: () -> Unit
@@ -59,32 +63,14 @@ fun ForgotPasswordScreen(
         PrivacyPolicyDialog(onDismiss = { showPrivacyDialog = false })
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.forgot_password_title),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackPressed) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
-                )
-            )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
+    StandardLayout(
+        navController = navController,
+        title = stringResource(id = R.string.forgot_password_title),
+        showTopBar = true,
+        showBackButton = true,
+        showBottomBar = false,
+        onNavigateBack = onBackPressed,
+        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -161,5 +147,19 @@ fun ForgotPasswordScreen(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ForgotPasswordScreenPreview() {
+    RovitsAppTheme {
+        val navController = rememberNavController()
+        ForgotPasswordScreen(
+            navController = navController,
+            viewModel = AuthViewModel(),
+            onBackPressed = {},
+            onResetSuccess = {}
+        )
     }
 }

@@ -82,7 +82,7 @@ fun SettingsScreenContent(
         title = stringResource(id = R.string.settings),
         showTopBar = true,
         showBackButton = true,
-        showBottomBar = true,
+        showBottomBar = false,
         onNavigateBack = { navController.popBackStack() }
     ) { paddingValues ->
         Column(
