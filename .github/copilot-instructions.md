@@ -494,6 +494,130 @@ LazyColumn {
 - ViewModel factory pattern'i kullan
 - Gelecekte Hilt/Koin geçişine hazır kod yaz
 
+### Repository Interface Pattern
+**ZORUNLU:** Tüm Repository sınıfları için Interface kullan
+- Her Repository için bir Interface tanımla (`IAuthRepository`, `IUserPreferencesRepository`)
+- Concrete implementasyon Interface'i implement etmeli
+- ViewModel'ler Interface'e bağımlı olmalı, concrete class'a değil
+- Preview ve test için Fake Repository implementasyonları oluştur
+
+```kotlin
+// İyi ✅ - Interface kullanımı
+interface IAuthRepository {
+    suspend fun signInWithEmail(email: String, password: String): AuthResult<User>
+    fun getCurrentUser(): User?
+    fun signOut()
+}
+
+class AuthRepository : IAuthRepository {
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    
+    override suspend fun signInWithEmail(email: String, password: String): AuthResult<User> {
+        // Firebase implementasyonu
+    }
+    
+    override fun getCurrentUser(): User? {
+        // Firebase implementasyonu
+    }
+    
+    override fun signOut() {
+        auth.signOut()
+    }
+}
+
+// ViewModel Interface'e bağımlı
+class AuthViewModel(
+    private val repository: IAuthRepository = AuthRepository()
+) : ViewModel() {
+    // ViewModel içeriği
+}
+
+// Kötü ❌ - Doğrudan concrete class kullanımı
+class AuthViewModel(
+    private val repository: AuthRepository = AuthRepository()
+) : ViewModel() {
+    // Bu yaklaşım test ve preview için esneklik sağlamaz
+}
+```
+
+### Fake Repository Pattern
+Preview ve test için `data/repository/fake/` klasöründe Fake Repository'ler oluştur
+
+```kotlin
+// data/repository/fake/FakeAuthRepository.kt
+class FakeAuthRepository : IAuthRepository {
+    private var currentUser: User? = MOCK_USER
+    
+    override suspend fun signInWithEmail(email: String, password: String): AuthResult<User> {
+        return if (email.isNotEmpty() && password.isNotEmpty()) {
+            currentUser = MOCK_USER.copy(email = email)
+            AuthResult.Success(currentUser!!)
+        } else {
+            AuthResult.Error(AppException.AuthError("ERROR_INVALID_CREDENTIALS"))
+        }
+    }
+    
+    override fun getCurrentUser(): User? = currentUser
+    
+    override fun signOut() {
+        currentUser = null
+    }
+    
+    companion object {
+        val MOCK_USER = User(
+            uid = "preview_user_123",
+            fullName = "Önizleme Kullanıcı",
+            email = "preview@rovits.com",
+            photoUrl = null
+        )
+    }
+}
+```
+
+### Preview'larda Fake Repository Kullanımı
+**ZORUNLU:** Tüm Preview fonksiyonlarında Fake Repository kullan
+
+```kotlin
+// İyi ✅ - Fake Repository ile Preview
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    RovitsAppTheme {
+        LoginScreen(
+            navController = rememberNavController(),
+            viewModel = AuthViewModel(
+                repository = FakeAuthRepository()
+            ),
+            onLoginSuccess = {},
+            onNavigateToRegister = {}
+        )
+    }
+}
+
+// Kötü ❌ - Gerçek Repository ile Preview (Firebase hatası verir)
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    RovitsAppTheme {
+        LoginScreen(
+            navController = rememberNavController(),
+            viewModel = AuthViewModel(), // Firebase bağımlılığı hata verir
+            onLoginSuccess = {},
+            onNavigateToRegister = {}
+        )
+    }
+}
+```
+
+### Repository Interface Checklist
+✅ Her Repository için Interface tanımla  
+✅ Tüm public metodları Interface'e ekle  
+✅ Concrete class Interface'i implement etsin  
+✅ ViewModel constructor'da Interface tipini kullan  
+✅ Fake Repository implementasyonu oluştur  
+✅ Preview'larda Fake Repository kullan  
+✅ Test'lerde Fake Repository kullan
+
 ## 🚫 Kaçınılması Gerekenler
 
 ❌ Hard-coded string'ler  
@@ -505,7 +629,10 @@ LazyColumn {
 ❌ Main thread'de ağır işlemler  
 ❌ Gereksiz nested Composable'lar  
 ❌ StandardLayout yerine manuel Scaffold kullanımı  
-❌ Özel TopBar/BottomBar yerine standart bileşenleri kullanmamak
+❌ Özel TopBar/BottomBar yerine standart bileşenleri kullanmamak  
+❌ Repository'ler için Interface kullanmamak  
+❌ Preview'larda gerçek Firebase Repository kullanımı  
+❌ ViewModel'de concrete Repository class'ına doğrudan bağımlılık
 
 ## ✅ Best Practices
 
@@ -518,7 +645,10 @@ LazyColumn {
 ✅ Error handling  
 ✅ Null safety  
 ✅ StandardLayout kullanımı  
-✅ Standart bileşenleri tercih etme
+✅ Standart bileşenleri tercih etme  
+✅ Repository Interface Pattern kullanımı  
+✅ Preview'larda Fake Repository kullanımı  
+✅ Dependency Injection ile gevşek bağlantı
 
 ## 🔧 Proje Özellikleri
 
@@ -542,25 +672,73 @@ LazyColumn {
 
 ### ViewModel Pattern
 ```kotlin
+// Basit ViewModel (Application parametresi almayan)
 class AuthViewModel(
-    private val authRepository: AuthRepository = AuthRepository()
+    private val repository: IAuthRepository = AuthRepository()
 ) : ViewModel() {
     
-    private val _authState = MutableStateFlow<AuthState>(AuthState. Idle)
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
     
     fun login(email: String, password: String) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
-            authRepository.signInWithEmail(email, password)
-                .collect { result ->
-                    _authState.value = when (result) {
-                        is AuthResult.Success -> AuthState. Authenticated(result.user)
-                        is AuthResult.Error -> AuthState. Error(result.exception. message)
-                    }
+            when (val result = repository.signInWithEmail(email, password)) {
+                is AuthResult.Success -> {
+                    _authState.value = AuthState.Authenticated(result.data)
                 }
+                is AuthResult.Error -> {
+                    _authState.value = AuthState.Error(result.exception.message)
+                }
+            }
         }
     }
+}
+
+// AndroidViewModel (Application parametresi alır - Factory gerektirir)
+class ThemeViewModel(
+    application: Application,
+    private val repository: IUserPreferencesRepository = UserPreferencesRepository.getInstance(application)
+) : AndroidViewModel(application) {
+    
+    val themeConfig: StateFlow<AppThemeConfig> = repository.themeConfigFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = AppThemeConfig.FOLLOW_SYSTEM
+        )
+}
+
+// Factory Pattern (AndroidViewModel için zorunlu)
+class ThemeViewModelFactory(
+    private val application: Application,
+    private val repository: IUserPreferencesRepository? = null
+) : ViewModelProvider.Factory {
+    
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ThemeViewModel::class.java)) {
+            return ThemeViewModel(
+                application = application,
+                repository = repository ?: UserPreferencesRepository.getInstance(application)
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+// Kullanım
+@Composable
+fun MyScreen() {
+    val context = LocalContext.current
+    
+    // Basit ViewModel
+    val authViewModel: AuthViewModel = viewModel()
+    
+    // AndroidViewModel (Factory ile)
+    val themeViewModel: ThemeViewModel = viewModel(
+        factory = ThemeViewModelFactory(context.applicationContext as Application)
+    )
 }
 ```
 

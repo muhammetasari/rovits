@@ -82,8 +82,8 @@ fun RegisterScreen(
     StandardLayout(
         navController = navController,
         title = stringResource(id = R.string.register),
-        showTopBar = true,
-        showBackButton = true,
+        showTopBar = false,
+        showBackButton = false,
         showBottomBar = false,
         onNavigateBack = onBackPressed,
         scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -95,21 +95,11 @@ fun RegisterScreen(
                 .padding(24.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
             // Logo
             RovitsLogo(size = 240.dp)
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Subtitle
-            Text(
-                text = stringResource(id = R.string.register_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
 
             // Full Name TextField
             OutlinedTextField(
@@ -215,7 +205,7 @@ fun RegisterScreen(
             // Password strength indicator
             PasswordStrengthIndicator(password = password)
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Register Button
             Button(
@@ -242,7 +232,7 @@ fun RegisterScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Or Divider
             Row(
@@ -260,7 +250,7 @@ fun RegisterScreen(
                 HorizontalDivider(modifier = Modifier.weight(1f))
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Google Sign In Button
             OutlinedButton(
@@ -294,7 +284,7 @@ fun RegisterScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Sign In Text
             Row(
@@ -317,7 +307,7 @@ fun RegisterScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Terms and Privacy
             TermsPrivacyText(
@@ -394,7 +384,7 @@ fun RegisterScreenPreview() {
         val navController = rememberNavController()
         RegisterScreen(
             navController = navController,
-            viewModel = AuthViewModel(),
+            viewModel = AuthViewModel(repository = com.rovits.app.data.repository.fake.FakeAuthRepository()),
             onBackPressed = {},
             onNavigateToLogin = {},
             onRegisterSuccess = {},

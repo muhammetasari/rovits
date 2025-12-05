@@ -24,7 +24,7 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
  * Handles theme configuration persistence and retrieval.
  * Follows clean architecture principles with separation of concerns.
  */
-class UserPreferencesRepository(private val context: Context) {
+class UserPreferencesRepository(private val context: Context) : IUserPreferencesRepository {
 
     /**
      * PreferencesKey for storing the theme configuration
@@ -37,7 +37,7 @@ class UserPreferencesRepository(private val context: Context) {
      * Flow that emits the current theme configuration.
      * Returns FOLLOW_SYSTEM as default if no value is stored.
      */
-    val themeConfigFlow: Flow<AppThemeConfig> = context.dataStore.data
+    override val themeConfigFlow: Flow<AppThemeConfig> = context.dataStore.data
         .map { preferences ->
             val themeString = preferences[PreferencesKeys.THEME_CONFIG]
             AppThemeConfig.fromString(themeString)
@@ -48,7 +48,7 @@ class UserPreferencesRepository(private val context: Context) {
      *
      * @param themeConfig The theme configuration to save
      */
-    suspend fun saveThemeConfig(themeConfig: AppThemeConfig) {
+    override suspend fun saveThemeConfig(themeConfig: AppThemeConfig) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.THEME_CONFIG] = themeConfig.name
         }
@@ -60,7 +60,7 @@ class UserPreferencesRepository(private val context: Context) {
      *
      * @return The current theme configuration or FOLLOW_SYSTEM as default
      */
-    suspend fun getThemeConfig(): AppThemeConfig {
+    override suspend fun getThemeConfig(): AppThemeConfig {
         var themeConfig = AppThemeConfig.FOLLOW_SYSTEM
         context.dataStore.data.map { prefs ->
             val themeString = prefs[PreferencesKeys.THEME_CONFIG]

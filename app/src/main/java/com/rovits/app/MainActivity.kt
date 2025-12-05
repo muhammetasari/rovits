@@ -28,6 +28,7 @@ import com.rovits.app.navigation.profileNavGraph
 import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.viewmodel.AuthViewModel
 import com.rovits.app.ui.viewmodel.ThemeViewModel
+import com.rovits.app.ui.viewmodel.ThemeViewModelFactory
 import com.rovits.app.utils.LocaleHelper
 import androidx.compose.runtime.remember
 
@@ -45,7 +46,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             // Initialize ThemeViewModel to observe theme changes
-            val themeViewModel: ThemeViewModel = viewModel()
+            val themeViewModel: ThemeViewModel = viewModel(
+                factory = ThemeViewModelFactory(application)
+            )
             val themeConfig by themeViewModel.themeConfig.collectAsState()
 
             RovitsAppTheme(themeConfig = themeConfig) {

@@ -23,6 +23,7 @@ import com.rovits.app.data.model.AppThemeConfig
 import com.rovits.app.ui.common.StandardLayout
 import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.viewmodel.ThemeViewModel
+import com.rovits.app.ui.viewmodel.ThemeViewModelFactory
 import com.rovits.app.ui.components.ThemeSelectionDialog
 import com.rovits.app.ui.components.AboutApplicationDialog
 import com.rovits.app.ui.components.ListMenuItem
@@ -37,7 +38,10 @@ fun SettingsScreen(
     navController: NavController,
     themeViewModel: ThemeViewModel? = null
 ) {
-    val viewModel = themeViewModel ?: viewModel()
+    val context = LocalContext.current
+    val viewModel = themeViewModel ?: viewModel(
+        factory = ThemeViewModelFactory(context.applicationContext as android.app.Application)
+    )
     val currentTheme by viewModel.themeConfig.collectAsState()
     var showThemeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }

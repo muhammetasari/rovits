@@ -8,13 +8,14 @@ import com.rovits.app.R
 import com.rovits.app.data.model.AuthResult
 import com.rovits.app.data.model.AuthState
 import com.rovits.app.data.repository.AuthRepository
+import com.rovits.app.data.repository.IAuthRepository
 import com.rovits.app.util.error.ErrorMapper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AuthViewModel(private val repository: AuthRepository = AuthRepository()) : ViewModel() {
+class AuthViewModel(private val repository: IAuthRepository = AuthRepository()) : ViewModel() {
 
     private val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState.asStateFlow()

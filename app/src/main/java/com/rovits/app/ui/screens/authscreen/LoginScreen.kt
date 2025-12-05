@@ -157,12 +157,11 @@ fun LoginScreen(
                 .padding(24.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
             // Logo
             RovitsLogo(size = 240.dp)
 
-            Spacer(modifier = Modifier.height(36.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Email/Username TextField
             Column {
@@ -204,7 +203,7 @@ fun LoginScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Password TextField
             OutlinedTextField(
@@ -255,7 +254,7 @@ fun LoginScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Login Button
             Button(
@@ -286,7 +285,7 @@ fun LoginScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Sign Up Text
             Row(
@@ -362,7 +361,7 @@ fun LoginScreenPreview() {
         val navController = rememberNavController()
         LoginScreen(
             navController = navController,
-            viewModel = AuthViewModel(),
+            viewModel = AuthViewModel(repository = com.rovits.app.data.repository.fake.FakeAuthRepository()),
             onNavigateToForgotPassword = {},
             onNavigateToRegister = {},
             onLoginSuccess = {},

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.rovits.app.data.model.AppThemeConfig
+import com.rovits.app.data.repository.IUserPreferencesRepository
 import com.rovits.app.data.repository.UserPreferencesRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,10 +20,12 @@ import kotlinx.coroutines.launch
  * - Persistence through UserPreferencesRepository
  *
  * @param application Application context for repository initialization
+ * @param repository Optional IUserPreferencesRepository for testing/preview purposes
  */
-class ThemeViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val userPreferencesRepository = UserPreferencesRepository.getInstance(application)
+class ThemeViewModel(
+    application: Application,
+    private val repository: IUserPreferencesRepository = UserPreferencesRepository.getInstance(application)
+) : AndroidViewModel(application) {
 
     /**
      * StateFlow that emits the current theme configuration.
@@ -32,7 +35,7 @@ class ThemeViewModel(application: Application) : AndroidViewModel(application) {
      *   after the last subscriber unsubscribes, preventing unnecessary restarts
      * - initialValue: FOLLOW_SYSTEM as the default until the first value is loaded
      */
-    val themeConfig: StateFlow<AppThemeConfig> = userPreferencesRepository.themeConfigFlow
+    val themeConfig: StateFlow<AppThemeConfig> = repository.themeConfigFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -46,7 +49,7 @@ class ThemeViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun updateThemeConfig(config: AppThemeConfig) {
         viewModelScope.launch {
-            userPreferencesRepository.saveThemeConfig(config)
+            repository.saveThemeConfig(config)
         }
     }
 }

@@ -12,11 +12,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import java.io.IOException
 
-class AuthRepository {
+class AuthRepository : IAuthRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     // Get current user as Flow
-    fun getCurrentUserFlow(): Flow<User?> = flow {
+    override fun getCurrentUserFlow(): Flow<User?> = flow {
         val firebaseUser = auth.currentUser
         if (firebaseUser != null) {
             emit(
@@ -33,7 +33,7 @@ class AuthRepository {
     }
 
     // Get current user (synchronous)
-    fun getCurrentUser(): User? {
+    override fun getCurrentUser(): User? {
         val firebaseUser = auth.currentUser
         return if (firebaseUser != null) {
             User(
@@ -48,7 +48,7 @@ class AuthRepository {
     }
 
     // Sign in with email and password
-    suspend fun signInWithEmail(email: String, password: String): AuthResult<User> {
+    override suspend fun signInWithEmail(email: String, password: String): AuthResult<User> {
         return try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
             val firebaseUser = result.user
@@ -75,7 +75,7 @@ class AuthRepository {
     }
 
     // Sign up with email, password and full name
-    suspend fun signUpWithEmail(fullName: String, email: String, password: String): AuthResult<User> {
+    override suspend fun signUpWithEmail(fullName: String, email: String, password: String): AuthResult<User> {
         return try {
             // Create user account
             val result = auth.createUserWithEmailAndPassword(email, password).await()
@@ -110,7 +110,7 @@ class AuthRepository {
     }
 
     // Sign in with Google
-    suspend fun signInWithGoogle(idToken: String): AuthResult<User> {
+    override suspend fun signInWithGoogle(idToken: String): AuthResult<User> {
         return try {
             android.util.Log.d("AuthRepository", "signInWithGoogle: Creating credential with idToken")
             val credential = GoogleAuthProvider.getCredential(idToken, null)
@@ -139,7 +139,7 @@ class AuthRepository {
     }
 
     // Send password reset email
-    suspend fun sendPasswordResetEmail(email: String): AuthResult<Unit> {
+    override suspend fun sendPasswordResetEmail(email: String): AuthResult<Unit> {
         return try {
             auth.sendPasswordResetEmail(email).await()
             AuthResult.Success(Unit)
@@ -153,7 +153,7 @@ class AuthRepository {
     }
 
     // Sign out
-    fun signOut() {
+    override fun signOut() {
         auth.signOut()
     }
 }
