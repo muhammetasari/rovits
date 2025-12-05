@@ -21,6 +21,9 @@ import com.rovits.app.ui.components.PrivacyPolicyDialog
 import com.rovits.app.ui.components.TermsPrivacyText
 import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.viewmodel.AuthViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -155,9 +158,14 @@ fun ForgotPasswordScreen(
 fun ForgotPasswordScreenPreview() {
     RovitsAppTheme {
         val navController = rememberNavController()
+        val mockAuthState = remember { MutableStateFlow(com.rovits.app.data.model.AuthState()) }
+        val previewViewModel = remember {
+            AuthViewModel().apply {
+            }
+        }
         ForgotPasswordScreen(
             navController = navController,
-            viewModel = AuthViewModel(),
+            viewModel = previewViewModel,
             onBackPressed = {},
             onResetSuccess = {}
         )

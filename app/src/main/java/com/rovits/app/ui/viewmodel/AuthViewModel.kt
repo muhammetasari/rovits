@@ -1,6 +1,7 @@
 package com.rovits.app.ui.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rovits.app.R
@@ -24,8 +25,19 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
 
     private fun checkCurrentUser() {
         viewModelScope.launch {
-            val user = repository.getCurrentUser()
-            _authState.value = _authState.value.copy(currentUser = user)
+            try {
+                val user = repository.getCurrentUser()
+                _authState.value = _authState.value.copy(
+                    currentUser = user,
+                    error = null
+                )
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Failed to check current user", e)
+                _authState.value = _authState.value.copy(
+                    currentUser = null,
+                    error = e.message
+                )
+            }
         }
     }
 
