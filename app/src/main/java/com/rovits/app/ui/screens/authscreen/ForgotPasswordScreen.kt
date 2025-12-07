@@ -37,6 +37,8 @@ fun ForgotPasswordScreen(
     val context = LocalContext.current
     val authState by viewModel.authState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val isEmailValid = email.isNotBlank() && isValidEmail(email)
+    val isEmailInvalid = email.isNotBlank() && !isEmailValid
 
     // Handle success
     LaunchedEffect(authState.isSuccess) {
@@ -70,7 +72,10 @@ fun ForgotPasswordScreen(
         showBackButton = true,
         showBottomBar = false,
         onNavigateBack = onBackPressed,
-        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -99,23 +104,38 @@ fun ForgotPasswordScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !authState.isLoading,
                 singleLine = true,
+                isError = isEmailInvalid,
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     focusedTextColor = MaterialTheme.colorScheme.onSurface,
                     unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    cursorColor = MaterialTheme.colorScheme.primary
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    errorBorderColor = MaterialTheme.colorScheme.error,
+                    errorCursorColor = MaterialTheme.colorScheme.error
                 ),
                 textStyle = MaterialTheme.typography.bodyMedium
             )
+
+            // Error message
+            if (isEmailInvalid) {
+                Text(
+                    text = stringResource(id = R.string.error_invalid_email_format),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 0.dp, top = 8.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
             // Send Reset Link Button
             Button(
                 onClick = { viewModel.sendPasswordResetEmail(email, context) },
-                enabled = !authState.isLoading,
+                enabled = !authState.isLoading && isEmailValid,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -162,3 +182,8 @@ fun ForgotPasswordScreenPreview() {
         )
     }
 }
+
+private fun isValidEmail(email: String): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+

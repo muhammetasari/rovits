@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,31 +23,20 @@ import com.rovits.app.ui.theme.RovitsAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(
+fun ProfileDetailScreen(
     navController: NavController,
     user: User?,
-    onLogout: () -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateToThemeDemo: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {},
-    onNavigateToProfileDetail: () -> Unit = {}
+    onNavigateToChangePassword: () -> Unit = {}
 ) {
     StandardLayout(
         navController = navController,
-        title = stringResource(id = R.string.account),
+        title = stringResource(id = R.string.edit_profile_title),
         showTopBar = true,
-        showBackButton = false,
+        showBackButton = true,
         showBottomBar = false,
         onNavigateBack = onNavigateBack,
-        topAppBarActions = {
-            IconButton(onClick = onNavigateToSettings) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = stringResource(id = R.string.content_description_settings),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -58,8 +46,6 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(24.dp))
-
-            // ...existing code...
             Box(
                 modifier = Modifier.size(120.dp),
                 contentAlignment = Alignment.BottomEnd
@@ -78,6 +64,19 @@ fun ProfileScreen(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+
+                FloatingActionButton(
+                    onClick = { /* Edit profile photo */ },
+                    modifier = Modifier.size(36.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = stringResource(id = R.string.content_description_edit),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -85,24 +84,25 @@ fun ProfileScreen(
             // Menu Items
             ListMenuItem(
                 icon = Icons.Default.Person,
-                title = stringResource(id = R.string.profile_details),
+                title = stringResource(id = R.string.name),
+                subtitle = user?.fullName ?: stringResource(id = R.string.guest),
                 hasTrailingIcon = true,
-                onClick = onNavigateToProfileDetail
+                onClick = {}
+            )
+            ListMenuItem(
+                icon = Icons.Default.Person,
+                title = stringResource(id = R.string.email),
+                subtitle = user?.email ?: stringResource(id = R.string.guest),
+                hasTrailingIcon = true,
+                onClick = {}
+            )
+            ListMenuItem(
+                icon = Icons.Default.Person,
+                title = stringResource(id = R.string.change_password),
+                hasTrailingIcon = true,
+                onClick = onNavigateToChangePassword
             )
 
-            ListMenuItem(
-                icon = Icons.Default.Palette,
-                title = stringResource(id = R.string.theme_demo),
-                hasTrailingIcon = true,
-                onClick = onNavigateToThemeDemo
-            )
-
-            ListMenuItem(
-                icon = Icons.AutoMirrored.Filled.Logout,
-                title = stringResource(id = R.string.logout),
-                hasTrailingIcon = false,
-                onClick = onLogout
-            )
         }
     }
 }
@@ -110,14 +110,19 @@ fun ProfileScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun ProfileScreenPreview() {
+fun ProfileDetailPreview() {
     RovitsAppTheme {
-        ProfileScreen(
+        ProfileDetailScreen(
             navController = rememberNavController(),
-            user = null,
-            onLogout = {},
+            user = User(
+                uid = "preview_user_123",
+                fullName = "Ali Sarı",
+                email = "ali.sari@rovits.com",
+                photoUrl = null
+            ),
             onNavigateBack = {},
-            onNavigateToThemeDemo = {}
+            onNavigateToThemeDemo = {},
+            onNavigateToChangePassword = {}
         )
     }
 }

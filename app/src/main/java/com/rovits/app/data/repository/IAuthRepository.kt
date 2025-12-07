@@ -61,6 +61,16 @@ interface IAuthRepository {
     suspend fun sendPasswordResetEmail(email: String): AuthResult<Unit>
 
     /**
+     * Changes the current user's password.
+     * First reauthenticates with the current password, then updates to new password.
+     *
+     * @param currentPassword User's current password for verification
+     * @param newPassword New password to set
+     * @return AuthResult with Unit on success or error on failure
+     */
+    suspend fun changePassword(currentPassword: String, newPassword: String): AuthResult<Unit>
+
+    /**
      * Signs out the current user.
      */
     fun signOut()

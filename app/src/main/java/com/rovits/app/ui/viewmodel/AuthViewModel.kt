@@ -212,9 +212,79 @@ class AuthViewModel(private val repository: IAuthRepository = AuthRepository()) 
         }
     }
 
+    fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String, context: Context) {
+        // Validation
+        if (currentPassword.isBlank()) {
+            _authState.value = _authState.value.copy(
+                error = context.getString(R.string.error_current_password_empty)
+            )
+            return
+        }
+
+        if (newPassword.isBlank()) {
+            _authState.value = _authState.value.copy(
+                error = context.getString(R.string.error_new_password_empty)
+            )
+            return
+        }
+
+        if (confirmPassword.isBlank()) {
+            _authState.value = _authState.value.copy(
+                error = context.getString(R.string.error_confirm_password_empty)
+            )
+            return
+        }
+
+        if (newPassword != confirmPassword) {
+            _authState.value = _authState.value.copy(
+                error = context.getString(R.string.error_password_mismatch)
+            )
+            return
+        }
+
+        if (currentPassword == newPassword) {
+            _authState.value = _authState.value.copy(
+                error = context.getString(R.string.error_same_password)
+            )
+            return
+        }
+
+        if (newPassword.length < 6) {
+            _authState.value = _authState.value.copy(
+                error = context.getString(R.string.error_password_too_short)
+            )
+            return
+        }
+
+        viewModelScope.launch {
+            _authState.value = _authState.value.copy(isLoading = true, error = null, isSuccess = false)
+
+            when (val result = repository.changePassword(currentPassword, newPassword)) {
+                is AuthResult.Success -> {
+                    _authState.value = _authState.value.copy(
+                        isLoading = false,
+                        error = null,
+                        isSuccess = true
+                    )
+                }
+                is AuthResult.Error -> {
+                    _authState.value = _authState.value.copy(
+                        isLoading = false,
+                        error = ErrorMapper.mapToMessage(context, result.exception),
+                        isSuccess = false
+                    )
+                }
+            }
+        }
+    }
+
     fun signOut() {
         repository.signOut()
         _authState.value = AuthState()
+    }
+
+    fun resetAuthState() {
+        _authState.value = AuthState(currentUser = _authState.value.currentUser)
     }
 
     fun clearError() {

@@ -30,6 +30,28 @@
     <string name="language">Dil</string>
     <string name="select_language">Dil Seçin</string>
 
+    <!--Profile Edit Screen -->
+    <string name="edit_profile_title">Profil Detayları</string>
+    <string name="name">İsim</string>
+    <string name="guest">Misafir</string>
+    <string name="change_password">Şifre Değiştir</string>
+
+    <!-- Change Password Screen -->
+    <string name="change_password_title">Şifre Değiştir</string>
+    <string name="current_password">Mevcut Şifre</string>
+    <string name="new_password">Yeni Şifre</string>
+    <string name="confirm_new_password">Yeni Şifre Tekrar</string>
+    <string name="update_password">Şifreyi Güncelle</string>
+    <string name="current_password_hint">Mevcut şifrenizi girin</string>
+    <string name="new_password_hint">Yeni şifrenizi girin</string>
+    <string name="confirm_password_hint">Yeni şifrenizi tekrar girin</string>
+    <string name="error_current_password_empty">Mevcut şifre boş olamaz</string>
+    <string name="error_new_password_empty">Yeni şifre boş olamaz</string>
+    <string name="error_confirm_password_empty">Lütfen yeni şifrenizi onaylayın</string>
+    <string name="error_password_mismatch">Şifreler eşleşmiyor</string>
+    <string name="error_same_password">Yeni şifre mevcut şifre ile aynı olamaz</string>
+    <string name="success_password_changed">Şifre başarıyla değiştirildi</string>
+
     <!-- Terms and Privacy -->
     <string name="terms_privacy_text">Giriş yaparak, Kullanım Koşulları ve Gizlilik Politikası\'nı kabul ediyorum.</string>
     <string name="terms_of_use">Kullanım Koşulları</string>

@@ -30,6 +30,29 @@
     <string name="language">Language</string>
     <string name="select_language">Select Language</string>
 
+    <!--Profile Edit Screen -->
+    <string name="edit_profile_title">Profile Edit</string>
+    <string name="name">Name</string>
+    <string name="guest">Guest</string>
+    <string name="change_password">Change Password</string>
+
+    <!-- Change Password Screen -->
+    <string name="change_password_title">Change Password</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="update_password">Update Password</string>
+    <string name="current_password_hint">Enter your current password</string>
+    <string name="new_password_hint">Enter your new password</string>
+    <string name="confirm_password_hint">Re-enter your new password</string>
+    <string name="error_current_password_empty">Current password cannot be empty</string>
+    <string name="error_new_password_empty">New password cannot be empty</string>
+    <string name="error_confirm_password_empty">Please confirm your new password</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="error_same_password">New password cannot be the same as current password</string>
+    <string name="success_password_changed">Password changed successfully</string>
+
+
     <!-- Terms and Privacy -->
     <string name="terms_privacy_text">By signing in, I agree with Terms of Use and Privacy Policy</string>
     <string name="terms_of_use">Terms of Use</string>
@@ -172,7 +195,7 @@
     <!-- Bottom Navigation Bar -->
     <string name="bottom_bar_home">Home</string>
     <string name="bottom_bar_search">Search</string>
-    <string name="bottom_bar_appointment">Appointment</string>
+    <string name="bottom_bar_appointment">Appoint</string>
     <string name="bottom_bar_profile">Profile</string>
     <string name="bottom_bar_settings">Settings</string>
 </resources>

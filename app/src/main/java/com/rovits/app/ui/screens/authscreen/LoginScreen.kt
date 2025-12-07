@@ -1,6 +1,5 @@
 package com.rovits.app.ui.screens.authscreen
 
-import android.app.Activity
 import android.util.Patterns
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,13 +22,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.rovits.app.R
 import com.rovits.app.ui.common.StandardLayout
+import com.rovits.app.ui.components.LanguageSelectionDialog
 import com.rovits.app.ui.components.RovitsLogo
 import com.rovits.app.ui.components.TermsOfUseDialog
 import com.rovits.app.ui.components.PrivacyPolicyDialog
 import com.rovits.app.ui.components.TermsPrivacyText
 import com.rovits.app.ui.theme.RovitsAppTheme
 import com.rovits.app.ui.viewmodel.AuthViewModel
-import com.rovits.app.utils.LocaleHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +51,7 @@ fun LoginScreen(
 
     val context = LocalContext.current
     val authState by viewModel.authState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // Handle authentication state
     LaunchedEffect(authState.isSuccess) {
@@ -64,7 +64,7 @@ fun LoginScreen(
     // Handle errors
     LaunchedEffect(authState.error) {
         authState.error?.let { error ->
-            // Show error in UI - handled by SnackBar in content
+            snackbarHostState.showSnackbar(error)
             viewModel.clearError()
         }
     }
@@ -72,7 +72,7 @@ fun LoginScreen(
     // Handle Google Sign-In errors
     LaunchedEffect(authState.googleSignInError) {
         authState.googleSignInError?.let { error ->
-            // Show error in UI - handled by SnackBar in content
+            snackbarHostState.showSnackbar(error)
             viewModel.clearGoogleSignInError()
         }
     }
@@ -83,6 +83,9 @@ fun LoginScreen(
     }
     if (showPrivacyDialog) {
         PrivacyPolicyDialog(onDismiss = { showPrivacyDialog = false })
+    }
+    if (showLanguageMenu) {
+        LanguageSelectionDialog(onDismiss = { showLanguageMenu = false })
     }
 
     StandardLayout(
@@ -98,57 +101,11 @@ fun LoginScreen(
                     contentDescription = stringResource(id = R.string.language)
                 )
             }
-            if (showLanguageMenu) {
-                val currentLanguage = LocaleHelper.getCurrentLanguageName(context)
-                val english = stringResource(id = R.string.english)
-                val turkish = stringResource(id = R.string.turkish)
-                AlertDialog(
-                    onDismissRequest = { showLanguageMenu = false },
-                    title = {
-                        Text(text = stringResource(id = R.string.select_language))
-                    },
-                    text = {
-                        Column {
-                            Button(
-                                onClick = {
-                                    showLanguageMenu = false
-                                    LocaleHelper.setLocale(context, LocaleHelper.LANGUAGE_ENGLISH)
-                                    (context as? Activity)?.recreate()
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (currentLanguage == english) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                    contentColor = if (currentLanguage == english) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            ) {
-                                Text(text = english)
-                            }
-                            Button(
-                                onClick = {
-                                    showLanguageMenu = false
-                                    LocaleHelper.setLocale(context, LocaleHelper.LANGUAGE_TURKISH)
-                                    (context as? Activity)?.recreate()
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (currentLanguage == turkish) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                    contentColor = if (currentLanguage == turkish) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            ) {
-                                Text(text = turkish)
-                            }
-                        }
-                    },
-                    confirmButton = {},
-                    dismissButton = {}
-                )
-            }
         },
-        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -369,4 +326,3 @@ fun LoginScreenPreview() {
         )
     }
 }
-

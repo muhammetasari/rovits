@@ -41,6 +41,7 @@ object ErrorMapper {
             "ERROR_REQUIRES_RECENT_LOGIN" -> context.getString(R.string.error_requires_recent_login)
 
             // Diğer Kimlik Bilgisi Hataları
+            // Firebase güvenlik nedeniyle artık "user not found" yerine genellikle "invalid credentials" döndürür
             "ERROR_INVALID_CREDENTIAL" -> context.getString(R.string.error_invalid_credential)
             "ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL" -> context.getString(R.string.error_account_exists_with_different_credential)
             "ERROR_INVALID_ACTION_CODE" -> context.getString(R.string.error_invalid_action_code)

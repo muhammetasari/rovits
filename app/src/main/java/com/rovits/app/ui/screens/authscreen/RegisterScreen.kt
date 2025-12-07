@@ -86,7 +86,10 @@ fun RegisterScreen(
         showBackButton = false,
         showBottomBar = false,
         onNavigateBack = onBackPressed,
-        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier

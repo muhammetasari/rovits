@@ -49,9 +49,11 @@ class FakeAuthRepository : IAuthRepository {
 
     override suspend fun signInWithGoogle(idToken: String): AuthResult<User> {
         return if (idToken.isNotEmpty()) {
-            currentUser = MOCK_USER.copy(
-                fullName = "Google User",
-                photoUrl = "https://lh3.googleusercontent.com/a/default-user"
+            currentUser = User(
+                uid = "google_user_${System.currentTimeMillis()}",
+                fullName = "Ahmet Yılmaz", // Google'dan gelen displayName simülasyonu
+                email = "ahmet.yilmaz@gmail.com",
+                photoUrl = "https://lh3.googleusercontent.com/a/default-user" // Google profil resmi
             )
             AuthResult.Success(currentUser!!)
         } else {
@@ -64,6 +66,24 @@ class FakeAuthRepository : IAuthRepository {
             AuthResult.Success(Unit)
         } else {
             AuthResult.Error(com.rovits.app.util.error.AppException.AuthError("ERROR_INVALID_EMAIL"))
+        }
+    }
+
+    override suspend fun changePassword(currentPassword: String, newPassword: String): AuthResult<Unit> {
+        return when {
+            currentPassword.isEmpty() -> {
+                AuthResult.Error(com.rovits.app.util.error.AppException.AuthError("ERROR_WRONG_PASSWORD"))
+            }
+            newPassword.length < 6 -> {
+                AuthResult.Error(com.rovits.app.util.error.AppException.AuthError("ERROR_WEAK_PASSWORD"))
+            }
+            currentPassword == newPassword -> {
+                AuthResult.Error(com.rovits.app.util.error.AppException.AuthError("ERROR_SAME_PASSWORD"))
+            }
+            else -> {
+                // Simulate successful password change
+                AuthResult.Success(Unit)
+            }
         }
     }
 

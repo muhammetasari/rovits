@@ -1,5 +1,6 @@
 package com.rovits.app.data.repository
 
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.GoogleAuthProvider
@@ -119,12 +120,26 @@ class AuthRepository : IAuthRepository {
             val firebaseUser = result.user
 
             if (firebaseUser != null) {
-                android.util.Log.d("AuthRepository", "signInWithGoogle: Success - User: ${firebaseUser.email}")
+                // Google'dan gelen displayName (tam ad)
+                val displayName = firebaseUser.displayName
+                val email = firebaseUser.email ?: ""
+
+                // Eğer displayName boşsa, email'den isim oluştur
+                val fullName = if (!displayName.isNullOrBlank()) {
+                    displayName
+                } else {
+                    // Email'in @ işaretinden önceki kısmını al ve baş harfleri büyük yap
+                    email.substringBefore("@").split(".", "_", "-")
+                        .joinToString(" ") { it.replaceFirstChar { char -> char.uppercase() } }
+                }
+
+                android.util.Log.d("AuthRepository", "signInWithGoogle: Success - User: $email, DisplayName: $displayName, FullName: $fullName")
+
                 AuthResult.Success(
                     User(
                         uid = firebaseUser.uid,
-                        fullName = firebaseUser.displayName ?: "",
-                        email = firebaseUser.email ?: "",
+                        fullName = fullName,
+                        email = email,
                         photoUrl = firebaseUser.photoUrl?.toString()
                     )
                 )
@@ -142,6 +157,36 @@ class AuthRepository : IAuthRepository {
     override suspend fun sendPasswordResetEmail(email: String): AuthResult<Unit> {
         return try {
             auth.sendPasswordResetEmail(email).await()
+            AuthResult.Success(Unit)
+        } catch (e: FirebaseAuthException) {
+            AuthResult.Error(AppException.AuthError(e.errorCode, e.message))
+        } catch (e: IOException) {
+            AuthResult.Error(AppException.NetworkError(e.message))
+        } catch (e: Exception) {
+            AuthResult.Error(AppException.UnknownError(e.message))
+        }
+    }
+
+    // Change password
+    override suspend fun changePassword(currentPassword: String, newPassword: String): AuthResult<Unit> {
+        return try {
+            val firebaseUser = auth.currentUser
+            if (firebaseUser == null) {
+                return AuthResult.Error(AppException.AuthError("ERROR_USER_NOT_FOUND"))
+            }
+
+            val email = firebaseUser.email
+            if (email.isNullOrBlank()) {
+                return AuthResult.Error(AppException.AuthError("ERROR_EMAIL_NOT_FOUND"))
+            }
+
+            // First, reauthenticate with current password
+            val credential = EmailAuthProvider.getCredential(email, currentPassword)
+            firebaseUser.reauthenticate(credential).await()
+
+            // If reauthentication succeeds, update password
+            firebaseUser.updatePassword(newPassword).await()
+
             AuthResult.Success(Unit)
         } catch (e: FirebaseAuthException) {
             AuthResult.Error(AppException.AuthError(e.errorCode, e.message))

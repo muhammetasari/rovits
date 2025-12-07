@@ -1,7 +1,9 @@
 package com.rovits.app.ui.components
 
 import android.app.Activity
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,28 +13,6 @@ import androidx.compose.ui.unit.dp
 import com.rovits.app.R
 import com.rovits.app.utils.LocaleHelper
 
-/**
- * Dil seçimi için dialog bileşeni.
- *
- * Kullanıcının uygulama dilini İngilizce veya Türkçe olarak değiştirmesine olanak tanır.
- * Seçilen dil vurgulanır ve dil değişikliği sonrası Activity yeniden başlatılır.
- *
- * @param onDismiss Dialog kapatıldığında çağrılacak callback fonksiyonu.
- *                  Dil seçildikten sonra da bu fonksiyon çağrılır.
- *
- * @see LocaleHelper Dil değiştirme işlemleri için kullanılan yardımcı sınıf.
- *
- * Örnek kullanım:
- * ```
- * var showLanguageDialog by remember { mutableStateOf(false) }
- *
- * if (showLanguageDialog) {
- *     LanguageSelectionDialog(
- *         onDismiss = { showLanguageDialog = false }
- *     )
- * }
- * ```
- */
 @Composable
 fun LanguageSelectionDialog(
     onDismiss: () -> Unit
@@ -59,14 +39,8 @@ fun LanguageSelectionDialog(
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (currentLanguage == english)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = if (currentLanguage == english)
-                            MaterialTheme.colorScheme.onPrimary
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant
+                        containerColor = if (currentLanguage == english) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (currentLanguage == english) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Text(text = english)
@@ -81,14 +55,8 @@ fun LanguageSelectionDialog(
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (currentLanguage == turkish)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = if (currentLanguage == turkish)
-                            MaterialTheme.colorScheme.onPrimary
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant
+                        containerColor = if (currentLanguage == turkish) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (currentLanguage == turkish) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Text(text = turkish)
@@ -99,3 +67,4 @@ fun LanguageSelectionDialog(
         dismissButton = {}
     )
 }
+

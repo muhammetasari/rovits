@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,6 +28,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -48,7 +53,9 @@ data class ListMenuItemStyle(
     val cardElevation: Dp = 0.dp,
     val cardShape: Shape? = null,
     val backgroundColor: Color? = null,
-    val selectedBackgroundColor: Color? = null
+    val selectedBackgroundColor: Color? = null,
+    val trailingIconSize: Dp = 24.dp,
+    val trailingIconTint: Color? = null
 )
 
 /**
@@ -60,6 +67,7 @@ data class ListMenuItemStyle(
  * @param modifier Optional modifier for the component
  * @param subtitle Optional subtitle text below the title
  * @param hasTrailingIcon Whether to show a chevron icon on the right (for navigation)
+ * @param trailingIcon Custom icon to display when hasTrailingIcon is true (defaults to ChevronRight)
  * @param trailingContent Custom composable content to display on the right
  * @param showSwitchesButton Whether to show a switch toggle on the right
  * @param switchState The current state of the switch (if showSwitchesButton is true)
@@ -81,6 +89,7 @@ fun ListMenuItem(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     hasTrailingIcon: Boolean = false,
+    trailingIcon: ImageVector = Icons.Default.ChevronRight,
     trailingContent: (@Composable () -> Unit)? = null,
     showSwitchesButton: Boolean = false,
     switchState: Boolean = false,
@@ -218,9 +227,10 @@ fun ListMenuItem(
             // Trailing Arrow Icon
             if (hasTrailingIcon) {
                 Icon(
-                    imageVector = Icons.Default.ChevronRight,
+                    imageVector = trailingIcon,
                     contentDescription = stringResource(id = R.string.content_description_navigate),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = style.trailingIconTint ?: MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(style.trailingIconSize)
                 )
             }
 
@@ -235,6 +245,91 @@ fun ListMenuItem(
                 )
             }
         }
+    }
+}
+
+// Preview Examples
+@Composable
+private fun ListMenuItemPreviewContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Default trailing icon (ChevronRight)
+        ListMenuItem(
+            icon = Icons.Default.Settings,
+            title = "Ayarlar",
+            subtitle = "Varsayılan ChevronRight ikonu",
+            hasTrailingIcon = true,
+            onClick = {}
+        )
+
+        // Custom trailing icon - Different style
+        ListMenuItem(
+            icon = Icons.Default.Notifications,
+            title = "Bildirimler",
+            subtitle = "Özel trailing icon örneği",
+            hasTrailingIcon = true,
+            trailingIcon = Icons.Default.ChevronRight,
+            onClick = {},
+            style = ListMenuItemStyle(
+                trailingIconSize = 32.dp
+            )
+        )
+
+        // Custom trailing icon with custom style
+        ListMenuItem(
+            icon = Icons.Default.Language,
+            title = "Dil Seçimi",
+            subtitle = "Özel renkli trailing icon",
+            hasTrailingIcon = true,
+            trailingIcon = Icons.Default.ChevronRight,
+            onClick = {},
+            style = ListMenuItemStyle(
+                trailingIconSize = 28.dp,
+                trailingIconTint = MaterialTheme.colorScheme.primary
+            )
+        )
+
+        // Multiple custom icons
+        ListMenuItem(
+            icon = Icons.Default.Security,
+            title = "Güvenlik",
+            subtitle = "Farklı icon boyutu örneği",
+            hasTrailingIcon = true,
+            trailingIcon = Icons.Default.ChevronRight,
+            onClick = {},
+            style = ListMenuItemStyle(
+                trailingIconSize = 20.dp
+            )
+        )
+    }
+}
+
+@Preview(
+    name = "Light Mode - Default",
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_NO
+)
+@Composable
+fun ListMenuItemTrailingIconPreviewLight() {
+    com.rovits.app.ui.theme.RovitsAppTheme {
+        ListMenuItemPreviewContent()
+    }
+}
+
+@Preview(
+    name = "Dark Mode - Default",
+    showBackground = true,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun ListMenuItemTrailingIconPreviewDark() {
+    com.rovits.app.ui.theme.RovitsAppTheme {
+        ListMenuItemPreviewContent()
     }
 }
 
