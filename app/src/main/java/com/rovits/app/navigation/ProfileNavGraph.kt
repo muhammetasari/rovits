@@ -3,15 +3,17 @@ package com.rovits.app.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rovits.app.data.model.User
+import com.rovits.app.data.repository.UserRepository
 import com.rovits.app.ui.screens.ChangePasswordScreen
 import com.rovits.app.ui.screens.ProfileDetailScreen
 import com.rovits.app.ui.screens.ProfileScreen
 import com.rovits.app.ui.screens.SettingsScreen
 import com.rovits.app.ui.theme.demo.ThemeDemoScreen
 import com.rovits.app.ui.viewmodel.AuthViewModel
-
-
+import com.rovits.app.ui.viewmodel.ProfileDetailViewModel
+import com.rovits.app.ui.viewmodel.ProfileDetailViewModelFactory
 
 fun NavGraphBuilder.profileNavGraph(
     navController: NavController,
@@ -32,9 +34,12 @@ fun NavGraphBuilder.profileNavGraph(
     }
 
     composable(Screen.ProfileDetail.route) {
+        val userRepository = UserRepository()
+        val factory = ProfileDetailViewModelFactory(userRepository)
+        val viewModel: ProfileDetailViewModel = viewModel(factory = factory)
         ProfileDetailScreen(
             navController = navController,
-            user = user,
+            viewModel = viewModel,
             onNavigateBack = { navController.popBackStack() },
             onNavigateToChangePassword = { navController.navigate(Screen.ChangePassword.route) }
         )

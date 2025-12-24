@@ -196,4 +196,5 @@
     <string name="bottom_bar_appointment">Randevu</string>
     <string name="bottom_bar_profile">Profil</string>
     <string name="bottom_bar_settings">Ayarlar</string>
+    <string name="passwords_do_not_match">Şifreler uyuşmuyor</string>
 </resources>

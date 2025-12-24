@@ -231,9 +231,21 @@ fun ChangePasswordScreen(
                 enabled = !authState.isLoading
             )
 
+            // Yeni şifreler uyuşmuyor mu kontrolü
+            val isPasswordMismatch = newPassword.isNotEmpty() && confirmPassword.isNotEmpty() && newPassword != confirmPassword
+            if (isPasswordMismatch) {
+                Text(
+                    text = stringResource(R.string.passwords_do_not_match),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             // Şifreyi Güncelle Butonu
+            val isButtonEnabled = currentPassword.isNotEmpty() && newPassword.isNotEmpty() && confirmPassword.isNotEmpty() && !authState.isLoading && !isPasswordMismatch
             Button(
                 onClick = {
                     focusManager.clearFocus()
@@ -247,7 +259,7 @@ fun ChangePasswordScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                enabled = !authState.isLoading
+                enabled = isButtonEnabled
             ) {
                 if (authState.isLoading) {
                     CircularProgressIndicator(
@@ -276,4 +288,3 @@ fun ChangePasswordScreenPreview() {
         )
     }
 }
-

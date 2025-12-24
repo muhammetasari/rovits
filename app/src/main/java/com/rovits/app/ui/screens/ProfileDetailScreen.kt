@@ -13,22 +13,33 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.rovits.app.R
 import com.rovits.app.data.model.User
+import com.rovits.app.data.repository.fake.FakeUserRepository
 import com.rovits.app.ui.common.StandardLayout
 import com.rovits.app.ui.components.ListMenuItem
 import com.rovits.app.ui.theme.RovitsAppTheme
+import com.rovits.app.ui.viewmodel.ProfileDetailUiState
+import com.rovits.app.ui.viewmodel.ProfileDetailViewModel
 
+/**
+ * Profil detay ekranı. Kullanıcı bilgilerini gösterir ve düzenleme işlemlerini yönetir.
+ * ViewModel ve UI state ile profesyonel şekilde yönetilir.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileDetailScreen(
     navController: NavController,
-    user: User?,
+    viewModel: ProfileDetailViewModel = viewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToChangePassword: () -> Unit = {}
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    var snackbarHostState = remember { SnackbarHostState() }
+
     StandardLayout(
         navController = navController,
         title = stringResource(id = R.string.edit_profile_title),
@@ -37,94 +48,123 @@ fun ProfileDetailScreen(
         showBottomBar = false,
         onNavigateBack = onNavigateBack,
     ) { paddingValues ->
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(24.dp))
-            Box(
-                modifier = Modifier.size(120.dp),
-                contentAlignment = Alignment.BottomEnd
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = stringResource(id = R.string.profile),
-                        modifier = Modifier.size(60.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            when (uiState) {
+                is ProfileDetailUiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-
-                FloatingActionButton(
-                    onClick = { /* Edit profile photo */ },
-                    modifier = Modifier.size(36.dp),
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = stringResource(id = R.string.content_description_edit),
-                        modifier = Modifier.size(18.dp)
+                is ProfileDetailUiState.Error -> {
+                    val message = (uiState as ProfileDetailUiState.Error).message
+                    LaunchedEffect(message) {
+                        snackbarHostState.showSnackbar(message)
+                    }
+                }
+                is ProfileDetailUiState.Success -> {
+                    val user = (uiState as ProfileDetailUiState.Success).user
+                    ProfileDetailContent(
+                        user = user,
+                        onNavigateToChangePassword = onNavigateToChangePassword
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Menu Items
-            ListMenuItem(
-                icon = Icons.Default.Person,
-                title = stringResource(id = R.string.name),
-                subtitle = user?.fullName ?: stringResource(id = R.string.guest),
-                hasTrailingIcon = true,
-                onClick = {}
-            )
-            ListMenuItem(
-                icon = Icons.Default.Email,
-                title = stringResource(id = R.string.email),
-                subtitle = user?.email ?: stringResource(id = R.string.guest),
-                hasTrailingIcon = true,
-                onClick = {}
-            )
-
-            // Change Password - Yalnızca email/password ile giriş yapan kullanıcılar için aktif
-            val isPasswordChangeEnabled = user?.isPasswordProvider == true && user.isAnonymous == false
-
-            ListMenuItem(
-                icon = Icons.Default.Password,
-                title = stringResource(id = R.string.change_password),
-                subtitle = when {
-                    user == null -> null
-                    user.isAnonymous -> stringResource(id = R.string.change_password_disabled_guest)
-                    !user.isPasswordProvider -> stringResource(id = R.string.change_password_disabled_google)
-                    else -> null
-                },
-                hasTrailingIcon = isPasswordChangeEnabled,
-                enabled = isPasswordChangeEnabled,
-                onClick = onNavigateToChangePassword
-            )
-
+            SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
         }
     }
 }
 
+@Composable
+private fun ProfileDetailContent(
+    user: User?,
+    onNavigateToChangePassword: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(24.dp))
+        ProfileAvatar()
+        Spacer(modifier = Modifier.height(32.dp))
+        ProfileMenuItems(user = user, onNavigateToChangePassword = onNavigateToChangePassword)
+    }
+}
+
+@Composable
+private fun ProfileAvatar() {
+    Box(
+        modifier = Modifier.size(120.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = stringResource(id = R.string.profile),
+                modifier = Modifier.size(60.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        FloatingActionButton(
+            onClick = { /* Edit profile photo */ },
+            modifier = Modifier.size(36.dp),
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        ) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = stringResource(id = R.string.content_description_edit),
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProfileMenuItems(
+    user: User?,
+    onNavigateToChangePassword: () -> Unit
+) {
+    ListMenuItem(
+        icon = Icons.Default.Person,
+        title = stringResource(id = R.string.name),
+        subtitle = user?.fullName ?: stringResource(id = R.string.guest),
+        hasTrailingIcon = true,
+        onClick = {}
+    )
+    ListMenuItem(
+        icon = Icons.Default.Email,
+        title = stringResource(id = R.string.email),
+        subtitle = user?.email ?: stringResource(id = R.string.guest),
+        hasTrailingIcon = true,
+        onClick = {}
+    )
+    val isPasswordChangeEnabled = user?.isPasswordProvider == true && user.isAnonymous == false
+    ListMenuItem(
+        icon = Icons.Default.Password,
+        title = stringResource(id = R.string.change_password),
+        subtitle = when {
+            user == null -> null
+            user.isAnonymous -> stringResource(id = R.string.change_password_disabled_guest)
+            !user.isPasswordProvider -> stringResource(id = R.string.change_password_disabled_google)
+            else -> null
+        },
+        hasTrailingIcon = isPasswordChangeEnabled,
+        enabled = isPasswordChangeEnabled,
+        onClick = onNavigateToChangePassword
+    )
+}
 
 @Preview(showBackground = true, name = "Email/Password User")
 @Composable
 fun ProfileDetailPreview() {
     RovitsAppTheme {
-        ProfileDetailScreen(
-            navController = rememberNavController(),
+        val fakeRepo = FakeUserRepository(
             user = User(
                 uid = "preview_user_123",
                 fullName = "Ali Sarı",
@@ -132,7 +172,12 @@ fun ProfileDetailPreview() {
                 photoUrl = null,
                 isPasswordProvider = true,
                 isAnonymous = false
-            ),
+            )
+        )
+        val viewModel = ProfileDetailViewModel(fakeRepo)
+        ProfileDetailScreen(
+            navController = rememberNavController(),
+            viewModel = viewModel,
             onNavigateBack = {},
             onNavigateToChangePassword = {}
         )
@@ -143,8 +188,7 @@ fun ProfileDetailPreview() {
 @Composable
 fun ProfileDetailGoogleUserPreview() {
     RovitsAppTheme {
-        ProfileDetailScreen(
-            navController = rememberNavController(),
+        val fakeRepo = FakeUserRepository(
             user = User(
                 uid = "google_user_456",
                 fullName = "Ayşe Yılmaz",
@@ -152,7 +196,12 @@ fun ProfileDetailGoogleUserPreview() {
                 photoUrl = null,
                 isPasswordProvider = false,
                 isAnonymous = false
-            ),
+            )
+        )
+        val viewModel = ProfileDetailViewModel(fakeRepo)
+        ProfileDetailScreen(
+            navController = rememberNavController(),
+            viewModel = viewModel,
             onNavigateBack = {},
             onNavigateToChangePassword = {}
         )
