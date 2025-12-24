@@ -20,12 +20,20 @@ class AuthRepository : IAuthRepository {
     override fun getCurrentUserFlow(): Flow<User?> = flow {
         val firebaseUser = auth.currentUser
         if (firebaseUser != null) {
+            // Check if user signed in with email/password provider
+            // EmailAuthProvider.PROVIDER_ID = "password"
+            val isPasswordProvider = firebaseUser.providerData.any {
+                it.providerId == EmailAuthProvider.PROVIDER_ID || it.providerId == "password"
+            }
+
             emit(
                 User(
                     uid = firebaseUser.uid,
                     fullName = firebaseUser.displayName ?: "",
                     email = firebaseUser.email ?: "",
-                    photoUrl = firebaseUser.photoUrl?.toString()
+                    photoUrl = firebaseUser.photoUrl?.toString(),
+                    isPasswordProvider = isPasswordProvider,
+                    isAnonymous = firebaseUser.isAnonymous
                 )
             )
         } else {
@@ -37,11 +45,19 @@ class AuthRepository : IAuthRepository {
     override fun getCurrentUser(): User? {
         val firebaseUser = auth.currentUser
         return if (firebaseUser != null) {
+            // Check if user signed in with email/password provider
+            // EmailAuthProvider.PROVIDER_ID = "password"
+            val isPasswordProvider = firebaseUser.providerData.any {
+                it.providerId == EmailAuthProvider.PROVIDER_ID || it.providerId == "password"
+            }
+
             User(
                 uid = firebaseUser.uid,
                 fullName = firebaseUser.displayName ?: "",
                 email = firebaseUser.email ?: "",
-                photoUrl = firebaseUser.photoUrl?.toString()
+                photoUrl = firebaseUser.photoUrl?.toString(),
+                isPasswordProvider = isPasswordProvider,
+                isAnonymous = firebaseUser.isAnonymous
             )
         } else {
             null
@@ -60,7 +76,9 @@ class AuthRepository : IAuthRepository {
                         uid = firebaseUser.uid,
                         fullName = firebaseUser.displayName ?: "",
                         email = firebaseUser.email ?: "",
-                        photoUrl = firebaseUser.photoUrl?.toString()
+                        photoUrl = firebaseUser.photoUrl?.toString(),
+                        isPasswordProvider = true,
+                        isAnonymous = false
                     )
                 )
             } else {
@@ -95,7 +113,9 @@ class AuthRepository : IAuthRepository {
                         uid = firebaseUser.uid,
                         fullName = fullName,
                         email = firebaseUser.email ?: "",
-                        photoUrl = firebaseUser.photoUrl?.toString()
+                        photoUrl = firebaseUser.photoUrl?.toString(),
+                        isPasswordProvider = true,
+                        isAnonymous = false
                     )
                 )
             } else {
@@ -140,7 +160,9 @@ class AuthRepository : IAuthRepository {
                         uid = firebaseUser.uid,
                         fullName = fullName,
                         email = email,
-                        photoUrl = firebaseUser.photoUrl?.toString()
+                        photoUrl = firebaseUser.photoUrl?.toString(),
+                        isPasswordProvider = false,
+                        isAnonymous = false
                     )
                 )
             } else {

@@ -36,7 +36,6 @@ fun NavGraphBuilder.profileNavGraph(
             navController = navController,
             user = user,
             onNavigateBack = { navController.popBackStack() },
-            onNavigateToThemeDemo = { navController.navigate(Screen.ThemeDemo.route) },
             onNavigateToChangePassword = { navController.navigate(Screen.ChangePassword.route) }
         )
     }

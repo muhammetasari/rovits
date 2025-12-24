@@ -39,7 +39,9 @@ class FakeAuthRepository : IAuthRepository {
                 uid = "fake_uid_${System.currentTimeMillis()}",
                 fullName = fullName,
                 email = email,
-                photoUrl = null
+                photoUrl = null,
+                isPasswordProvider = true,
+                isAnonymous = false
             )
             AuthResult.Success(currentUser!!)
         } else {
@@ -53,7 +55,9 @@ class FakeAuthRepository : IAuthRepository {
                 uid = "google_user_${System.currentTimeMillis()}",
                 fullName = "Ahmet Yılmaz", // Google'dan gelen displayName simülasyonu
                 email = "ahmet.yilmaz@gmail.com",
-                photoUrl = "https://lh3.googleusercontent.com/a/default-user" // Google profil resmi
+                photoUrl = "https://lh3.googleusercontent.com/a/default-user", // Google profil resmi
+                isPasswordProvider = false, // Google ile giriş
+                isAnonymous = false
             )
             AuthResult.Success(currentUser!!)
         } else {
@@ -99,7 +103,9 @@ class FakeAuthRepository : IAuthRepository {
             uid = "preview_user_123",
             fullName = "Önizleme Kullanıcı",
             email = "preview@rovits.com",
-            photoUrl = null
+            photoUrl = null,
+            isPasswordProvider = true,
+            isAnonymous = false
         )
     }
 }

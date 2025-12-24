@@ -35,6 +35,8 @@
     <string name="name">İsim</string>
     <string name="guest">Misafir</string>
     <string name="change_password">Şifre Değiştir</string>
+    <string name="change_password_disabled_google">Şifre değiştirme Google hesapları için kullanılamaz</string>
+    <string name="change_password_disabled_guest">Şifre değiştirme misafir hesapları için kullanılamaz</string>
 
     <!-- Change Password Screen -->
     <string name="change_password_title">Şifre Değiştir</string>

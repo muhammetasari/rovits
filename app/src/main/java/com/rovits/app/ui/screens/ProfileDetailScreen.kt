@@ -27,7 +27,6 @@ fun ProfileDetailScreen(
     navController: NavController,
     user: User?,
     onNavigateBack: () -> Unit,
-    onNavigateToThemeDemo: () -> Unit = {},
     onNavigateToChangePassword: () -> Unit = {}
 ) {
     StandardLayout(
@@ -38,6 +37,7 @@ fun ProfileDetailScreen(
         showBottomBar = false,
         onNavigateBack = onNavigateBack,
     ) { paddingValues ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -90,16 +90,27 @@ fun ProfileDetailScreen(
                 onClick = {}
             )
             ListMenuItem(
-                icon = Icons.Default.Person,
+                icon = Icons.Default.Email,
                 title = stringResource(id = R.string.email),
                 subtitle = user?.email ?: stringResource(id = R.string.guest),
                 hasTrailingIcon = true,
                 onClick = {}
             )
+
+            // Change Password - Yalnızca email/password ile giriş yapan kullanıcılar için aktif
+            val isPasswordChangeEnabled = user?.isPasswordProvider == true && user.isAnonymous == false
+
             ListMenuItem(
-                icon = Icons.Default.Person,
+                icon = Icons.Default.Password,
                 title = stringResource(id = R.string.change_password),
-                hasTrailingIcon = true,
+                subtitle = when {
+                    user == null -> null
+                    user.isAnonymous -> stringResource(id = R.string.change_password_disabled_guest)
+                    !user.isPasswordProvider -> stringResource(id = R.string.change_password_disabled_google)
+                    else -> null
+                },
+                hasTrailingIcon = isPasswordChangeEnabled,
+                enabled = isPasswordChangeEnabled,
                 onClick = onNavigateToChangePassword
             )
 
@@ -108,7 +119,7 @@ fun ProfileDetailScreen(
 }
 
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Email/Password User")
 @Composable
 fun ProfileDetailPreview() {
     RovitsAppTheme {
@@ -118,10 +129,31 @@ fun ProfileDetailPreview() {
                 uid = "preview_user_123",
                 fullName = "Ali Sarı",
                 email = "ali.sari@rovits.com",
-                photoUrl = null
+                photoUrl = null,
+                isPasswordProvider = true,
+                isAnonymous = false
             ),
             onNavigateBack = {},
-            onNavigateToThemeDemo = {},
+            onNavigateToChangePassword = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Google User")
+@Composable
+fun ProfileDetailGoogleUserPreview() {
+    RovitsAppTheme {
+        ProfileDetailScreen(
+            navController = rememberNavController(),
+            user = User(
+                uid = "google_user_456",
+                fullName = "Ayşe Yılmaz",
+                email = "ayse.yilmaz@gmail.com",
+                photoUrl = null,
+                isPasswordProvider = false,
+                isAnonymous = false
+            ),
+            onNavigateBack = {},
             onNavigateToChangePassword = {}
         )
     }

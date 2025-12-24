@@ -35,6 +35,8 @@
     <string name="name">Name</string>
     <string name="guest">Guest</string>
     <string name="change_password">Change Password</string>
+    <string name="change_password_disabled_google">Password change is not available for Google accounts</string>
+    <string name="change_password_disabled_guest">Password change is not available for guest accounts</string>
 
     <!-- Change Password Screen -->
     <string name="change_password_title">Change Password</string>
