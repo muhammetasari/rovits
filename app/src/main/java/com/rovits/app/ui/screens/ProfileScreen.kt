@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,7 +32,8 @@ fun ProfileScreen(
     onNavigateBack: () -> Unit,
     onNavigateToThemeDemo: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
-    onNavigateToProfileDetail: () -> Unit = {}
+    onNavigateToProfileDetail: () -> Unit = {},
+    onEditProfilePhoto: () -> Unit = {}
 ) {
     StandardLayout(
         navController = navController,
@@ -59,24 +61,53 @@ fun ProfileScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ...existing code...
+            // Profile Avatar
             Box(
                 modifier = Modifier.size(120.dp),
                 contentAlignment = Alignment.BottomEnd
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
+                if (user?.photoUrl != null && user.photoUrl.isNotBlank()) {
+                    coil.compose.AsyncImage(
+                        model = user.photoUrl,
                         contentDescription = stringResource(id = R.string.profile),
-                        modifier = Modifier.size(60.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                        placeholder = painterResource(id = R.drawable.ic_person_placeholder),
+                        error = painterResource(id = R.drawable.ic_person_placeholder)
                     )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = stringResource(id = R.string.profile),
+                            modifier = Modifier.size(60.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                // Sadece e-posta/şifre ile giriş yapanlar için düzenle butonu
+                if (user?.isPasswordProvider == true) {
+                    FloatingActionButton(
+                        onClick = onEditProfilePhoto, // callback tetikleniyor
+                        modifier = Modifier.size(36.dp),
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(id = R.string.content_description_edit),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
             }
 
@@ -117,7 +148,8 @@ fun ProfileScreenPreview() {
             user = null,
             onLogout = {},
             onNavigateBack = {},
-            onNavigateToThemeDemo = {}
+            onNavigateToThemeDemo = {},
+            onEditProfilePhoto = {} // preview için boş bırakıldı
         )
     }
 }

@@ -16,6 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import com.rovits.app.R
 import com.rovits.app.data.model.User
 import com.rovits.app.data.repository.fake.FakeUserRepository
@@ -38,7 +41,7 @@ fun ProfileDetailScreen(
     onNavigateToChangePassword: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var snackbarHostState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     StandardLayout(
         navController = navController,
@@ -84,43 +87,60 @@ private fun ProfileDetailContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(24.dp))
-        ProfileAvatar()
+        ProfileAvatar(user = user)
         Spacer(modifier = Modifier.height(32.dp))
         ProfileMenuItems(user = user, onNavigateToChangePassword = onNavigateToChangePassword)
     }
 }
 
 @Composable
-private fun ProfileAvatar() {
+private fun ProfileAvatar(user: User?) {
     Box(
         modifier = Modifier.size(120.dp),
         contentAlignment = Alignment.BottomEnd
     ) {
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Person,
+        if (!user?.photoUrl.isNullOrBlank()) {
+            AsyncImage(
+                model = user.photoUrl,
                 contentDescription = stringResource(id = R.string.profile),
-                modifier = Modifier.size(60.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.ic_person_placeholder),
+                error = painterResource(id = R.drawable.ic_person_placeholder)
             )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = stringResource(id = R.string.profile),
+                    modifier = Modifier.size(60.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
-        FloatingActionButton(
-            onClick = { /* Edit profile photo */ },
-            modifier = Modifier.size(36.dp),
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        ) {
-            Icon(
-                imageVector = Icons.Default.Edit,
-                contentDescription = stringResource(id = R.string.content_description_edit),
-                modifier = Modifier.size(18.dp)
-            )
+        // Sadece e-posta/şifre ile giriş yapanlar için düzenle butonu
+        if (user?.isPasswordProvider == true) {
+            FloatingActionButton(
+                onClick = { /* Profil fotoğrafı düzenle */ },
+                modifier = Modifier.size(36.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(id = R.string.content_description_edit),
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
     }
 }
